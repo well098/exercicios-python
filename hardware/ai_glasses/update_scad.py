@@ -13,14 +13,22 @@ Uso:
     python3 update_scad.py --print-template > components.csv     # gera CSV de exemplo
     python3 update_scad.py --components components.csv --dry-run  # só mostra o cálculo
 
+    # pipeline completo: CSV -> aplica params -> exporta todos os STLs
+    python3 update_scad.py --components components.csv --scad ai_glasses.scad \
+            --in-place --export-stl --outdir stl --fn 96
+
+    # só exportar STLs do .scad como está (sem CSV)
+    python3 update_scad.py --scad ai_glasses.scad --export-stl
+
 CSV esperado (cabeçalho obrigatório):
-    component,side,length_mm,width_mm,height_mm,clearance_mm,notes
+    component,side,length_mm,width_mm,height_mm,clearance_mm,qty,notes
 
     side        : right | left | front   (right/left = hastes; front = frente)
     length_mm   : dimensão ao longo da haste (empilhamento)
     width_mm    : dimensão na espessura da haste (Y)
     height_mm   : dimensão na altura da haste (Z)
     clearance_mm: folga desejada em volta do componente (padrão via --clearance)
+    qty         : quantidade (opcional, default 1) — empilha N vezes no comprimento
 
     Componentes especiais (por nome, case-insensitive):
       contém "camera"                 -> define camera_d (usa maior de W/H)
@@ -31,10 +39,13 @@ Somente stdlib. Sem dependências externas.
 from __future__ import annotations
 import argparse
 import csv
+import os
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass, field
-from io import StringIO
 
 # --------------------------------------------------------------------------- #
 #  Modelo de dados
@@ -47,6 +58,7 @@ class Component:
     width: float
     height: float
     clearance: float
+    qty: int = 1
     notes: str = ""
 
 
@@ -58,21 +70,25 @@ class SideResult:
     items: list[str] = field(default_factory=list)
 
 
-TEMPLATE_CSV = """component,side,length_mm,width_mm,height_mm,clearance_mm,notes
-ESP32-S3,right,25.5,18.0,3.5,0.8,placa principal
-A7670SA 4G,right,24.0,17.6,2.4,0.8,modem LTE
-MIC MEMS,right,4.0,3.0,1.0,0.5,microfone
-Camera OV2640,front,9.0,9.0,6.0,0.6,câmera frontal (define furo)
-Microdisplay,front,12.0,10.0,4.0,0.8,area reservada do display
-Bateria LiPo,left,50.0,20.0,6.0,1.0,bateria recarregavel
-PMIC,left,10.0,10.0,2.0,0.6,gerenciamento de energia
-MAX98357A,left,16.0,12.0,2.5,0.6,amplificador I2S
-Speaker,left,12.0,12.0,4.0,0.8,microalto-falante
+TEMPLATE_CSV = """component,side,length_mm,width_mm,height_mm,clearance_mm,qty,notes
+ESP32-S3,right,25.5,18.0,3.5,0.8,1,placa principal
+A7670SA 4G,right,24.0,17.6,2.4,0.8,1,modem LTE
+MIC MEMS,right,4.0,3.0,1.0,0.5,1,microfone
+Camera OV2640,front,9.0,9.0,6.0,0.6,1,câmera frontal (define furo)
+Microdisplay,front,12.0,10.0,4.0,0.8,1,area reservada do display
+Bateria LiPo,left,50.0,20.0,6.0,1.0,1,bateria recarregavel
+PMIC,left,10.0,10.0,2.0,0.6,1,gerenciamento de energia
+MAX98357A,left,16.0,12.0,2.5,0.6,1,amplificador I2S
+Speaker,left,12.0,12.0,4.0,0.8,1,microalto-falante
 """
 
 # Parâmetros do .scad que este script controla (os demais ficam intactos).
 CONTROLLED = ["temple_w", "temple_h", "bay_len", "wall", "fit_tol",
               "camera_d", "display_bay_w", "display_bay_h"]
+
+# Peças exportáveis (valores válidos de "part" no .scad).
+ALL_PARTS = ["front", "temple_right", "temple_left",
+             "cartridge_right", "cartridge_left", "end_cap"]
 
 
 # --------------------------------------------------------------------------- #
@@ -94,6 +110,10 @@ def load_components(path: str, default_clearance: float) -> list[Component]:
                          f"(use right | left | front)")
             try:
                 clr_raw = (row.get("clearance_mm") or "").strip()
+                qty_raw = (row.get("qty") or "").strip()
+                qty = int(qty_raw) if qty_raw else 1
+                if qty < 1:
+                    sys.exit(f"[erro] linha {i}: qty deve ser >= 1 (got {qty})")
                 out.append(Component(
                     name=row["component"].strip(),
                     side=side,
@@ -101,6 +121,7 @@ def load_components(path: str, default_clearance: float) -> list[Component]:
                     width=float(row["width_mm"]),
                     height=float(row["height_mm"]),
                     clearance=float(clr_raw) if clr_raw else default_clearance,
+                    qty=qty,
                     notes=(row.get("notes") or "").strip(),
                 ))
             except ValueError as e:
@@ -127,10 +148,10 @@ def compute(components: list[Component], wall: float, gap: float) -> dict:
             display_h = max(display_h or 0, c.height + 2 * c.clearance)
         if c.side in sides:
             s = sides[c.side]
-            s.bay_len += c.length + gap
+            s.bay_len += c.qty * (c.length + gap)          # empilha N vezes ao longo do bay
             s.bay_w = max(s.bay_w, c.width + 2 * c.clearance)
             s.bay_h = max(s.bay_h, c.height + 2 * c.clearance)
-            s.items.append(c.name)
+            s.items.append(c.name if c.qty == 1 else f"{c.name} ×{c.qty}")
 
     # a armação usa uma única seção de haste -> pega o envelope máximo dos dois lados
     bay_w = max(sides["right"].bay_w, sides["left"].bay_w)
@@ -221,6 +242,61 @@ def sanity_warnings(values: dict, wall: float) -> list[str]:
 
 
 # --------------------------------------------------------------------------- #
+#  Export de STL via OpenSCAD headless
+# --------------------------------------------------------------------------- #
+INSTALL_HINT = ("OpenSCAD não encontrado. Instale-o (https://openscad.org/downloads.html) "
+                "ou informe o caminho com --openscad /caminho/para/openscad.")
+
+
+def find_openscad(explicit: str | None) -> str | None:
+    if explicit:
+        return explicit if (shutil.which(explicit) or os.path.isfile(explicit)) else None
+    for name in ("openscad", "openscad-nightly", "OpenSCAD"):
+        found = shutil.which(name)
+        if found:
+            return found
+    return None
+
+
+def needs_xvfb(force: bool) -> bool:
+    # headless: sem DISPLAY e com xvfb-run disponível -> prefixa xvfb-run
+    if force:
+        return True
+    return not os.environ.get("DISPLAY") and shutil.which("xvfb-run") is not None
+
+
+def export_stl(scad_path: str, parts: list[str], outdir: str,
+               openscad: str, fn: int, use_xvfb: bool) -> int:
+    os.makedirs(outdir, exist_ok=True)
+    prefix = ["xvfb-run", "-a"] if use_xvfb else []
+    failures = 0
+    print("── Exportando STL ────────────────────────────────────────────")
+    for part in parts:
+        if part not in ALL_PARTS:
+            print(f"  ! {part}: peça desconhecida (ignorada)")
+            failures += 1
+            continue
+        out = os.path.join(outdir, f"ai_glasses_{part}.stl")
+        cmd = prefix + [openscad, "-o", out,
+                        "-D", f'part="{part}"', "-D", f"$fn={fn}", scad_path]
+        proc = subprocess.run(cmd, capture_output=True, text=True)
+        size = os.path.getsize(out) if os.path.isfile(out) else 0
+        if proc.returncode == 0 and size > 0:
+            print(f"  ✓ {part:16s} -> {out}  ({size/1024:.1f} KB)")
+        else:
+            failures += 1
+            err = (proc.stderr or proc.stdout or "").strip().splitlines()
+            tail = err[-1] if err else f"returncode={proc.returncode}"
+            print(f"  ! {part:16s} FALHOU: {tail}")
+    print("──────────────────────────────────────────────────────────────")
+    if failures == 0:
+        print(f"[ok] {len(parts)} STL(s) exportado(s) em {outdir}/")
+    else:
+        print(f"[aviso] {failures} peça(s) falharam.", file=sys.stderr)
+    return failures
+
+
+# --------------------------------------------------------------------------- #
 #  CLI
 # --------------------------------------------------------------------------- #
 def main() -> None:
@@ -234,46 +310,88 @@ def main() -> None:
     ap.add_argument("--gap", type=float, default=3.0, help="folga entre componentes empilhados (mm) [3.0]")
     ap.add_argument("--dry-run", action="store_true", help="só calcula e mostra, não grava")
     ap.add_argument("--print-template", action="store_true", help="imprime um components.csv de exemplo e sai")
+    # --- export de STL ---
+    ap.add_argument("--export-stl", action="store_true", help="exporta os STLs via OpenSCAD headless")
+    ap.add_argument("--outdir", default="stl", help="pasta de saída dos STLs [stl]")
+    ap.add_argument("--parts", help="lista de peças separadas por vírgula (default: todas)")
+    ap.add_argument("--fn", type=int, default=96, help="$fn para o export final [96]")
+    ap.add_argument("--openscad", help="caminho do executável openscad (senão detecta no PATH)")
+    ap.add_argument("--xvfb", action="store_true", help="força usar xvfb-run (headless)")
     args = ap.parse_args()
 
     if args.print_template:
         sys.stdout.write(TEMPLATE_CSV)
         return
 
-    if not args.components:
-        ap.error("--components é obrigatório (ou use --print-template)")
+    # 1) Se houver CSV, calcula e (fora de dry-run) aplica no .scad
+    if args.components:
+        components = load_components(args.components, args.clearance)
+        values = compute(components, wall=args.wall, gap=args.gap)
+        report(values, args.wall)
+        for w in sanity_warnings(values, args.wall):
+            print(f"[aviso] {w}", file=sys.stderr)
 
-    components = load_components(args.components, args.clearance)
-    values = compute(components, wall=args.wall, gap=args.gap)
+        if args.dry_run:
+            return
 
-    report(values, args.wall)
-    for w in sanity_warnings(values, args.wall):
-        print(f"[aviso] {w}", file=sys.stderr)
+        if not args.scad:
+            ap.error("--scad é obrigatório para gravar (ou use --dry-run)")
 
-    if args.dry_run:
-        return
+        with open(args.scad, encoding="utf-8") as fh:
+            text = fh.read()
+        new_text, changes = patch_scad(text, values)
+        print("── Parâmetros escritos ───────────────────────────────────────")
+        for c in changes:
+            print(c)
 
-    if not args.scad:
-        ap.error("--scad é obrigatório para gravar (ou use --dry-run)")
+        if args.in_place:
+            with open(args.scad, "w", encoding="utf-8") as fh:
+                fh.write(new_text)
+            print(f"[ok] {args.scad} atualizado in-place.")
+        elif args.out:
+            with open(args.out, "w", encoding="utf-8") as fh:
+                fh.write(new_text)
+            print(f"[ok] escrito em {args.out}.")
+        elif not args.export_stl:
+            sys.stdout.write(new_text)
+    elif not args.export_stl:
+        ap.error("--components é obrigatório (ou use --print-template / --export-stl)")
 
-    with open(args.scad, encoding="utf-8") as fh:
-        text = fh.read()
+    # 2) Export de STL (opcional)
+    if args.export_stl:
+        # decide qual .scad exportar: o que foi gravado, senão --scad, senão --out
+        scad_to_export = None
+        if args.in_place and args.scad:
+            scad_to_export = args.scad
+        elif args.out:
+            scad_to_export = args.out
+        elif args.scad:
+            scad_to_export = args.scad
+        if not scad_to_export or not os.path.isfile(scad_to_export):
+            ap.error("--export-stl precisa de um .scad válido (--scad ...).")
 
-    new_text, changes = patch_scad(text, values)
-    print("── Parâmetros escritos ───────────────────────────────────────")
-    for c in changes:
-        print(c)
+        # se calculou params mas não gravou em disco, gera um temporário aplicado
+        tmp = None
+        if args.components and not args.in_place and not args.out:
+            fd, tmp = tempfile.mkstemp(suffix=".scad")
+            os.close(fd)
+            with open(tmp, "w", encoding="utf-8") as fh:
+                fh.write(new_text)
+            scad_to_export = tmp
 
-    if args.in_place:
-        with open(args.scad, "w", encoding="utf-8") as fh:
-            fh.write(new_text)
-        print(f"[ok] {args.scad} atualizado in-place.")
-    elif args.out:
-        with open(args.out, "w", encoding="utf-8") as fh:
-            fh.write(new_text)
-        print(f"[ok] escrito em {args.out}.")
-    else:
-        sys.stdout.write(new_text)
+        openscad = find_openscad(args.openscad)
+        if not openscad:
+            print(f"[erro] {INSTALL_HINT}", file=sys.stderr)
+            if tmp:
+                os.unlink(tmp)
+            sys.exit(2)
+
+        parts = ([p.strip() for p in args.parts.split(",")] if args.parts else ALL_PARTS)
+        rc = export_stl(scad_to_export, parts, args.outdir, openscad,
+                        fn=args.fn, use_xvfb=needs_xvfb(args.xvfb))
+        if tmp:
+            os.unlink(tmp)
+        sys.exit(1 if rc else 0)
 
 
 if __name__ == "__main__":

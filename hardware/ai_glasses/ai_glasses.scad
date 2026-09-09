@@ -1,5 +1,5 @@
 // ============================================================================
-//  ÓCULOS INTELIGENTES DE IA — GERADOR PARAMÉTRICO DE CHASSI  (Rev C — elegante)
+//  ÓCULOS INTELIGENTES DE IA — GERADOR PARAMÉTRICO DE CHASSI  (Rev D — chassi consistente)
 //  AI SMART GLASSES — Parametric Chassis Generator
 //
 //  Armação impressa em 3D com cartuchos eletrônicos removíveis (PETG / FDM).
@@ -8,6 +8,11 @@
 //  Rev C: hastes afiladas com gancho de orelha curvo e seção cápsula,
 //         ponte curvada, apoios de nariz, boss da câmera, cartuchos
 //         arredondados com pega. Toda a geometria segue paramétrica.
+//  Rev D: o INTERIOR da haste (bay, trilho, cartucho, tampa) agora segue o
+//         mesmo perfil de afilamento da casca externa (function temple_scale),
+//         em vez de manter dimensões fixas herdadas da haste reta — corrige
+//         parede que afinava até furar perto da tampa e o flange da tampa
+//         que não fechava contra a casca real naquele ponto.
 //
 //  >>> TODAS AS DIMENSÕES SÃO PRELIMINARES (CONCEITO). <<<
 //  >>> VALIDAR CONTRA OS COMPONENTES ELETRÔNICOS REAIS ANTES DO CAD FINAL. <<<
@@ -66,7 +71,6 @@ tip_scale       = 0.55; // afilamento na ponta do gancho (fração)
 ear_hook_radius = 26;   // raio do gancho de orelha
 ear_hook_angle  = 78;   // varredura do gancho (graus)
 wall            = 1.8;  // espessura de parede  (>= 2x bico 0.4)
-bridge_wall     = 4.0;  // reforço estrutural (informativo/echo)
 
 /* [Compartimento (bay) e trilho] */
 bay_start   = 6;    // início do compartimento a partir da dobradiça
@@ -104,21 +108,45 @@ rim_outer_h   = lens_h + 2*rim_t;
 front_total_w = 2*rim_outer_w + bridge + 2*hinge_margin;   // ~150 (CONCEITO)
 front_total_h = rim_outer_h;
 zc            = temple_h/2;                                 // eixo neutro da haste
-bay_w         = temple_w - 2*wall;
-bay_h         = temple_h - 2*wall;
-cart_w        = bay_w - 2*fit_tol;
-cart_h        = bay_h - 2*fit_tol;
-cart_len      = bay_len - cap_depth - cart_front_gap;
 cc_front      = rim_outer_w + bridge;                       // centro-a-centro dos aros
 cam_cx        = camera_side*(cc_front/2 + rim_outer_w/2 - camera_edge_inset);
 cam_cy        = rim_outer_h/2 - camera_edge_inset*0.5;      // canto superior do aro
 
-echo("=== ÓCULOS IA (Rev C) — dimensões derivadas (CONCEITO, validar) ===");
+// posições-chave ao longo da haste (mesma referência de x usada em temple_outer())
+bay_x0   = bay_start;                    // início do bay (perto da dobradiça)
+bay_x1   = bay_start + bay_len - cap_depth; // fim do bay "reto" / início do soquete da tampa
+bay_x2   = bay_start + bay_len;          // onde a tampa efetivamente encosta na casca
+
+// escala local do afilamento em qualquer x — MESMA interpolação usada para
+// posicionar as seções capsule_xsec() em temple_outer(); fonte única de
+// verdade para bay/trilho/cartucho/tampa não "furarem" a casca ao afilar.
+function temple_scale(x) =
+    let(x1 = temple_straight*0.5, s0 = 1.0, s1 = (1 + taper_end)/2, s2 = taper_end)
+    x <= x1 ? s0 + (s1 - s0)*(x/x1)
+            : s1 + (s2 - s1)*((x - x1)/(temple_straight - x1));
+
+// seção interna disponível (bay) em x, já descontada a parede -> [largura, altura]
+function bay_dims(x) = [temple_w*temple_scale(x) - 2*wall, temple_h*temple_scale(x) - 2*wall];
+
+// compat (usado só como referência/echo — a geometria real agora consulta bay_dims(x) por posição)
+bay_w = bay_dims(bay_x0)[0];
+bay_h = bay_dims(bay_x0)[1];
+cart_len = bay_x1 - (bay_start + cart_front_gap);
+
+assert(bay_dims(bay_x2)[0] > 0.5, "Parede da haste (largura) ficaria < 0.5mm perto da tampa — reduza bay_len/cap_depth ou aumente temple_w/taper_end.");
+assert(bay_dims(bay_x2)[1] > 0.5, "Parede da haste (altura) ficaria < 0.5mm perto da tampa — reduza bay_len/cap_depth ou aumente temple_h/taper_end.");
+assert(wall - rail_d > 0.3, "rail_d muito profundo para a espessura de parede 'wall' — reduza rail_d ou aumente wall.");
+
+echo("=== ÓCULOS IA (Rev D) — dimensões derivadas (CONCEITO, validar) ===");
 echo(front_total_w_mm = front_total_w);
 echo(front_total_h_mm = front_total_h);
 echo(aro_externo_mm = [rim_outer_w, rim_outer_h]);
-echo(bay_interno_mm = [bay_len, bay_w, bay_h]);
-echo(cartucho_mm = [cart_len, cart_w, cart_h]);
+echo(bay_no_inicio_mm = bay_dims(bay_x0));
+echo(bay_no_fim_mm = bay_dims(bay_x1));
+echo(secao_no_encosto_da_tampa_mm = bay_dims(bay_x2));
+echo(cartucho_comprimento_mm = cart_len);
+haste_construida_mm = temple_straight + ear_hook_radius*ear_hook_angle*PI/180;
+echo(haste_construida_vs_spec_mm = [haste_construida_mm, temple_len]);
 
 // ============================================================================
 //  HELPERS
@@ -238,17 +266,39 @@ module temple_outer() {
     }
 }
 
+// cavidade afilada entre x0 e x1 (hull de duas seções retangulares locais,
+// sempre centrada em zc — acompanha bay_dims() em vez de usar 1 tamanho fixo)
+module tapered_cavity(x0, x1) {
+    d0 = bay_dims(x0); d1 = bay_dims(x1);
+    hull() {
+        translate([x0, 0, zc]) cube([0.02, d0[0], d0[1]], center = true);
+        translate([x1, 0, zc]) cube([0.02, d1[0], d1[1]], center = true);
+    }
+}
+
+// rasgo do trilho (fêmea) entre x0 e x1, colado à borda LOCAL do bay — a
+// folga de parede remanescente (wall - rail_d) fica constante ao longo do afilamento
+module tapered_rail_slot(x0, x1, side) {
+    w0 = bay_dims(x0)[0]/2; w1 = bay_dims(x1)[0]/2;
+    hull() {
+        translate([x0, side*(w0 + rail_d/2), zc]) cube([0.02, rail_d, rail_h], center = true);
+        translate([x1, side*(w1 + rail_d/2), zc]) cube([0.02, rail_d, rail_h], center = true);
+    }
+}
+
 module temple(elec = true) {
     difference() {
         temple_outer();
-        // compartimento interno (bay), centrado em zc
-        translate([bay_start, -bay_w/2, zc - bay_h/2]) cube([bay_len - cap_depth, bay_w, bay_h]);
-        // abertura traseira (tampa / entrada do cartucho)
-        translate([bay_start + bay_len - cap_depth, -bay_w/2, zc - bay_h/2]) cube([cap_depth + 1, bay_w, bay_h]);
-        // rasgos do trilho (fêmea) — cavados para dentro das paredes laterais
-        for (sy = [-1, 1])
-            translate([bay_start, sy < 0 ? -bay_w/2 - rail_d : bay_w/2, zc - rail_h/2])
-                cube([bay_len - cap_depth, rail_d, rail_h]);
+        // compartimento interno (bay), afilado para acompanhar a casca
+        tapered_cavity(bay_x0, bay_x1);
+        // soquete da tampa: mesma seção local de onde a tampa realmente encosta (bay_x2),
+        // não a seção do início do bay — fecha o gap de vedação identificado na Rev C
+        // (cube SEM center=true em X: com center=true a caixa centralizaria em bay_x1
+        // e recuaria pra dentro do bay em vez de avançar até bay_x2, deixando a ponta sólida)
+        d2 = bay_dims(bay_x2);
+        translate([bay_x1, -d2[0]/2, zc - d2[1]/2]) cube([(bay_x2 - bay_x1) + 1, d2[0], d2[1]]);
+        // rasgos do trilho (fêmea), afilados junto com o bay
+        for (sy = [-1, 1]) tapered_rail_slot(bay_x0, bay_x1, sy);
         // janela do conector plugável (lado da dobradiça)
         translate([bay_start - 0.5, -conn_w/2, zc - conn_h/2]) cube([wall + 1, conn_w, conn_h]);
         // portas acústicas
@@ -260,37 +310,58 @@ module temple(elec = true) {
                     rotate([90, 0, 0]) cylinder(h = temple_w + 2, d = acoustic_port_d, center = true);
         }
     }
-    // divisória da câmara acústica (haste esquerda)
-    if (!elec)
-        translate([temple_straight - 22, -bay_w/2, zc - bay_h/2]) cube([spk_divider_t, bay_w, bay_h]);
+    // divisória da câmara acústica (haste esquerda) — dimensionada à seção local, não fixa
+    if (!elec) {
+        dvx = temple_straight - 22;
+        dd = bay_dims(dvx);
+        translate([dvx, 0, zc]) cube([spk_divider_t, dd[0], dd[1]], center = true);
+    }
 }
 
 // ============================================================================
 //  08 — CARTUCHO REMOVÍVEL  (arredondado, afilado, com pega)
 // ============================================================================
+// dimensões do cartucho nas duas pontas, derivadas da MESMA bay_dims() da haste
+// (front = lado da dobradiça, rear = lado da tampa) — garante que o cartucho
+// afila junto com o bay em vez de usar um fator de afilamento arbitrário
+cart_x0_global = bay_start + cart_front_gap;
+cart_x1_global = bay_x1;
+cart_d_front = [bay_dims(cart_x0_global)[0] - 2*fit_tol, bay_dims(cart_x0_global)[1] - 2*fit_tol];
+cart_d_rear  = [bay_dims(cart_x1_global)[0] - 2*fit_tol, bay_dims(cart_x1_global)[1] - 2*fit_tol];
+cart_w_front = cart_d_front[0]; cart_h_front = cart_d_front[1];
+cart_w_rear  = cart_d_rear[0];  cart_h_rear  = cart_d_rear[1];
+// menor seção nas duas pontas — usada para o bolsão interno, garante que ele
+// nunca ultrapasse o casco afilado do cartucho em nenhum ponto do comprimento
+cart_w_min = min(cart_w_front, cart_w_rear);
+cart_h_min = min(cart_h_front, cart_h_rear);
+
 module cartridge(elec = true) {
     difference() {
         union() {
-            // corpo afilado (hull de duas seções)
+            // corpo afilado (hull de duas seções — frente maior, perto da tampa menor)
             hull() {
-                translate([1, 0, cart_h/2]) rbox_c(2, cart_w, cart_h, min(cart_w, cart_h)/2);
-                translate([cart_len - 1, 0, cart_h/2]) rbox_c(2, cart_w*cart_taper, cart_h*cart_taper, min(cart_w, cart_h)/2*cart_taper);
+                translate([1, 0, cart_h_front/2]) rbox_c(2, cart_w_front, cart_h_front, min(cart_w_front, cart_h_front)/2);
+                translate([cart_len - 1, 0, cart_h_rear/2]) rbox_c(2, cart_w_rear, cart_h_rear, min(cart_w_rear, cart_h_rear)/2);
             }
-            // nervuras do trilho (macho)
+            // nervuras do trilho (macho), afiladas junto com o corpo
             for (sy = [-1, 1])
-                translate([0, sy < 0 ? -cart_w/2 - (rail_d - rail_tol) : cart_w/2, cart_h/2 - rail_h/2])
-                    cube([cart_len, rail_d - rail_tol, rail_h - 2*rail_tol]);
-            // trava snap
-            translate([cart_len - latch_w, -cart_w/2, cart_h]) cube([latch_w, cart_w, latch_h]);
+                hull() {
+                    translate([1, sy*(cart_w_front/2 + (rail_d - rail_tol)/2), cart_h_front - rail_h/2])
+                        cube([0.02, rail_d - rail_tol, rail_h - 2*rail_tol], center = true);
+                    translate([cart_len - 1, sy*(cart_w_rear/2 + (rail_d - rail_tol)/2), cart_h_rear - rail_h/2])
+                        cube([0.02, rail_d - rail_tol, rail_h - 2*rail_tol], center = true);
+                }
+            // trava snap (extremidade traseira, junto à tampa)
+            translate([cart_len - latch_w, -cart_w_rear/2, cart_h_rear]) cube([latch_w, cart_w_rear, latch_h]);
         }
-        // bolsão da eletrônica (VOLUME RESERVADO — visual)
-        translate([4, -cart_w/2 + 1.2, 1.2]) cube([cart_len - 8, cart_w - 2.4, cart_h - 2.0]);
-        // recorte do conector
-        translate([-1, -conn_w/2, cart_h/2 - conn_h/2]) cube([conn_w, conn_w, conn_h]);
+        // bolsão da eletrônica (VOLUME RESERVADO — visual; usa a menor seção das duas pontas)
+        translate([4, -cart_w_min/2 + 1.2, 1.2]) cube([cart_len - 8, cart_w_min - 2.4, cart_h_min - 2.0]);
+        // recorte do conector (extremidade da dobradiça)
+        translate([-1, -conn_w/2, cart_h_front/2 - conn_h/2]) cube([conn_w, conn_w, conn_h]);
         // ranhuras de pega na traseira
         for (i = [0 : grip_ridges - 1])
-            translate([cart_len - 1.5 - i*1.6, -cart_w/2 - 1, -1])
-                cube([0.7, cart_w + 2, cart_h + 2]);
+            translate([cart_len - 1.5 - i*1.6, -cart_w_rear/2 - 1, -1])
+                cube([0.7, cart_w_rear + 2, cart_h_rear + 2]);
     }
 }
 
@@ -305,17 +376,21 @@ module cap_gasket_groove(plug_w, plug_h) {
 }
 
 module end_cap() {
-    plug_w = bay_w - 2*fit_tol;
-    plug_h = bay_h - 2*fit_tol;
-    zcap = wall + fit_tol + plug_h/2;
+    // escala local exatamente onde a tampa encosta na casca (bay_x2) — antes o
+    // flange usava a escala do fim de temple_straight, 12mm depois do ponto real
+    // de encosto, o que deixava uma folga ao redor da tampa e furava a vedação
+    s2 = temple_scale(bay_x2);
+    d2 = bay_dims(bay_x2);          // seção real do soquete (cavidade cortada em temple())
+    plug_w = d2[0] - 2*fit_tol;     // plugue menor que o soquete pela folga de encaixe
+    plug_h = d2[1] - 2*fit_tol;
     difference() {
         union() {
-            // flange externo arredondado (batente contra o casco)
-            translate([0, 0, temple_h/2]) rbox_c(cap_flange, temple_w*taper_end, temple_h*taper_end, min(temple_w, temple_h)/2*taper_end);
-            // plugue que entra na abertura
-            translate([cap_flange, -plug_w/2, wall + fit_tol]) cube([cap_depth - fit_tol, plug_w, plug_h]);
+            // flange externo arredondado — mesma seção real da casca em bay_x2
+            translate([0, 0, zc]) rbox_c(cap_flange, temple_w*s2, temple_h*s2, min(temple_w, temple_h)/2*s2);
+            // plugue que entra no soquete (ver tapered_cavity/soquete em temple())
+            translate([cap_flange, -plug_w/2, zc - plug_h/2]) cube([cap_depth - fit_tol, plug_w, plug_h]);
         }
-        translate([cap_flange + 2, 0, zcap]) cap_gasket_groove(plug_w, plug_h);
+        translate([cap_flange + 2, 0, zc]) cap_gasket_groove(plug_w, plug_h);
     }
 }
 

@@ -27,7 +27,7 @@
 $fn = 64;                 // 64 preview / 96–128 para render final
 
 /* [Peça a gerar] */
-part = "layout"; // [layout, front, temple_right, temple_left, cartridge_right, cartridge_left, end_cap]
+part = "layout"; // [layout, assembled, front, temple_right, temple_left, cartridge_right, cartridge_left, end_cap]
 
 /* [Referência óptica  —  55 [] 18 - 140] */
 lens_w      = 55;   // largura nominal da abertura da lente (spec)
@@ -70,6 +70,7 @@ taper_end       = 0.80; // afilamento no fim da seção reta (fração)
 tip_scale       = 0.55; // afilamento na ponta do gancho (fração)
 ear_hook_radius = 26;   // raio do gancho de orelha
 ear_hook_angle  = 78;   // varredura do gancho (graus)
+ear_hook_segments = 30; // segmentos do gancho (30 impressão / ~10-12 preview leve p/ web)
 wall            = 1.8;  // espessura de parede  (>= 2x bico 0.4)
 
 /* [Compartimento (bay) e trilho] */
@@ -252,7 +253,7 @@ module hook_xsec(a, s) {
 }
 
 module temple_outer() {
-    steps = 30;
+    steps = ear_hook_segments;
     union() {
         // seção reta afilada (dois trechos p/ transição suave)
         hull() { xsec_lin(0, 1.0); xsec_lin(temple_straight*0.5, (1 + taper_end)/2); }
@@ -407,6 +408,42 @@ module layout() {
 }
 
 // ============================================================================
+//  MONTAGEM (visualização — como fica montado; NÃO é peça pra imprimir)
+// ============================================================================
+// Ponto da dobradiça na frente (mesmo X das abas de dobradiça em front_profile_2d)
+hinge_x = cc_front/2 + rim_outer_w/2 + hinge_pad_w/2 - 2;
+
+// Transforma o sistema de coordenadas local da haste (X=comprimento, Y=espessura
+// fina, Z=altura) para o eixo da frente (X=largura, Y=altura, Z=profundidade),
+// com a haste esticada reta para trás a partir da dobradiça (sem folga de abertura).
+module temple_to_world(hx, side) {
+    translate([hx, -zc, front_t/2])
+        rotate([0, 0, 90]) rotate([0, 90, 0])
+            if (side < 0) mirror([0, 1, 0]) children();
+            else children();
+}
+
+// tampa entra "de trás pra frente" no soquete: precisa girar 180° em Y, mas o
+// eixo de rotação do OpenSCAD passa por z=0 e a tampa é centrada em z=zc — sem
+// a translação de 2×zc depois do rotate, ela cai espelhada para z=-zc (por
+// isso aparecia flutuando longe da haste na primeira tentativa)
+module end_cap_inserted(x) {
+    translate([x, 0, 2*zc]) rotate([0, 180, 0]) end_cap();
+}
+
+module assembled() {
+    front();
+    // haste + cartucho + tampa, lado direito
+    temple_to_world(hinge_x, 1) temple(elec = true);
+    temple_to_world(hinge_x, 1) translate([cart_x0_global, 0, zc - cart_h_front/2]) cartridge(elec = true);
+    temple_to_world(hinge_x, 1) end_cap_inserted(bay_x2 + cap_flange/2);
+    // haste + cartucho + tampa, lado esquerdo (espelhado)
+    temple_to_world(-hinge_x, -1) temple(elec = false);
+    temple_to_world(-hinge_x, -1) translate([cart_x0_global, 0, zc - cart_h_front/2]) cartridge(elec = false);
+    temple_to_world(-hinge_x, -1) end_cap_inserted(bay_x2 + cap_flange/2);
+}
+
+// ============================================================================
 //  SELETOR
 // ============================================================================
 if      (part == "front")           front();
@@ -415,4 +452,5 @@ else if (part == "temple_left")     mirror([0, 1, 0]) temple(elec = false);
 else if (part == "cartridge_right") cartridge(elec = true);
 else if (part == "cartridge_left")  cartridge(elec = false);
 else if (part == "end_cap")         end_cap();
+else if (part == "assembled")       assembled();
 else                                layout();

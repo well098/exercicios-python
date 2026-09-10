@@ -27,7 +27,7 @@
 $fn = 64;                 // 64 preview / 96–128 para render final
 
 /* [Peça a gerar] */
-part = "layout"; // [layout, assembled, front, temple_right, temple_left, cartridge_right, cartridge_left, end_cap]
+part = "layout"; // [layout, assembled, front, temple_right, temple_left, cartridge_right, cartridge_left, end_cap, clip, clip_assembled]
 
 /* [Referência óptica  —  55 [] 18 - 140] */
 lens_w      = 55;   // largura nominal da abertura da lente (spec)
@@ -72,6 +72,15 @@ ear_hook_radius = 26;   // raio do gancho de orelha
 ear_hook_angle  = 78;   // varredura do gancho (graus)
 ear_hook_segments = 30; // segmentos do gancho (30 impressão / ~10-12 preview leve p/ web)
 wall            = 1.8;  // espessura de parede  (>= 2x bico 0.4)
+
+/* [Clipe de lapela — casco alternativo, mesma cavidade/trilho/cartucho/tampa] */
+clip_blade_w    = 7;    // largura da lâmina de mola
+clip_blade_t    = 1.4;  // espessura da lâmina (mola em PETG, sem inserto metálico)
+clip_gap        = 2.6;  // folga entre a lâmina e o corpo (espessura do tecido)
+clip_pinch_gap  = 0.7;  // folga residual na ponta (aperto real no tecido)
+clip_anchor_x   = 10;   // onde a lâmina nasce, colada ao corpo
+clip_tip_x      = 80;   // onde a lâmina termina, curvando de volta ao corpo
+clip_led_d      = 2.5;  // furo do LED de status (fibra óptica ou difusor colado)
 
 /* [Compartimento (bay) e trilho] */
 bay_start   = 6;    // início do compartimento a partir da dobradiça
@@ -128,6 +137,11 @@ function temple_scale(x) =
 
 // seção interna disponível (bay) em x, já descontada a parede -> [largura, altura]
 function bay_dims(x) = [temple_w*temple_scale(x) - 2*wall, temple_h*temple_scale(x) - 2*wall];
+
+// altura da superfície SUPERIOR do casco em x (usada pra desenhar a lâmina do
+// clipe rente à casca, com folga constante, em vez de uma curva arbitrária)
+function core_top(x) = zc + temple_h/2*temple_scale(x);
+clip_core_end = bay_x2 + cap_flange + 1; // corpo reto termina logo após o flange da tampa
 
 // compat (usado só como referência/echo — a geometria real agora consulta bay_dims(x) por posição)
 bay_w = bay_dims(bay_x0)[0];
@@ -320,6 +334,70 @@ module temple(elec = true) {
 }
 
 // ============================================================================
+//  CLIPE DE LAPELA — casco alternativo (mesma cavidade/trilho/cartucho/tampa)
+//  Valida o conceito de "cartucho universal": só o casco externo muda; a
+//  cavidade, o trilho e a tampa vêm de tapered_cavity()/tapered_rail_slot()/
+//  end_cap(), sem alterar nenhum deles.
+// ============================================================================
+module clip_core() {
+    hull() { xsec_lin(0, 1.0); xsec_lin(temple_straight*0.5, (1 + taper_end)/2); }
+    hull() { xsec_lin(temple_straight*0.5, (1 + taper_end)/2); xsec_lin(clip_core_end, temple_scale(clip_core_end)); }
+}
+
+module clip_blade_xsec(x, z) {
+    translate([x, 0, z]) rbox_c(2, clip_blade_w, clip_blade_t, clip_blade_t/2);
+}
+
+// lâmina de mola: nasce colada ao corpo em clip_anchor_x, sobe com folga
+// constante (clip_gap) e desce de volta perto do corpo na ponta (clip_pinch_gap)
+// — mesma técnica de hull() encadeado do gancho de orelha da haste
+module clip_blade() {
+    pts = [
+        [clip_anchor_x,        0.2],
+        [clip_anchor_x + 6,    clip_gap*0.6],
+        [clip_anchor_x + 14,   clip_gap],
+        [clip_tip_x - 14,      clip_gap],
+        [clip_tip_x - 4,       clip_gap*0.5],
+        [clip_tip_x,           clip_pinch_gap],
+    ];
+    for (i = [0 : len(pts) - 2])
+        hull() {
+            clip_blade_xsec(pts[i][0],     core_top(pts[i][0])     + pts[i][1]);
+            clip_blade_xsec(pts[i+1][0],   core_top(pts[i+1][0])   + pts[i+1][1]);
+        }
+    // pé de ancoragem: desce até o EIXO NEUTRO do corpo (zc), bem dentro do
+    // sólido — core_top(x) só vale exatamente na linha de centro (y=0); nas
+    // bordas da lâmina (±clip_blade_w/2) a superfície real arredondada fica
+    // mais baixa, então "encostar" a 0.2mm do topo não garante penetração
+    // real em toda a largura. Ancorar no eixo neutro elimina essa ambiguidade.
+    hull() {
+        clip_blade_xsec(clip_anchor_x, core_top(clip_anchor_x) + 0.2);
+        translate([clip_anchor_x, 0, zc]) rbox_c(2, clip_blade_w, 1, 0.4);
+    }
+}
+
+module clip(elec = false) {
+    union() {
+        difference() {
+            clip_core();
+            tapered_cavity(bay_x0, bay_x1);
+            d2 = bay_dims(bay_x2);
+            translate([bay_x1, -d2[0]/2, zc - d2[1]/2]) cube([(bay_x2 - bay_x1) + 1, d2[0], d2[1]]);
+            for (sy = [-1, 1]) tapered_rail_slot(bay_x0, bay_x1, sy);
+            translate([bay_start - 0.5, -conn_w/2, zc - conn_h/2]) cube([wall + 1, conn_w, conn_h]);
+            // porta acústica (frente) e furo do LED de status (topo)
+            translate([bay_start + 8, 0, zc - temple_h/2 - 1]) cylinder(h = wall + 2, d = mic_port_d);
+            translate([bay_start + 20, 0, core_top(bay_start + 20) - 1])
+                cylinder(h = wall + 2, d = clip_led_d);
+            // botão de comando (topo, perto de onde o polegar encosta ao ajustar o clipe)
+            translate([clip_anchor_x + 22, 0, core_top(clip_anchor_x + 22) - 1])
+                cylinder(h = wall + 2, d = 3.2);
+        }
+        clip_blade();
+    }
+}
+
+// ============================================================================
 //  08 — CARTUCHO REMOVÍVEL  (arredondado, afilado, com pega)
 // ============================================================================
 // dimensões do cartucho nas duas pontas, derivadas da MESMA bay_dims() da haste
@@ -453,4 +531,6 @@ else if (part == "cartridge_right") cartridge(elec = true);
 else if (part == "cartridge_left")  cartridge(elec = false);
 else if (part == "end_cap")         end_cap();
 else if (part == "assembled")       assembled();
+else if (part == "clip")            clip();
+else if (part == "clip_assembled")  union() { clip(); translate([cart_x0_global, 0, zc - cart_h_front/2]) cartridge(elec = false); translate([bay_x2 + cap_flange/2, 0, 2*zc]) rotate([0, 180, 0]) end_cap(); }
 else                                layout();

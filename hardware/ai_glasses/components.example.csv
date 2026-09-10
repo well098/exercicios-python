@@ -1,0 +1,10 @@
+component,side,length_mm,width_mm,height_mm,clearance_mm,qty,notes
+ESP32-S3,right,25.5,18.0,3.5,0.8,1,placa principal
+A7670SA 4G,right,24.0,17.6,2.4,0.8,1,modem LTE
+MIC MEMS,right,4.0,3.0,1.0,0.5,1,microfone
+Camera OV2640,front,9.0,9.0,6.0,0.6,1,câmera frontal (define furo)
+Microdisplay,front,12.0,10.0,4.0,0.8,1,area reservada do display
+Bateria LiPo,left,50.0,20.0,6.0,1.0,1,bateria recarregavel
+PMIC,left,10.0,10.0,2.0,0.6,1,gerenciamento de energia
+MAX98357A,left,16.0,12.0,2.5,0.6,1,amplificador I2S
+Speaker,left,12.0,12.0,4.0,0.8,1,microalto-falante

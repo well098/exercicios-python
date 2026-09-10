@@ -13,6 +13,13 @@
 //         em vez de manter dimensões fixas herdadas da haste reta — corrige
 //         parede que afinava até furar perto da tampa e o flange da tampa
 //         que não fechava contra a casca real naquele ponto.
+//  Rev E: novo casco "clip" (clipe de lapela) reaproveitando a MESMA cavidade/
+//         trilho/cartucho/tampa da haste, validando o conceito de cartucho
+//         universal. Furo da câmera passa a usar encaixe por pressão
+//         (snap_bore: dedos flexíveis + ressalto) em vez de furo liso — regra
+//         geral pra qualquer abertura que recebe um componente real inserido
+//         (a janela da câmera continua colada/vedada; furos passivos como
+//         porta do mic e do alto-falante continuam furo simples).
 //
 //  >>> TODAS AS DIMENSÕES SÃO PRELIMINARES (CONCEITO). <<<
 //  >>> VALIDAR CONTRA OS COMPONENTES ELETRÔNICOS REAIS ANTES DO CAD FINAL. <<<
@@ -59,6 +66,10 @@ camera_pod_d      = 12;  // diâmetro do pod (ressalto) da câmera
 camera_pod_h      = 2.2; // altura do pod
 camera_edge_inset = 8;   // recuo a partir do canto do aro
 camera_window_ext = 1.2; // rebaixo p/ janela transparente vedada
+snap_fingers      = 4;   // nº de dedos flexíveis do encaixe por pressão do módulo da câmera
+snap_finger_len   = 3;   // comprimento do dedo (a partir da face de inserção)
+snap_nub          = 0.4; // ressalto de retenção na ponta do dedo (CONCEITO — ajustar ao módulo real)
+snap_slit_w       = 0.6; // largura da fenda entre dedos (>= 2x altura de camada, imprimível)
 display_bay_w     = 17;  // ÁREA RESERVADA microdisplay (largura) — não é cota fixa
 display_bay_h     = 9;   // ÁREA RESERVADA microdisplay (altura)  — não é cota fixa
 
@@ -196,6 +207,41 @@ module capsule_xsec(s) {
 }
 
 // ============================================================================
+//  ENCAIXE POR PRESSÃO (snap-fit) — módulo genérico, use em contexto de
+//  difference() no lugar de um cylinder() simples sempre que um componente
+//  REAL é inserido (não confundir com furo passivo tipo porta acústica, que
+//  não recebe peça nenhuma e continua sendo um cylinder() comum).
+//
+//  Fura o diâmetro do componente + folga; corta N fendas radiais perto da
+//  face de inserção (z = depth), dividindo a parede em dedos flexíveis; um
+//  ressalto (nub) perto da ponta do dedo reduz o diâmetro livre ali — o
+//  componente vence o ressalto ao entrar (flexiona os dedos pra fora) e
+//  fica retido depois, sem cola nem parafuso. CONCEITO: ajustar nub/
+//  finger_len ao componente real (altura, se tem rebordo, etc.) depois de
+//  escolhido.
+// ============================================================================
+module snap_bore(d, depth, n = snap_fingers, finger_len = snap_finger_len,
+                  nub = snap_nub, slit_w = snap_slit_w) {
+    bore_d = d + 2*fit_tol;
+    nub_d  = max(bore_d - 2*nub, 0.5);
+    nub_h  = finger_len*0.3;
+    nub_z  = depth - finger_len*0.4;
+    union() {
+        // furo abaixo do ressalto, diâmetro cheio
+        cylinder(h = nub_z, d = bore_d);
+        // gargalo (ressalto): diâmetro se fecha e reabre — a diferença entre
+        // isso e um furo cheio É o ressalto físico que sobra no plástico
+        translate([0, 0, nub_z]) cylinder(h = nub_h, d1 = bore_d, d2 = nub_d);
+        translate([0, 0, nub_z + nub_h]) cylinder(h = depth - (nub_z + nub_h), d1 = nub_d, d2 = bore_d);
+        // fendas radiais perto da face de inserção, dividindo a parede em dedos
+        for (i = [0 : n - 1])
+            rotate([0, 0, i*360/n])
+                translate([-slit_w/2, 0, depth - finger_len])
+                    cube([slit_w, bore_d/2 + 3, finger_len + 1]);
+    }
+}
+
+// ============================================================================
 //  01 — FRENTE
 // ============================================================================
 module lens_ring_2d() {
@@ -245,8 +291,10 @@ module front() {
         // bisel elegante nas aberturas das lentes
         lens_chamfer(-1);
         lens_chamfer( 1);
-        // furo da câmera (através do pod)
-        translate([cam_cx, cam_cy, -1]) cylinder(h = front_t + camera_pod_h + 2, d = camera_d);
+        // furo da câmera: encaixe por pressão (dedos + ressalto) prende o
+        // MÓDULO da câmera sem cola/parafuso; a janela (abaixo) continua colada/
+        // vedada — são duas fixações diferentes pra duas funções diferentes.
+        translate([cam_cx, cam_cy, -0.5]) snap_bore(camera_d, front_t + camera_pod_h + 1);
         // rebaixo p/ janela vedada
         translate([cam_cx, cam_cy, front_t + camera_pod_h - camera_window_ext])
             cylinder(h = camera_window_ext + 1, d = camera_d + 3);

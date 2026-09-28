@@ -11,7 +11,61 @@
     --shadow: 0 1px 3px rgba(15,26,51,.06), 0 12px 32px rgba(15,26,51,.08);
     --shadow-sm: 0 1px 3px rgba(15,26,51,.07);
     --radius: 18px;
+    --fhero: linear-gradient(140deg, #2d3fd6 0%, #6a4bff 55%, #b84dff 100%);
+    --falt: linear-gradient(150deg, #0aa896 0%, #1a7fd6 100%);
   }
+  /* ---------- temas (escolha no menu; bege é o padrão) ---------- */
+  :root, :root[data-theme="bege"] {
+    --bg: #f3ede2; --surface: #fffcf6; --surface-2: #faf5ec; --surface-3: #f0e8da;
+    --ink: #2a2118; --ink-2: #6b5d4d; --muted: #a3968a; --hair: #ebe2d3; --hair-2: #dccfbb;
+    --accent-soft: #ecebfb;
+    --shadow: 0 1px 3px rgba(60,40,20,.06), 0 12px 32px rgba(60,40,20,.08);
+    --shadow-sm: 0 1px 3px rgba(60,40,20,.07);
+  }
+  :root[data-theme="branco"] {
+    --bg: #f3f5fa; --surface: #ffffff; --surface-2: #f7f8fc; --surface-3: #eef1f8;
+    --ink: #0f1a33; --ink-2: #56607e; --muted: #98a0b8; --hair: #e7eaf2; --hair-2: #d8ddea;
+    --accent-soft: #eceefe;
+    --shadow: 0 1px 3px rgba(15,26,51,.06), 0 12px 32px rgba(15,26,51,.08);
+    --shadow-sm: 0 1px 3px rgba(15,26,51,.07);
+  }
+  :root[data-theme="preto"] {
+    color-scheme: dark;
+    --bg: #0e1014; --surface: #171a21; --surface-2: #1e222a; --surface-3: #262b35; 
+    --ink: #eef1f7; --ink-2: #aab2c5; --muted: #737c92; --hair: #292e39; --hair-2: #363c49;
+    --accent: #7c8cff; --accent-soft: #242a4d; --mae: #2cc9b2; --mae-soft: #12302c;
+    --crit: #ff6b70; --crit-soft: #3a1c1f; --warn: #f0a63a; --warn-soft: #3a2c14;
+    --info: #5b9dff; --info-soft: #1a2a44; --good: #38c985; --good-soft: #15301f;
+    --shadow: 0 1px 3px rgba(0,0,0,.35), 0 12px 32px rgba(0,0,0,.35);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.4);
+  }
+  :root[data-theme="azul"] {
+    --bg: #e9f0fa; --surface: #ffffff; --surface-2: #f3f7fd; --surface-3: #e2ebf7;
+    --ink: #0b1f3f; --ink-2: #4a5f82; --muted: #8ea0bd; --hair: #dbe5f2; --hair-2: #c7d5e9;
+    --accent: #1463d8; --accent-soft: #e0ecfd;
+    --hero: linear-gradient(135deg, #0b2a66 0%, #1463d8 58%, #19b4d8 120%);
+    --hero-glow: rgba(11,58,140,.28);
+    --fhero: linear-gradient(140deg, #0b3a8c 0%, #1463d8 55%, #2fa8f0 100%);
+    --falt: linear-gradient(150deg, #0aa896 0%, #1463d8 100%);
+    --shadow: 0 1px 3px rgba(11,31,63,.06), 0 12px 32px rgba(11,31,63,.09);
+  }
+  :root[data-theme="vermelho"] {
+    --bg: #faeeec; --surface: #fffaf9; --surface-2: #fcf3f1; --surface-3: #f5e3e0;
+    --ink: #3a0d12; --ink-2: #7d4a50; --muted: #b89499; --hair: #f0dbd8; --hair-2: #e5c6c3;
+    --accent: #b8162f; --accent-soft: #fbe2e5; --crit: #e0521b; --crit-soft: #fdebe2;
+    --hero: linear-gradient(135deg, #4a0a14 0%, #b8162f 58%, #f08a24 120%);
+    --hero-glow: rgba(140,20,40,.28);
+    --fhero: linear-gradient(140deg, #7a0f22 0%, #b8162f 55%, #e8465f 100%);
+    --falt: linear-gradient(150deg, #d9602a 0%, #b8162f 100%);
+    --shadow: 0 1px 3px rgba(58,13,18,.06), 0 12px 32px rgba(58,13,18,.09);
+  }
+  .theme-pick { display: flex; align-items: center; gap: 7px; padding: 4px 10px; }
+  .theme-pick .tl-l { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-right: 2px; }
+  .theme-pick button { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--hair-2); cursor: pointer; padding: 0; flex-shrink: 0; transition: transform .15s, box-shadow .15s; }
+  .theme-pick button:hover { transform: scale(1.12); }
+  .theme-pick button.on { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
+  @media (max-width: 900px) { .theme-pick { padding: 0 4px; } .theme-pick .tl-l { display: none; } }
+  body { transition: background-color .3s, color .3s; }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
   html, body { margin: 0; height: 100%; }
@@ -78,7 +132,7 @@
   .dot.ok { background: var(--good); } .dot.stale { background: var(--warn); } .dot.off { background: var(--hair-2); }
 
   /* sinal principal */
-  .hero { background: var(--hero); color: #fff; border-radius: 22px; padding: 24px; box-shadow: 0 18px 40px rgba(29,43,140,.28); display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; position: relative; overflow: hidden; }
+  .hero { background: var(--hero); color: #fff; border-radius: 22px; padding: 24px; box-shadow: 0 18px 40px var(--hero-glow, rgba(29,43,140,.28)); display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; position: relative; overflow: hidden; }
   .hero::after { content: ""; position: absolute; right: -80px; top: -80px; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.14), transparent 70%); pointer-events: none; }
   @media (max-width: 860px) { .hero { grid-template-columns: 1fr; } }
   .hero .lbl { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; opacity: .8; display: flex; align-items: center; gap: 8px; }
@@ -94,8 +148,8 @@
   .hero .acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
   .btn { border: 0; border-radius: 11px; padding: 9px 14px; font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: transform .1s, background .15s, opacity .15s; }
   .btn:active { transform: scale(.97); }
-  .btn.w { background: #fff; color: var(--ink); } .btn.wg { background: rgba(255,255,255,.14); color: #fff; }
-  .btn.p { background: var(--accent); color: #fff; } .btn.p:hover { background: #2f40e6; }
+  .btn.w { background: #fff; color: #0f1a33; } .btn.wg { background: rgba(255,255,255,.14); color: #fff; }
+  .btn.p { background: var(--accent); color: #fff; } .btn.p:hover { filter: brightness(.9); }
   .btn.g { background: var(--good); color: #fff; } .btn.r { background: var(--surface-3); color: var(--ink); }
   .btn.ghost { background: transparent; color: var(--accent); padding: 6px 8px; }
   .btn.sm { padding: 7px 11px; font-size: 12.5px; }
@@ -198,7 +252,7 @@
   svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
   .ax { fill: var(--muted); font-size: 10.5px; }
 
-  .toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; transition: all .25s; z-index: 60; box-shadow: var(--shadow); max-width: calc(100% - 32px); }
+  .toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: var(--ink); color: var(--surface); padding: 11px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; transition: all .25s; z-index: 60; box-shadow: var(--shadow); max-width: calc(100% - 32px); }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
   .empty { color: var(--muted); font-size: 13px; padding: 16px 4px; }
   .demo-flag { font-size: 11px; color: var(--warn); background: var(--warn-soft); border-radius: 8px; padding: 3px 8px; font-weight: 700; }
@@ -226,9 +280,9 @@
   .ftile .td .cl { font-size: 11px; opacity: .8; }
   .ftile .ft { font-size: 11.5px; margin-top: auto; padding-top: 6px; }
   .ftile .sk { margin-top: auto; padding-top: 8px; }
-  .ftile.hero { background: linear-gradient(140deg, #2d3fd6 0%, #6a4bff 55%, #b84dff 100%); color: #fff; box-shadow: 0 14px 32px rgba(76,60,230,.28); }
+  .ftile.hero { background: var(--fhero); color: #fff; box-shadow: 0 14px 32px rgba(76,60,230,.28); }
   .ftile.hero .tv { font-size: 42px; }
-  .ftile.alt { background: linear-gradient(150deg, #0aa896 0%, #1a7fd6 100%); color: #fff; box-shadow: 0 14px 32px rgba(10,140,170,.25); }
+  .ftile.alt { background: var(--falt); color: #fff; box-shadow: 0 14px 32px rgba(10,140,170,.25); }
   .ftile.hero .tl, .ftile.hero .tl .dr, .ftile.alt .tl, .ftile.alt .tl .dr { color: rgba(255,255,255,.85); }
   .ftile.t2 .tv { font-size: 24px; }
   .fchip { font-size: 11.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px; white-space: nowrap; background: var(--surface-3); color: var(--ink-2); }
@@ -513,6 +567,19 @@ try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && s.recs
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(ST)); } catch (e) {} };
 const recsBy = st => ST.recs.filter(r => r.status === st);
 
+/* ================= TEMA ================= */
+const THEMES = [
+  { id: "bege",     l: "Bege",     sw: "linear-gradient(135deg,#f3ede2 50%,#d9c7a8 50%)" },
+  { id: "branco",   l: "Branco",   sw: "linear-gradient(135deg,#ffffff 50%,#dfe4ef 50%)" },
+  { id: "preto",    l: "Preto",    sw: "linear-gradient(135deg,#171a21 50%,#7c8cff 50%)" },
+  { id: "azul",     l: "Azul",     sw: "linear-gradient(135deg,#e9f0fa 50%,#1463d8 50%)" },
+  { id: "vermelho", l: "Vermelho", sw: "linear-gradient(135deg,#faeeec 50%,#b8162f 50%)" },
+];
+let THEME = "bege";
+try { const t = localStorage.getItem("mae-theme"); if (THEMES.some(x => x.id === t)) THEME = t; } catch (e) {}
+function setTheme(id){ THEME = id; document.documentElement.dataset.theme = id; try { localStorage.setItem("mae-theme", id); } catch (e) {} }
+setTheme(THEME);
+
 function toast(msg){ const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 2400); }
 
 /* ================= NAVEGAÇÃO ================= */
@@ -532,8 +599,10 @@ function renderNav(){
     ${NAV.map(g => `<div class="nav-group">${g.g ? `<div class="gl">${g.g}</div>` : ""}${g.items.map(it => `
       <button class="nav-item ${it.ask ? "ask" : ""} ${ROUTE === it.id ? "on" : ""}" data-r="${it.id}" ${it.soon ? "disabled" : ""}>
         <span class="ic">${it.ic}</span>${it.l}${it.soon ? '<span class="soon">em breve</span>' : badge[it.id] ? `<span class="badge ${it.id === "visao" ? "" : "soft"}">${badge[it.id]}</span>` : ""}</button>`).join("")}</div>`).join("")}
+    <div class="theme-pick" role="radiogroup" aria-label="Tema"><span class="tl-l">Tema</span>${THEMES.map(t => `<button role="radio" aria-checked="${THEME === t.id}" class="${THEME === t.id ? "on" : ""}" data-theme-id="${t.id}" title="${t.l}" aria-label="${t.l}" style="background:${t.sw}"></button>`).join("")}</div>
     <div class="side-foot">${EMPRESA} · dados de exemplo<br><button id="reset">Reiniciar demonstração</button></div>`;
   document.querySelectorAll(".nav-item[data-r]").forEach(b => b.addEventListener("click", () => { if (!b.disabled) go(b.dataset.r); }));
+  document.querySelectorAll("[data-theme-id]").forEach(b => b.addEventListener("click", () => { setTheme(b.dataset.themeId); renderNav(); toast("Tema " + THEMES.find(t => t.id === THEME).l.toLowerCase() + " aplicado."); }));
   document.getElementById("reset").addEventListener("click", () => { ST = freshState(); save(); render(); toast("Demonstração reiniciada."); });
 }
 function go(r){ ROUTE = r; try { history.replaceState(null, "", "#" + r); } catch (e) {} closeDrawer(); render(); document.querySelector(".main").scrollTo?.(0, 0); window.scrollTo(0, 0); }
@@ -930,7 +999,7 @@ function finBridge(){
     if (k < bars.length - 1) s += `<line x1="${(cx + bw / 2).toFixed(1)}" x2="${(pl + slot * (k + 1.5) - bw / 2).toFixed(1)}" y1="${y(bb.y1)}" y2="${y(bb.y1)}" stroke="var(--hair-2)" stroke-dasharray="3 3"/>`; });
   svg.innerHTML = s;
 }
-const FTS = [{ k: "receita", c: "#3b4dff" }, { k: "opex", c: "#f08a24" }, { k: "lucroLiq", c: "#149b5f" }];
+const FTS = [{ k: "receita", c: "var(--accent)" }, { k: "opex", c: "#f08a24" }, { k: "lucroLiq", c: "#149b5f" }];
 let FTR = null;
 function fProject(k){
   const pts = FIN.slice(-12).map(r => r[k]), n = pts.length, xm = (n - 1) / 2, ym = avg(pts); let sxy = 0, sxx = 0;
@@ -955,7 +1024,7 @@ function finTrend(anim){
     s += `<path d="M${x(FIN.length - 1)},${y(last)} ${band.map((p, h) => `L${x(FIN.length + h)},${y(p.hi)}`).join(" ")} ${[...band].reverse().map((p, h) => `L${x(N - 1 - h)},${y(p.lo)}`).join(" ")} Z" fill="${sr.c}" opacity=".12"/>`;
     s += `<polyline class="ftl" points="${FIN.map((r, j) => `${x(j).toFixed(1)},${y(r[sr.k]).toFixed(1)}`).join(" ")}" fill="none" stroke="${sr.c}" stroke-width="${sr.k === "receita" ? 3 : 2.2}" stroke-linecap="round" stroke-linejoin="round"/>`;
     s += `<polyline points="${x(FIN.length - 1)},${y(last)} ${band.map((p, h) => `${x(FIN.length + h).toFixed(1)},${y(p.v).toFixed(1)}`).join(" ")}" fill="none" stroke="${sr.c}" stroke-width="2.2" stroke-dasharray="6 5"/>`;
-    s += `<circle id="fsd-${sr.k}" r="5" fill="${sr.c}" stroke="#fff" stroke-width="2"/>`; });
+    s += `<circle id="fsd-${sr.k}" r="5" fill="${sr.c}" stroke="var(--surface)" stroke-width="2"/>`; });
   s += `<line id="f-sline" y1="${pt}" y2="${pt + ph}" stroke="var(--ink-2)" stroke-dasharray="3 3"/>`;
   for (let j = 0; j < N; j++) s += `<rect class="fhit" data-j="${j}" x="${x(j) - pw / (N - 1) / 2}" y="${pt}" width="${pw / (N - 1)}" height="${ph}" fill="transparent"/>`;
   svg.innerHTML = s;
@@ -1027,7 +1096,7 @@ function finMetricDrill(k){
   FIN.forEach((r, j) => { if (j % 4 === 0 || j === FIN.length - 1) s += `<text class="ax" x="${x(j)}" y="${H - 7}" text-anchor="middle">${r.lbl}</text>`; });
   s += `<line x1="${x(i)}" x2="${x(i)}" y1="${pt}" y2="${pt + ph}" stroke="var(--accent)" opacity=".4"/>`;
   if (hasB) s += `<polyline points="${bv.map((v, j) => `${x(j).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="var(--ink-2)" stroke-width="1.8" stroke-dasharray="5 4"/>`;
-  s += `<polyline points="${vals.map((v, j) => `${x(j).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${m.dir < 0 ? "#f08a24" : "var(--accent)"}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${x(i)}" cy="${y(vals[i])}" r="5" fill="${m.dir < 0 ? "#f08a24" : "var(--accent)"}" stroke="#fff" stroke-width="2"/>`;
+  s += `<polyline points="${vals.map((v, j) => `${x(j).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${m.dir < 0 ? "#f08a24" : "var(--accent)"}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${x(i)}" cy="${y(vals[i])}" r="5" fill="${m.dir < 0 ? "#f08a24" : "var(--accent)"}" stroke="var(--surface)" stroke-width="2"/>`;
   let rows = ""; for (let j = i; j >= Math.max(0, i - 11); j--) { const r = FIN[j], mo = j ? fDelta(k, r[k], FIN[j - 1][k]) : null, bd = hasB ? fDelta(k, r[k], r.b[k]) : null;
     rows += `<tr ${j === i ? 'style="font-weight:800;background:var(--surface-2)"' : ""}><td>${r.lbl}</td><td class="n">${fFmt(k, r[k], true)}</td><td class="n">${mo ? fChip(mo) : "—"}</td>${hasB ? `<td class="n">${fFmt(k, r.b[k], true)}</td><td class="n">${bd ? fChip(bd) : "—"}</td>` : ""}</tr>`; }
   const w12 = FIN.slice(Math.max(0, i - 11), i + 1).map(r => r[k]);
@@ -1044,7 +1113,7 @@ function finSegDrill(k){
   const x = j => pl + j / (FIN.length - 1) * pw, y = v => pt + ph - (v - mn) / (mx - mn) * ph;
   let sv = ""; for (let q = 0; q <= 3; q++) { const gv = mn + (mx - mn) * q / 3; sv += `<line x1="${pl}" x2="${W - pr}" y1="${y(gv)}" y2="${y(gv)}" stroke="var(--hair)"/><text class="ax" x="${pl - 6}" y="${y(gv) + 3}" text-anchor="end">${brl(gv).replace("R$ ", "")}</text>`; }
   FIN.forEach((r, j) => { if (j % 4 === 0 || j === FIN.length - 1) sv += `<text class="ax" x="${x(j)}" y="${H - 7}" text-anchor="middle">${r.lbl}</text>`; });
-  sv += `<polyline points="${bv.map((v, j) => `${x(j)},${y(v)}`).join(" ")}" fill="none" stroke="var(--ink-2)" stroke-width="1.8" stroke-dasharray="5 4"/><polyline points="${vals.map((v, j) => `${x(j)},${y(v)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2.6"/><circle cx="${x(i)}" cy="${y(vals[i])}" r="5" fill="${s.color}" stroke="#fff" stroke-width="2"/>`;
+  sv += `<polyline points="${bv.map((v, j) => `${x(j)},${y(v)}`).join(" ")}" fill="none" stroke="var(--ink-2)" stroke-width="1.8" stroke-dasharray="5 4"/><polyline points="${vals.map((v, j) => `${x(j)},${y(v)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2.6"/><circle cx="${x(i)}" cy="${y(vals[i])}" r="5" fill="${s.color}" stroke="var(--surface)" stroke-width="2"/>`;
   const cl = i >= 18 ? s.ids.map(id => byId(CLIENTES, id)).sort((a, b) => b.rec[i - 18] - a.rec[i - 18]) : [];
   openDrawer(`Segmento ${k}`, `Faturamento, margem e clientes · ${d.ext}`, `
     <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${sv}</svg>

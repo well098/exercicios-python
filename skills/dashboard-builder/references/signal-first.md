@@ -33,6 +33,10 @@ O que a diferencia do motor isolado:
 
 Para outro domínio, troque `FSEGS` (segmentos e quais entidades compõem cada um) e as premissas de custo em `FIN`.
 
+## Temas
+
+O template traz um seletor de tema no menu com 5 opções: **bege** (padrão), branco, preto, azul e vermelho. Cada tema é um bloco `:root[data-theme="…"]` que redefine os tokens, inclusive os gradientes (`--hero`, `--fhero`, `--falt`, `--hero-glow`). A escolha fica salva em `localStorage` (`mae-theme`). Texto sobre fundo colorido continua `#fff`; todo o resto usa tokens, para que nenhum tema quebre o contraste. O preto é opcional: o padrão continua claro.
+
 ## Regras
 
 - **Todo sinal é calculado dos dados**, por uma função com limiar explícito (ex.: média de 2 meses ≥ 20% abaixo da de 4 meses, entre clientes com base ≥ R$ 15 mil). Nunca escreva sinais fixos no HTML: os números precisam bater entre a tela inicial, as listas, os perfis e as respostas.

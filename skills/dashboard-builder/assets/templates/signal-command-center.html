@@ -13,6 +13,7 @@
     --radius: 18px;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body { margin: 0; height: 100%; }
   body { background-color: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; font-variant-numeric: tabular-nums; }
   button, input, select, textarea { font: inherit; color: inherit; }
@@ -201,6 +202,91 @@
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
   .empty { color: var(--muted); font-size: 13px; padding: 16px 4px; }
   .demo-flag { font-size: 11px; color: var(--warn); background: var(--warn-soft); border-radius: 8px; padding: 3px 8px; font-weight: 700; }
+  /* ---------- financeiro (Cockpit do CFO Pro dentro do MAE) ---------- */
+  .fbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; background: var(--surface); border-radius: 16px; padding: 10px 14px; box-shadow: var(--shadow-sm); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
+  @media (max-width: 900px) { .fbar { position: static; } }
+  .fbar .f { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .fbar label { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .fbar select { font-size: 13px; font-weight: 700; background: var(--surface-2); border: 1px solid var(--hair-2); border-radius: 9px; padding: 7px 10px; }
+  .fbar .sp { flex: 1; } .fbar .ctx { font-size: 12px; color: var(--ink-2); }
+  .fexp-note { font-size: 11.5px; color: var(--ink-2); }
+  .tier { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 10px; margin-bottom: -6px; }
+  .tier::after { content: ""; flex: 1; height: 1px; background: var(--hair-2); }
+  .ft1 { display: grid; grid-template-columns: 1.35fr 1fr 1fr; gap: 14px; }
+  @media (max-width: 900px) { .ft1 { grid-template-columns: 1fr; } }
+  .ft2 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .ft2 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 440px) { .ft2 { grid-template-columns: 1fr; } }
+  .ftile { background: var(--surface); border-radius: 20px; padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 5px; cursor: pointer; border: 0; text-align: left; width: 100%; color: inherit; transition: transform .15s, box-shadow .15s; overflow: hidden; min-width: 0; }
+  .ftile:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(15,26,51,.1), 0 22px 46px rgba(15,26,51,.13); }
+  .ftile .tl { font-size: 12px; font-weight: 600; color: var(--ink-2); display: flex; justify-content: space-between; gap: 8px; }
+  .ftile .tl .dr { font-size: 10.5px; font-weight: 700; color: var(--muted); }
+  .ftile .tv { font-size: 30px; font-weight: 800; letter-spacing: -.03em; line-height: 1.05; }
+  .ftile .td { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 12px; margin-top: 2px; }
+  .ftile .td .cl { font-size: 11px; opacity: .8; }
+  .ftile .ft { font-size: 11.5px; margin-top: auto; padding-top: 6px; }
+  .ftile .sk { margin-top: auto; padding-top: 8px; }
+  .ftile.hero { background: linear-gradient(140deg, #2d3fd6 0%, #6a4bff 55%, #b84dff 100%); color: #fff; box-shadow: 0 14px 32px rgba(76,60,230,.28); }
+  .ftile.hero .tv { font-size: 42px; }
+  .ftile.alt { background: linear-gradient(150deg, #0aa896 0%, #1a7fd6 100%); color: #fff; box-shadow: 0 14px 32px rgba(10,140,170,.25); }
+  .ftile.hero .tl, .ftile.hero .tl .dr, .ftile.alt .tl, .ftile.alt .tl .dr { color: rgba(255,255,255,.85); }
+  .ftile.t2 .tv { font-size: 24px; }
+  .fchip { font-size: 11.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px; white-space: nowrap; background: var(--surface-3); color: var(--ink-2); }
+  .fchip.good { background: var(--good-soft); color: var(--good); } .fchip.bad { background: var(--crit-soft); color: var(--crit); }
+  .oncolor .fchip { background: rgba(255,255,255,.2); color: #fff; }
+  .fratios { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 900px) { .fratios { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 440px) { .fratios { grid-template-columns: 1fr; } }
+  .fratio { background: var(--surface); border-radius: 16px; padding: 13px 15px; box-shadow: var(--shadow-sm); border-left: 4px solid var(--hair-2); display: flex; flex-direction: column; gap: 3px; }
+  .fratio.good { border-left-color: var(--good); } .fratio.bad { border-left-color: var(--crit); } .fratio.warn { border-left-color: var(--warn); }
+  .fratio .rl { font-size: 11.5px; color: var(--ink-2); font-weight: 600; } .fratio .rv { font-size: 20px; font-weight: 800; } .fratio .rn { font-size: 11px; color: var(--muted); }
+  table.fvar { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 520px; }
+  table.fvar th { font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 800; text-align: right; padding: 6px 8px; border-bottom: 2px solid var(--hair-2); }
+  table.fvar th:first-child { text-align: left; }
+  table.fvar td { padding: 8px; text-align: right; border-bottom: 1px solid var(--hair); white-space: nowrap; }
+  table.fvar td:first-child { text-align: left; font-weight: 600; }
+  table.fvar tr.sub td:first-child { font-weight: 500; color: var(--ink-2); padding-left: 18px; }
+  table.fvar tr.total td { font-weight: 800; }
+  table.fvar tbody tr { cursor: pointer; } table.fvar tbody tr:hover { background: var(--surface-2); }
+  table.fvar td.cf { font-weight: 700; border-radius: 6px; }
+  .flegend { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+  .flegend button { font-size: 12px; background: transparent; border: 0; cursor: pointer; color: var(--ink-2); display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 8px; }
+  .flegend button:hover { background: var(--surface-2); } .flegend button.off { opacity: .35; }
+  .flegend .dt { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .flegend .dash { width: 16px; border-top: 2px dashed var(--ink-2); display: inline-block; }
+  .fscrub { display: flex; align-items: center; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
+  .fscrub input { flex: 1; min-width: 180px; accent-color: var(--accent); }
+  .fscrub .rd { display: flex; gap: 16px; flex-wrap: wrap; }
+  .fscrub .sr { display: flex; flex-direction: column; } .fscrub .sr .t { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; } .fscrub .sr .v { font-size: 15px; font-weight: 800; }
+  .ptag { font-size: 10px; font-weight: 800; color: var(--accent); background: var(--accent-soft); padding: 2px 7px; border-radius: 6px; margin-left: 6px; vertical-align: middle; }
+  .frow { display: grid; grid-template-columns: 1.25fr 1fr; gap: 18px; align-items: start; }
+  @media (max-width: 1360px) { .frow { grid-template-columns: 1fr; } }
+  .fseg { display: grid; grid-template-columns: 1fr auto; row-gap: 7px; gap: 12px; align-items: center; padding: 10px 8px; border-radius: 12px; cursor: pointer; border: 0; background: transparent; width: 100%; text-align: left; color: inherit; }
+  .fseg:hover { background: var(--surface-2); }
+  .fseg .sn { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+  .fseg .st { grid-column: 1 / -1; display: block; height: 14px; background: var(--surface-3); border-radius: 7px; overflow: hidden; }
+  .fseg .sf { display: block; height: 100%; width: 0; border-radius: 7px; transition: width 1s cubic-bezier(.2,.8,.25,1); }
+  .fseg .sv { font-size: 12.5px; text-align: right; display: flex; gap: 8px; align-items: center; } .fseg .sv b { font-size: 13.5px; } .fseg .sm { grid-column: 1 / -1; font-size: 11.5px; color: var(--muted); }
+
+  .fins { display: flex; flex-direction: column; gap: 10px; }
+  .fin-i { background: var(--surface-2); border-radius: 14px; padding: 13px 14px; border-left: 4px solid var(--accent); font-size: 13px; line-height: 1.55; color: var(--ink-2); }
+  .fin-i.good { border-left-color: var(--good); } .fin-i.bad { border-left-color: var(--crit); } .fin-i.warn { border-left-color: var(--warn); }
+  .fin-i .it { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--ink); margin-bottom: 3px; } .fin-i b { color: var(--ink); }
+  .fsum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 760px) { .fsum { grid-template-columns: 1fr; } }
+  .fsum > div { border-radius: 14px; padding: 14px; background: var(--surface-2); }
+  .fsum .sh { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+  .fsum .good .sh { color: var(--good); } .fsum .bad .sh { color: var(--crit); } .fsum .warn .sh { color: var(--warn); }
+  .fsum .stt { font-size: 14.5px; font-weight: 700; margin: 6px 0 3px; } .fsum .sb { font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
+  .fai { margin-top: 14px; border-radius: 14px; border: 1px dashed var(--hair-2); padding: 14px; display: none; }
+  .fai.show { display: block; }
+  .fai-out { margin-top: 10px; font-size: 13px; line-height: 1.6; white-space: pre-wrap; } .fai-out:empty { display: none; }
+  .fperc { background: var(--mae-soft); border-radius: 18px; padding: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .fperc { grid-template-columns: 1fr; } }
+  .fperc .pt { grid-column: 1 / -1; font-size: 12px; font-weight: 800; color: var(--mae); letter-spacing: .08em; text-transform: uppercase; }
+  .fperc .pc { background: var(--surface); border-radius: 14px; padding: 13px 14px; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+  .fperc .pc .ph { font-weight: 800; color: var(--ink); font-size: 14px; margin-bottom: 4px; }
+  .fperc .pc b { color: var(--ink); }
   @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1 !important; transform: none !important; animation: none !important; } .drawer, .rec, .toast { transition: none; } .dot.live { animation: none; } }
 </style>
 
@@ -215,6 +301,7 @@
 </aside>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 /* ================= DADOS DE EXEMPLO (empresa fictícia) ================= */
 const EMPRESA = "Aurora Distribuidora", USUARIO = "João";
@@ -389,6 +476,10 @@ function buildSignals(){
   return S;
 }
 const SIGNALS = buildSignals();
+function addMarginSignal(){
+  const d = FIN[FIN.length - 1], p = FIN[FIN.length - 2], dm = d.margemBruta - p.margemBruta;
+  if (dm < -0.003) SIGNALS.splice(1, 0, { id: "s-marg", sev: "warn", area: "financeiro", fontes: ["Planilha de vendas", "Compras e fornecedores"], t: `Margem bruta caiu ${Math.abs(dm * 100).toFixed(1).replace(".", ",")} p.p. em setembro`, d: `Faturamento ${pct(d.receita / p.receita - 1)}, mas o CMV subiu ${pct(d.cmv / p.cmv - 1)} com os reajustes de ${A.reajRec.map(r => r.f.nome).join(" e ")}`, imp: (p.margemBruta - d.margemBruta) * d.receita, n: 2 });
+}
 
 function buildRecs(){
   const R = [];
@@ -427,6 +518,7 @@ function toast(msg){ const t = document.getElementById("toast"); t.textContent =
 /* ================= NAVEGAÇÃO ================= */
 const NAV = [
   { g: "", items: [{ id: "visao", ic: "◉", l: "Visão geral" }] },
+  { g: "Negócio", items: [{ id: "financeiro", ic: "💰", l: "Financeiro" }] },
   { g: "Operação", items: [{ id: "clientes", ic: "👥", l: "Clientes" }, { id: "fornecedores", ic: "🤝", l: "Fornecedores" }, { id: "produtos", ic: "📦", l: "Produtos" }, { id: "contratos", ic: "📄", l: "Contratos" }, { id: "conversas", ic: "💬", l: "Conversas" }] },
   { g: "Inteligência", items: [{ id: "insights", ic: "✦", l: "Insights" }, { id: "recomendacoes", ic: "🎯", l: "Recomendações" }, { id: "acoes", ic: "⚙", l: "Ações" }, { id: "resultados", ic: "📊", l: "Resultados" }, { id: "aprendizado", ic: "📈", l: "Aprendizado" }, { id: "dna", ic: "🧬", l: "Company DNA", soon: true }] },
   { g: "", items: [{ id: "pergunte", ic: "🧠", l: "Pergunte à empresa", ask: true }] },
@@ -556,6 +648,11 @@ function evidenceList(sigId){
   } else if (sigId === "s-prod") {
     const x = A.prodQueda[0]; ev.push({ i: "📉", t: `${x.p.nome}: ${pct(x.v, 0)}`, d: `setembro ${num(x.p.qtd[5])} un. vs média jun–ago ${num(avg(x.p.qtd.slice(2, 5)))} un.` });
     A.convs.filter(m => m.prod === x.p.id).forEach(m => ev.push({ i: "💬", t: `${m.c.nome} · ${dia(m.dt)}`, d: `"${m.txt}"` }));
+  } else if (sigId === "s-marg") {
+    const d = FIN[FIN.length - 1], p = FIN[FIN.length - 2];
+    ev.push({ i: "📊", t: `Margem bruta ${fpct(p.margemBruta)} → ${fpct(d.margemBruta)}`, d: `faturamento ${brl(p.receita)} → ${brl(d.receita)} · CMV ${brl(p.cmv)} → ${brl(d.cmv)} · planilha de vendas` });
+    A.reajRec.forEach(r => ev.push({ i: "🏷", t: `${r.f.nome}: reajuste em setembro`, d: `índice ${r.f.preco[6]} → ${r.f.preco[7]} · ${r.f.cat}` }));
+    ev.push({ i: "🧮", t: "Como o impacto foi calculado", d: `Queda da margem bruta (em p.p.) × faturamento de setembro = ${brl((p.margemBruta - d.margemBruta) * d.receita)}/mês de lucro bruto a menos.` });
   } else if (sigId === "s-oport") {
     A.oport.forEach(m => ev.push({ i: "💬", t: `${m.c.nome} · ${dia(m.dt)}`, d: `"${m.txt}" · potencial estimado de ${brl(m.valor || 0)}` }));
   }
@@ -566,6 +663,7 @@ function openEvidencias(sigId){
   openDrawer("Evidências", s.t, `
     <div class="note">Confiança <span class="tag ${c.c}">${c.l}</span> · sustentado por <b>${s.n} tipo${s.n > 1 ? "s" : ""} de evidência</b> vindos de: ${s.fontes.join(", ")}.</div>
     <div>${evidenceList(sigId).map(e => `<div class="ev"><div class="ei">${e.i}</div><div><div class="et">${esc(e.t)}</div><div class="ed">${esc(e.d)}</div></div></div>`).join("")}</div>
+    ${sigId === "s-marg" ? `<button class="btn p sm" data-act="go:financeiro">Abrir o financeiro ›</button>` : ""}
     ${sigId === "s-reduz" ? `<div style="display:flex;gap:8px;flex-wrap:wrap">${A.reduz.map(x => `<button class="btn r sm" data-act="cliente:${x.c.id}">Abrir ${esc(x.c.nome)}</button>`).join("")}</div>` : ""}`);
 }
 function openRec(id){
@@ -627,12 +725,434 @@ function sigRow(s){
     <span class="go">evidências ›</span></button>`;
 }
 
+/* ================= FINANCEIRO · Cockpit do CFO Pro dentro do MAE ================= */
+const MES_ABR = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const MES_EXT = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+// segmentos de clientes: os últimos 6 meses vêm dos próprios clientes; os 18 anteriores são o histórico da planilha
+const FSEGS = [
+  { k: "Varejo alimentar",    ids: ["c1", "c6", "c8", "c12"],             g: 0.012, cmv: 0.74, color: "#3b4dff" },
+  { k: "Food service",        ids: ["c2", "c3", "c4", "c7", "c9", "c11"], g: 0.010, cmv: 0.66, color: "#0aa896" },
+  { k: "Hotelaria & eventos", ids: ["c5", "c10"],                         g: 0.018, cmv: 0.62, color: "#f08a24" },
+];
+const FIN = (() => {
+  const rows = []; let caixa = 412000;
+  for (let i = 0; i < 24; i++) {
+    const dt = new Date(2024, 9 + i, 1), seg = {};
+    FSEGS.forEach((s, n) => {
+      const abr = sum(s.ids.map(id => byId(CLIENTES, id).rec[0]));
+      const r = i >= 18 ? sum(s.ids.map(id => byId(CLIENTES, id).rec[i - 18])) : Math.round(abr * Math.pow(1 + s.g, i - 18) * (1 + 0.03 * Math.sin(i * 1.3 + n)));
+      const rate = s.cmv + (i >= 20 ? 0.004 : 0) + (i >= 23 && n < 2 ? 0.014 : 0); // reajustes de laticínios e azeite em setembro
+      seg[s.k] = { r, c: Math.round(r * rate) };
+    });
+    rows.push({ i, lbl: MES_ABR[dt.getMonth()] + "/" + String(dt.getFullYear()).slice(2), ext: MES_EXT[dt.getMonth()] + " de " + dt.getFullYear(), seg });
+  }
+  rows.forEach((r, i) => {
+    r.bseg = {};
+    FSEGS.forEach(s => { const br = i >= 12 ? Math.round(rows[i - 12].seg[s.k].r * 1.08) : Math.round(r.seg[s.k].r * 1.02); r.bseg[s.k] = { r: br, c: Math.round(br * s.cmv) }; });
+    r.receita = sum(FSEGS.map(s => r.seg[s.k].r)); r.cmv = sum(FSEGS.map(s => r.seg[s.k].c));
+    r.lucroBruto = r.receita - r.cmv;
+    r.opex = Math.round(45000 * Math.pow(1.008, i) + r.receita * 0.035) + (i === 21 ? 9000 : 0);
+    r.impostos = Math.round(r.receita * 0.045);
+    r.lucroOp = r.lucroBruto - r.opex; r.lucroLiq = r.lucroOp - r.impostos;
+    r.margemBruta = r.lucroBruto / r.receita; r.margemOp = r.lucroOp / r.receita; r.margemLiq = r.lucroLiq / r.receita;
+    r.capex = i === 15 ? 60000 : 6000; caixa += r.lucroLiq - r.capex; r.caixa = Math.round(caixa);
+    r.clientes = i >= 18 ? CLIENTES.length : 11; r.ticketMedio = r.receita / r.clientes;
+    const bR = sum(FSEGS.map(s => r.bseg[s.k].r)), bC = sum(FSEGS.map(s => r.bseg[s.k].c));
+    r.b = { receita: bR, cmv: bC, lucroBruto: bR - bC, opex: Math.round(46000 * Math.pow(1.008, i) + bR * 0.034), impostos: Math.round(bR * 0.045) };
+    r.b.lucroOp = r.b.lucroBruto - r.b.opex; r.b.lucroLiq = r.b.lucroOp - r.b.impostos;
+    r.b.margemBruta = r.b.lucroBruto / bR; r.b.margemOp = r.b.lucroOp / bR; r.b.margemLiq = r.b.lucroLiq / bR; r.b.ticketMedio = bR / r.clientes;
+  });
+  rows.forEach((r, i) => { const j = Math.max(0, i - 3), n = i - j; r.geracao = n ? Math.round((r.caixa - rows[j].caixa) / n) : 0; });
+  return rows;
+})();
+const FM = {
+  receita:     { l: "Faturamento",           t: "brl", dir: 1 },
+  cmv:         { l: "CMV",                   t: "brl", dir: -1 },
+  lucroBruto:  { l: "Lucro bruto",           t: "brl", dir: 1 },
+  margemBruta: { l: "Margem bruta",          t: "pct", dir: 1 },
+  opex:        { l: "Despesas operacionais", t: "brl", dir: -1 },
+  lucroOp:     { l: "Lucro operacional",     t: "brl", dir: 1 },
+  margemOp:    { l: "Margem operacional",    t: "pct", dir: 1 },
+  impostos:    { l: "Impostos",              t: "brl", dir: -1 },
+  lucroLiq:    { l: "Lucro líquido",         t: "brl", dir: 1 },
+  margemLiq:   { l: "Margem líquida",        t: "pct", dir: 1 },
+  ticketMedio: { l: "Ticket médio por cliente", t: "brl", dir: 1 },
+  caixa:       { l: "Caixa",                 t: "brl", dir: 1, noB: true },
+  geracao:     { l: "Geração de caixa (média 3m)", t: "brl", dir: 1, noB: true },
+};
+const FS = { idx: FIN.length - 1, cmp: "mom", hidden: {} };
+const FCMP = { mom: "mês anterior", yoy: "mesmo mês do ano anterior", bud: "meta" };
+const FHEAD = { mom: "Mês ant.", yoy: "Ano ant.", bud: "Meta" };
+const FVROWS = [["receita","total"],["cmv","sub"],["lucroBruto","total"],["margemBruta","sub"],["opex","sub"],["lucroOp","total"],["margemOp","sub"],["impostos","sub"],["lucroLiq","total"],["margemLiq","sub"]];
+const fpct = v => (v * 100).toFixed(1).replace(".", ",") + "%";
+const fFmt = (k, v, full) => v == null || !isFinite(v) ? "—" : FM[k].t === "pct" ? fpct(v) : full ? brlFull(v) : brl(v);
+function fBase(i, k, cmp = FS.cmp){
+  if (cmp === "mom") return i >= 1 ? FIN[i - 1][k] : null;
+  if (cmp === "yoy") return i >= 12 ? FIN[i - 12][k] : null;
+  return FM[k].noB ? null : (FIN[i].b[k] ?? null);
+}
+function fDelta(k, cur, base){
+  if (base == null || !isFinite(base) || cur == null) return null;
+  const m = FM[k], diff = cur - base, fav = diff * m.dir > 0 ? true : diff * m.dir < 0 ? false : null;
+  if (m.t === "pct") return { diff, fav, isPct: true, txt: (diff >= 0 ? "+" : "−") + Math.abs(diff * 100).toFixed(1).replace(".", ",") + " p.p." };
+  if (base === 0 || Math.sign(base) !== Math.sign(cur) || Math.abs(base) < Math.abs(cur) * 0.25) return { diff, fav, txt: (diff >= 0 ? "+" : "−") + brl(Math.abs(diff)) };
+  const p = diff / Math.abs(base); return { diff, pct: p, fav, txt: (p >= 0 ? "+" : "−") + Math.abs(p * 100).toFixed(1).replace(".", ",") + "%" };
+}
+const fChip = dl => !dl ? `<span class="fchip">sem base</span>` : `<span class="fchip ${dl.fav === null ? "" : dl.fav ? "good" : "bad"}">${dl.diff > 0 ? "▲" : dl.diff < 0 ? "▼" : "■"} ${dl.txt}</span>`;
+const fLast = {}, fH = {};
+function fAnim(el, key, target, fmt, dur = 750){
+  if (!el) return; if (fH[key]) cancelAnimationFrame(fH[key]);
+  const from = fLast[key] !== undefined ? fLast[key] : 0; fLast[key] = target;
+  if (REDUCE || !isFinite(target)) { el.textContent = fmt(target); return; }
+  const t0 = performance.now();
+  (function st(now){ const t = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - t, 3); el.textContent = fmt(from + (target - from) * e); if (t < 1) fH[key] = requestAnimationFrame(st); else fH[key] = null; })(performance.now());
+}
+function fSpark(vals, hi, color, h = 38){
+  const w = 240, mn = Math.min(...vals), mx = Math.max(...vals), r = mx - mn || 1, p = 3;
+  const x = i => p + i / (vals.length - 1) * (w - 2 * p), y = v => h - p - (v - mn) / r * (h - 2 * p);
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" style="display:block"><polyline points="${vals.map((v, i) => x(i).toFixed(1) + "," + y(v).toFixed(1)).join(" ")}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx="${x(hi).toFixed(1)}" cy="${y(vals[hi]).toFixed(1)}" r="3" fill="${color}"/></svg>`;
+}
+function fCf(dl){
+  if (!dl || dl.fav === null) return "";
+  const mag = dl.pct !== undefined ? Math.min(1, Math.abs(dl.pct) / 0.15) : dl.isPct ? Math.min(1, Math.abs(dl.diff) / 0.03) : Math.min(1, Math.abs(dl.diff) / (FIN[FS.idx].receita * 0.05));
+  return `background:${dl.fav ? `rgba(20,155,95,${(0.08 + 0.3 * mag).toFixed(2)})` : `rgba(229,72,77,${(0.08 + 0.3 * mag).toFixed(2)})`};color:${dl.fav ? "var(--good)" : "var(--crit)"}`;
+}
+
+function vFinanceiro(){
+  return `<div class="head reveal"><div class="eyebrow">Visão do negócio</div><h1>Financeiro</h1>
+      <p>Faturamento, lucro, margens e caixa, com comparação, variação e projeção. Clique em qualquer indicador, linha ou segmento para abrir o detalhe.</p></div>
+    <div class="fperc reveal" id="f-perc"></div>
+    <div class="fbar reveal" role="toolbar" aria-label="Filtros do financeiro">
+      <div class="f"><label for="f-mes">Mês</label><select id="f-mes">${FIN.map((r, i) => `<option value="${i}" ${i === FS.idx ? "selected" : ""}>${r.lbl}</option>`).join("")}</select></div>
+      <div class="f"><label>Comparar com</label><div class="chips" id="f-cmp">${Object.keys(FCMP).map(k => `<button data-c="${k}" class="${FS.cmp === k ? "on" : ""}">${k === "mom" ? "Mês anterior" : k === "yoy" ? "Ano anterior" : "Meta"}</button>`).join("")}</div></div>
+      <div class="sp"></div>
+      <div class="f" id="f-exp" hidden><button class="btn r sm" id="f-csv">⭳ CSV</button><button class="btn p sm" id="f-pdf">⭳ Relatório PDF</button></div>
+      <div class="ctx" id="f-ctx"></div>
+    </div>
+    <div class="fexp-note" id="f-note"></div>
+    <div class="tier">1 · Resultado</div><div class="ft1" id="f-t1"></div>
+    <div class="tier">2 · Rentabilidade & custos</div><div class="ft2" id="f-t2"></div>
+    <div class="tier">3 · Índices & fôlego</div><div class="fratios" id="f-ratios"></div>
+    <div class="frow">
+      <div class="card reveal"><h2>Análise de variação</h2><p class="cs" id="f-var-sub"></p><div class="tbl-wrap"><table class="fvar" id="f-var"></table></div></div>
+      <div class="card reveal"><h2>Ponte do lucro líquido</h2><p class="cs" id="f-br-sub"></p><div style="position:relative"><svg id="f-bridge" viewBox="0 0 560 300" style="width:100%;max-width:680px;margin:0 auto;height:auto;display:block"></svg></div></div>
+    </div>
+    <div class="card reveal"><h2>Tendência de 24 meses & projeção de 6 meses</h2>
+      <p class="cs">Regressão linear dos últimos 12 meses, faixa de confiança de 80%. Clique na legenda para ocultar séries; arraste ou clique no gráfico para percorrer.</p>
+      <div class="flegend" id="f-leg"></div>
+      <div class="tbl-wrap" style="overflow-x:auto"><svg id="f-trend" viewBox="0 0 1180 300" style="width:100%;min-width:560px;height:auto;display:block"></svg></div>
+      <div class="fscrub"><input type="range" id="f-scrub" min="0" max="29" value="${FS.idx}" aria-label="Mês na linha do tempo"><div class="rd" id="f-read"></div></div>
+    </div>
+    <div class="row2">
+      <div class="card reveal"><h2>Faturamento por segmento</h2><p class="cs" id="f-seg-sub"></p><div id="f-segs"></div></div>
+      <div class="card reveal"><h2>Insights financeiros</h2><p class="cs">Calculados para o mês e a base de comparação escolhidos</p><div class="fins" id="f-ins"></div></div>
+    </div>
+    <div class="card reveal"><h2>Resumo executivo</h2><p class="cs" id="f-sum-sub"></p><div class="fsum" id="f-sum"></div>
+      <div class="fai" id="f-ai"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn p sm" id="f-ai-btn">✦ Gerar parecer com Claude</button><button class="btn r sm" id="f-ai-stop" hidden>■ Parar</button><span class="fexp-note" id="f-ai-st">Parecer escrito a partir dos números da tela. Usa o seu plano do Claude.</span></div><div class="fai-out" id="f-ai-out"></div></div>
+    </div>`;
+}
+function finPerceived(){
+  const i = FS.idx, d = FIN[i], p = FIN[i - 1];
+  const cards = [];
+  if (p) {
+    const dm = d.margemBruta - p.margemBruta, dr = d.receita / p.receita - 1;
+    const forn = i === FIN.length - 1 && A.reajRec.length ? ` com os reajustes de <b>${A.reajRec.map(r => esc(r.f.nome)).join("</b> e <b>")}</b>` : "";
+    cards.push(dm < -0.003
+      ? { h: `Faturou ${pct(dr)}, mas a margem caiu`, b: `Margem bruta foi de ${fpct(p.margemBruta)} para <b>${fpct(d.margemBruta)}</b> (${(dm * 100).toFixed(1).replace(".", ",")} p.p.): o CMV subiu ${pct(d.cmv / p.cmv - 1)}${forn}.` }
+      : { h: `Faturamento ${pct(dr)} com margem ${dm >= 0 ? "estável ou melhor" : "estável"}`, b: `Margem bruta em <b>${fpct(d.margemBruta)}</b> (${dm >= 0 ? "+" : ""}${(dm * 100).toFixed(1).replace(".", ",")} p.p. no mês).` });
+  }
+  if (i >= 19) { const cc = CLIENTES.map(c => ({ c, v: c.rec[i - 18] - c.rec[i - 19] })).sort((a, b) => b.v - a.v), tot = d.receita - FIN[i - 1].receita, t4 = sum(cc.slice(0, 4).map(x => x.v));
+    cards.push({ h: tot > 0 && t4 > tot ? "Crescimento concentrado em poucos clientes" : "De onde veio a variação", b: `Os 4 clientes que mais cresceram somaram <b>${brl(t4)}</b>, contra ${brl(tot)} de variação total do faturamento${tot > 0 && t4 > tot ? `: o resto da carteira caiu ${brl(t4 - tot)}` : ""}. Maior alta: <b>${esc(cc[0].c.nome)}</b> (+${brl(cc[0].v)}).` }); }
+  else { const top = FSEGS.map(s => ({ s, v: d.seg[s.k].r - (FIN[i - 1] || d).seg[s.k].r })).sort((a, b) => b.v - a.v)[0]; cards.push({ h: "Segmento que mais moveu o mês", b: `<b>${top.s.k}</b> variou ${top.v >= 0 ? "+" : "−"}${brl(Math.abs(top.v))}.` }); }
+  const dl = d.lucroLiq - d.b.lucroLiq;
+  cards.push({ h: `Lucro ${dl >= 0 ? "acima" : "abaixo"} da meta`, b: `Lucro líquido de <b>${brl(d.lucroLiq)}</b> contra meta de ${brl(d.b.lucroLiq)} (${dl >= 0 ? "+" : "−"}${brl(Math.abs(dl))}). Margem líquida de ${fpct(d.margemLiq)}.` });
+  document.getElementById("f-perc").innerHTML = `<div class="pt">✦ O que o MAE percebeu no financeiro · ${d.lbl}</div>` + cards.map(c => `<div class="pc"><div class="ph">${c.h}</div>${c.b}</div>`).join("");
+}
+function finTiles(){
+  const i = FS.idx, d = FIN[i], win = FIN.slice(Math.max(0, i - 11), i + 1), hi = win.length - 1;
+  const yoy = i >= 12 ? fDelta("receita", d.receita, FIN[i - 12].receita) : null;
+  const t1 = [
+    { k: "receita", cls: "hero oncolor", title: "Faturamento do mês", foot: `${d.clientes} clientes ativos · ticket médio ${brl(d.ticketMedio)}`, extra: yoy && FS.cmp !== "yoy" ? `<span class="fchip">YoY ${yoy.txt}</span>` : "", col: "rgba(255,255,255,.95)" },
+    { k: "lucroLiq", cls: "", title: "Lucro líquido", foot: `margem líquida <b>${fpct(d.margemLiq)}</b> · meta ${brl(d.b.lucroLiq)}`, col: d.lucroLiq >= 0 ? "var(--good)" : "var(--crit)" },
+    { k: "caixa", cls: "alt oncolor", title: "Caixa", foot: `geração de caixa de <b>${brl(d.geracao)}/mês</b> (média 3 meses, já com investimentos)`, col: "rgba(255,255,255,.95)" },
+  ];
+  document.getElementById("f-t1").innerHTML = t1.map(t => { const dl = fDelta(t.k, d[t.k], fBase(i, t.k)), nb = FS.cmp === "bud" && FM[t.k].noB;
+    return `<button class="ftile ${t.cls} reveal in" data-fm="${t.k}"><div class="tl"><span>${t.title}</span><span class="dr">detalhar ›</span></div>
+      <div class="tv" id="fv-${t.k}" ${t.cls ? "" : `style="color:${t.col}"`}>—</div>
+      <div class="td">${nb ? `<span class="fchip">sem meta de caixa</span>` : fChip(dl) + `<span class="cl">vs ${FCMP[FS.cmp]}</span>`}${t.extra || ""}</div>
+      <div class="ft" ${t.cls ? "" : 'style="color:var(--ink-2)"'}>${t.foot}</div><div class="sk">${fSpark(win.map(x => x[t.k]), hi, t.col)}</div></button>`; }).join("");
+  t1.forEach(t => fAnim(document.getElementById("fv-" + t.k), "t1" + t.k, d[t.k], brl));
+  const t2 = ["margemBruta", "margemLiq", "opex", "ticketMedio"];
+  document.getElementById("f-t2").innerHTML = t2.map(k => { const col = FM[k].dir < 0 ? "#f08a24" : "var(--accent)";
+    return `<button class="ftile t2 reveal in" data-fm="${k}"><div class="tl"><span>${FM[k].l}</span><span class="dr">›</span></div><div class="tv" id="fv-${k}" style="color:${col}">—</div>
+      <div class="td">${fChip(fDelta(k, d[k], fBase(i, k)))}</div><div class="sk">${fSpark(win.map(x => x[k]), hi, col, 30)}</div></button>`; }).join("");
+  t2.forEach(k => fAnim(document.getElementById("fv-" + k), "t2" + k, d[k], v => fFmt(k, v)));
+  document.querySelectorAll("[data-fm]").forEach(el => el.addEventListener("click", () => finMetricDrill(el.dataset.fm)));
+}
+function finRatios(){
+  const i = FS.idx, d = FIN[i], y = i >= 12 ? FIN[i - 12] : null;
+  const g = y ? d.receita / y.receita - 1 : null, opR = d.opex / d.receita, opR12 = y ? y.opex / y.receita : null;
+  const top3 = i >= 18 ? CLIENTES.map(c => c.rec[i - 18]).sort((a, b) => b - a).slice(0, 3) : null, conc = top3 ? sum(top3) / d.receita : null;
+  const items = [
+    { l: "Crescimento do faturamento YoY", v: g == null ? "—" : pct(g), n: y ? `${brl(y.receita)} → ${brl(d.receita)}` : "precisa de 12 meses de histórico", s: g == null ? "" : g >= 0.1 ? "good" : g >= 0 ? "warn" : "bad" },
+    { l: "Despesas / faturamento", v: fpct(opR), n: opR12 ? `era ${fpct(opR12)} há 12 meses · ${opR < opR12 ? "ganhando" : "perdendo"} eficiência` : "quanto do faturamento vai para despesas", s: opR12 ? (opR < opR12 ? "good" : "bad") : "" },
+    { l: "Concentração (3 maiores clientes)", v: conc == null ? "—" : fpct(conc), n: conc == null ? "detalhe por cliente a partir de abr/26" : "acima de 40% aumenta o risco de receita", s: conc == null ? "" : conc > 0.4 ? "warn" : "good" },
+    { l: "Geração de caixa", v: brl(d.geracao) + "/mês", n: `caixa de ${brl(d.caixa)} · investimentos incluídos`, s: d.geracao > 0 ? "good" : "bad" },
+  ];
+  document.getElementById("f-ratios").innerHTML = items.map(x => `<div class="fratio ${x.s}"><div class="rl">${x.l}</div><div class="rv">${x.v}</div><div class="rn">${x.n}</div></div>`).join("");
+}
+function finVar(){
+  const i = FS.idx, d = FIN[i];
+  document.getElementById("f-var-sub").textContent = `${d.ext} contra ${FCMP[FS.cmp]}. Cor mais forte = desvio maior. Verde é favorável (custo menor também conta). Clique numa linha para o histórico.`;
+  document.getElementById("f-var").innerHTML = `<thead><tr><th>Linha</th><th>Atual</th><th>${FHEAD[FS.cmp]}</th><th>Var.</th><th>Var. %</th></tr></thead><tbody>` +
+    FVROWS.map(([k, cls]) => { const b = fBase(i, k), dl = fDelta(k, d[k], b), st = fCf(dl);
+      return `<tr class="${cls}" data-fm="${k}" tabindex="0"><td>${FM[k].l}</td><td>${fFmt(k, d[k])}</td><td>${fFmt(k, b)}</td>
+        <td class="cf" style="${FM[k].t === "pct" ? "" : st}">${dl && FM[k].t !== "pct" ? (dl.diff >= 0 ? "+" : "−") + brl(Math.abs(dl.diff)) : "—"}</td><td class="cf" style="${st}">${dl ? dl.txt : "—"}</td></tr>`; }).join("") + "</tbody>";
+  document.querySelectorAll("#f-var tbody tr").forEach(tr => { tr.addEventListener("click", () => finMetricDrill(tr.dataset.fm)); tr.addEventListener("keydown", e => { if (e.key === "Enter") finMetricDrill(tr.dataset.fm); }); });
+}
+function finBridge(){
+  const i = FS.idx, d = FIN[i], svg = document.getElementById("f-bridge"), sub = document.getElementById("f-br-sub");
+  const b = {}; ["receita", "cmv", "opex", "impostos", "lucroLiq"].forEach(k => b[k] = fBase(i, k));
+  if (b.lucroLiq == null) { sub.textContent = "Sem base de comparação para este mês."; svg.innerHTML = `<text class="ax" x="280" y="150" text-anchor="middle">Escolha outro mês ou outra base</text>`; return; }
+  sub.textContent = `Como o lucro líquido foi de ${brl(b.lucroLiq)} (${FCMP[FS.cmp]}) para ${brl(d.lucroLiq)}. Cada barra é o efeito de uma linha do resultado.`;
+  const steps = [{ l: FS.cmp === "bud" ? "Meta" : "Base", v: b.lucroLiq, tot: true }, { l: "Faturamento", v: d.receita - b.receita }, { l: "CMV", v: -(d.cmv - b.cmv) }, { l: "Despesas", v: -(d.opex - b.opex) }, { l: "Impostos", v: -(d.impostos - b.impostos) }, { l: "Atual", v: d.lucroLiq, tot: true }];
+  let run = 0; const bars = steps.map(s => { if (s.tot) { run = s.v; return { ...s, y0: 0, y1: s.v }; } const a = run; run += s.v; return { ...s, y0: a, y1: run }; });
+  const W = 560, H = 300, pl = 58, pr = 14, pt = 26, pb = 34, pw = W - pl - pr, ph = H - pt - pb;
+  const vals = bars.flatMap(x => [x.y0, x.y1]); let mn = Math.min(0, ...vals), mx = Math.max(0, ...vals); const pad = (mx - mn) * 0.12; mx += pad; if (mn < 0) mn -= pad;
+  const y = v => pt + ph - (v - mn) / (mx - mn) * ph, slot = pw / bars.length, bw = slot * 0.58;
+  let s = `<style>@keyframes fgrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}</style>`;
+  for (let k = 0; k <= 4; k++) { const gv = mn + (mx - mn) * k / 4, gy = y(gv); s += `<line x1="${pl}" x2="${W - pr}" y1="${gy}" y2="${gy}" stroke="var(--hair)"/><text class="ax" x="${pl - 7}" y="${gy + 3}" text-anchor="end">${brl(gv).replace("R$ ", "")}</text>`; }
+  s += `<line x1="${pl}" x2="${W - pr}" y1="${y(0)}" y2="${y(0)}" stroke="var(--hair-2)" stroke-width="1.4"/>`;
+  bars.forEach((bb, k) => { const cx = pl + slot * (k + 0.5), top = Math.min(y(bb.y0), y(bb.y1)), hh = Math.max(2, Math.abs(y(bb.y1) - y(bb.y0)));
+    const col = bb.tot ? "var(--accent)" : bb.v >= 0 ? "var(--good)" : "var(--crit)";
+    s += `<rect x="${(cx - bw / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" rx="4" fill="${col}" style="transform-origin:${cx}px ${y(bb.y0)}px;${REDUCE ? "" : `animation:fgrow .6s cubic-bezier(.2,.8,.25,1) ${k * 90}ms both`}"><title>${bb.l}: ${bb.tot ? brlFull(bb.v) : (bb.v >= 0 ? "+" : "−") + brlFull(Math.abs(bb.v))}</title></rect>`;
+    s += `<text class="ax" x="${cx}" y="${(top - 6).toFixed(1)}" text-anchor="middle" style="fill:${bb.tot ? "var(--ink)" : col};font-weight:700">${bb.tot ? brl(bb.v) : (bb.v >= 0 ? "+" : "−") + brl(Math.abs(bb.v))}</text><text class="ax" x="${cx}" y="${H - 12}" text-anchor="middle">${bb.l}</text>`;
+    if (k < bars.length - 1) s += `<line x1="${(cx + bw / 2).toFixed(1)}" x2="${(pl + slot * (k + 1.5) - bw / 2).toFixed(1)}" y1="${y(bb.y1)}" y2="${y(bb.y1)}" stroke="var(--hair-2)" stroke-dasharray="3 3"/>`; });
+  svg.innerHTML = s;
+}
+const FTS = [{ k: "receita", c: "#3b4dff" }, { k: "opex", c: "#f08a24" }, { k: "lucroLiq", c: "#149b5f" }];
+let FTR = null;
+function fProject(k){
+  const pts = FIN.slice(-12).map(r => r[k]), n = pts.length, xm = (n - 1) / 2, ym = avg(pts); let sxy = 0, sxx = 0;
+  pts.forEach((v, j) => { sxy += (j - xm) * (v - ym); sxx += (j - xm) ** 2; });
+  const sl = sxy / sxx, it = ym - sl * xm, res = Math.sqrt(pts.reduce((a, v, j) => a + (v - (it + sl * j)) ** 2, 0) / (n - 2));
+  return [1, 2, 3, 4, 5, 6].map(h => { const x = n - 1 + h, v = it + sl * x, bd = 1.28 * res * Math.sqrt(1 + 1 / n + (x - xm) ** 2 / sxx); return { v, lo: v - bd, hi: v + bd }; });
+}
+const fLblAt = j => { const dt = new Date(2024, 9 + j, 1); return MES_ABR[dt.getMonth()] + "/" + String(dt.getFullYear()).slice(2); };
+function finTrend(anim){
+  const svg = document.getElementById("f-trend"), N = FIN.length + 6, W = 1180, H = 300, pl = 62, pr = 34, pt = 16, pb = 30, pw = W - pl - pr, ph = H - pt - pb;
+  const P = {}; FTS.forEach(s => P[s.k] = fProject(s.k));
+  const shown = FTS.filter(s => !FS.hidden[s.k]), all = [0]; shown.forEach(s => { FIN.forEach(r => all.push(r[s.k])); P[s.k].forEach(p => all.push(p.lo, p.hi)); });
+  let mn = Math.min(...all), mx = Math.max(...all); const pd = (mx - mn) * 0.06; mx += pd; if (mn < 0) mn -= pd;
+  const x = j => pl + j / (N - 1) * pw, y = v => pt + ph - (v - mn) / (mx - mn) * ph; FTR = { x, y, P };
+  let s = "";
+  for (let k = 0; k <= 4; k++) { const gv = mn + (mx - mn) * k / 4, gy = y(gv); s += `<line x1="${pl}" x2="${W - pr}" y1="${gy}" y2="${gy}" stroke="var(--hair)"/><text class="ax" x="${pl - 7}" y="${gy + 3}" text-anchor="end">${brl(gv).replace("R$ ", "")}</text>`; }
+  if (mn < 0) s += `<line x1="${pl}" x2="${W - pr}" y1="${y(0)}" y2="${y(0)}" stroke="var(--hair-2)" stroke-width="1.4"/>`;
+  s += `<rect x="${x(FIN.length - 1)}" y="${pt}" width="${x(N - 1) - x(FIN.length - 1)}" height="${ph}" fill="var(--surface-2)"/><text class="ax" x="${(x(FIN.length - 1) + x(N - 1)) / 2}" y="${pt + 12}" text-anchor="middle" style="font-weight:800;fill:var(--accent)">PROJEÇÃO</text>`;
+  for (let j = 0; j < N; j++) if (j % 3 === 0 || j === N - 1) s += `<text class="ax" x="${x(j)}" y="${H - 8}" text-anchor="middle">${fLblAt(j)}</text>`;
+  s += `<line x1="${x(FS.idx)}" x2="${x(FS.idx)}" y1="${pt}" y2="${pt + ph}" stroke="var(--accent)" opacity=".35"/>`;
+  shown.forEach(sr => { const band = P[sr.k], last = FIN[FIN.length - 1][sr.k];
+    s += `<path d="M${x(FIN.length - 1)},${y(last)} ${band.map((p, h) => `L${x(FIN.length + h)},${y(p.hi)}`).join(" ")} ${[...band].reverse().map((p, h) => `L${x(N - 1 - h)},${y(p.lo)}`).join(" ")} Z" fill="${sr.c}" opacity=".12"/>`;
+    s += `<polyline class="ftl" points="${FIN.map((r, j) => `${x(j).toFixed(1)},${y(r[sr.k]).toFixed(1)}`).join(" ")}" fill="none" stroke="${sr.c}" stroke-width="${sr.k === "receita" ? 3 : 2.2}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    s += `<polyline points="${x(FIN.length - 1)},${y(last)} ${band.map((p, h) => `${x(FIN.length + h).toFixed(1)},${y(p.v).toFixed(1)}`).join(" ")}" fill="none" stroke="${sr.c}" stroke-width="2.2" stroke-dasharray="6 5"/>`;
+    s += `<circle id="fsd-${sr.k}" r="5" fill="${sr.c}" stroke="#fff" stroke-width="2"/>`; });
+  s += `<line id="f-sline" y1="${pt}" y2="${pt + ph}" stroke="var(--ink-2)" stroke-dasharray="3 3"/>`;
+  for (let j = 0; j < N; j++) s += `<rect class="fhit" data-j="${j}" x="${x(j) - pw / (N - 1) / 2}" y="${pt}" width="${pw / (N - 1)}" height="${ph}" fill="transparent"/>`;
+  svg.innerHTML = s;
+  if (anim && !REDUCE) svg.querySelectorAll(".ftl").forEach((el, k) => { const len = el.getTotalLength(); el.style.strokeDasharray = len; el.style.strokeDashoffset = len;
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transition = `stroke-dashoffset 1.3s ease ${k * 0.15}s`; el.style.strokeDashoffset = "0"; })); });
+  const sc = document.getElementById("f-scrub");
+  svg.querySelectorAll(".fhit").forEach(r => { const set = () => { sc.value = r.dataset.j; finScrub(); }; r.addEventListener("mousemove", set); r.addEventListener("click", () => { set(); if (+r.dataset.j < FIN.length) { FS.idx = +r.dataset.j; document.getElementById("f-mes").value = FS.idx; finRenderAll(false); } }); });
+  finScrub();
+}
+const fValAt = (k, j) => j < FIN.length ? FIN[j][k] : FTR.P[k][j - FIN.length].v;
+function finScrub(){
+  if (!FTR) return; const j = +document.getElementById("f-scrub").value, isP = j >= FIN.length, ln = document.getElementById("f-sline");
+  ln.setAttribute("x1", FTR.x(j)); ln.setAttribute("x2", FTR.x(j));
+  FTS.forEach(s => { const c = document.getElementById("fsd-" + s.k); if (c) { c.setAttribute("cx", FTR.x(j)); c.setAttribute("cy", FTR.y(fValAt(s.k, j))); } });
+  document.getElementById("f-read").innerHTML = `<div class="sr"><span class="t">Mês</span><span class="v">${fLblAt(j)}${isP ? '<span class="ptag">projeção</span>' : ""}</span></div>` +
+    FTS.map(s => { const p = isP ? FTR.P[s.k][j - FIN.length] : null; return `<div class="sr"><span class="t">${FM[s.k].l}</span><span class="v" style="color:${s.c}">${brl(fValAt(s.k, j))}${p ? ` <span style="font-size:10.5px;color:var(--muted);font-weight:600">${brl(p.lo)}–${brl(p.hi)}</span>` : ""}</span></div>`; }).join("");
+}
+function finSegs(){
+  const i = FS.idx, d = FIN[i], mx = Math.max(...FSEGS.map(s => d.seg[s.k].r));
+  document.getElementById("f-seg-sub").textContent = `${d.ext} · participação, margem bruta e variação contra ${FCMP[FS.cmp]}. Clique para detalhar.`;
+  const box = document.getElementById("f-segs");
+  box.innerHTML = FSEGS.map(s => { const x = d.seg[s.k], b = FS.cmp === "mom" ? (FIN[i - 1] ? FIN[i - 1].seg[s.k].r : null) : FS.cmp === "yoy" ? (FIN[i - 12] ? FIN[i - 12].seg[s.k].r : null) : d.bseg[s.k].r;
+    return `<button class="fseg" data-seg="${s.k}"><span class="sn"><span style="width:10px;height:10px;border-radius:3px;background:${s.color};display:inline-block"></span>${s.k}</span>
+      <span class="sv"><b>${brl(x.r)}</b> ${fChip(fDelta("receita", x.r, b))}</span>
+      <span class="st"><span class="sf" data-w="${(x.r / mx * 100).toFixed(1)}" style="background:${s.color}"></span></span>
+      <span class="sm">${Math.round(x.r / d.receita * 100)}% do faturamento · margem bruta ${fpct((x.r - x.c) / x.r)}</span></button>`; }).join("");
+  const fills = [...box.querySelectorAll(".sf")];
+  requestAnimationFrame(() => requestAnimationFrame(() => fills.forEach((f, k) => { if (REDUCE) f.style.width = f.dataset.w + "%"; else setTimeout(() => f.style.width = f.dataset.w + "%", k * 110); })));
+  box.querySelectorAll(".fseg").forEach(b => b.addEventListener("click", () => finSegDrill(b.dataset.seg)));
+}
+let FINS = [], FSUM = null;
+function finInsights(){
+  const i = FS.idx, d = FIN[i], out = [];
+  if (i >= 6) { const a = FIN.slice(i - 6, i + 1).map(r => r.receita), g = a.slice(1).map((v, k) => v / a[k] - 1), rc = (g[3] + g[4] + g[5]) / 3, pr = (g[0] + g[1] + g[2]) / 3;
+    out.push({ c: rc > pr ? "good" : "warn", t: "Ritmo do faturamento", h: `Média de <b>${pct(rc)}/mês</b> nos últimos 3 meses contra <b>${pct(pr)}/mês</b> nos 3 anteriores: ${rc > pr ? "<b>acelerando</b>" : "<b>desacelerando</b>"}.`, p: `Faturamento ${pct(rc)}/mês nos últimos 3 meses contra ${pct(pr)}/mês nos 3 anteriores.` }); }
+  const lines = ["receita", "cmv", "opex", "impostos"].map(k => { const b = fBase(i, k); return b == null ? null : { k, dl: fDelta(k, d[k], b), a: Math.abs(d[k] - b) }; }).filter(Boolean).sort((a, b) => b.a - a.a);
+  if (lines.length) { const L = lines[0]; out.push({ c: L.dl.fav ? "good" : "bad", t: `Maior desvio vs ${FCMP[FS.cmp]}`, h: `<b>${FM[L.k].l}</b> variou <b>${L.dl.diff >= 0 ? "+" : "−"}${brl(Math.abs(L.dl.diff))}</b> (${L.dl.txt}), ${L.dl.fav ? "a favor" : "contra"} o lucro.`, p: `${FM[L.k].l} variou ${L.dl.txt} (${brl(L.dl.diff)}).` }); }
+  if (i >= 12) { const y = FIN[i - 12], gR = d.receita / y.receita - 1, gO = d.opex / y.opex - 1;
+    out.push({ c: gR > gO ? "good" : "bad", t: "Eficiência das despesas", h: `Em 12 meses o faturamento cresceu <b>${pct(gR)}</b> e as despesas <b>${pct(gO)}</b>. ${gR > gO ? "A operação está ganhando escala." : "Os custos crescem mais rápido que as vendas."}`, p: `Faturamento ${pct(gR)} e despesas ${pct(gO)} em 12 meses.` });
+    const cs = FSEGS.map(s => ({ s, v: d.seg[s.k].r - y.seg[s.k].r })).sort((a, b) => b.v - a.v);
+    out.push({ c: "good", t: "Segmento que puxa o crescimento", h: `<b>${cs[0].s.k}</b> respondeu por <b>${brl(cs[0].v)}</b> dos ${brl(d.receita - y.receita)} a mais em 12 meses.`, p: `${cs[0].s.k} respondeu por ${brl(cs[0].v)} do crescimento anual.` }); }
+  const pj = fProject("receita"), end = pj[pj.length - 1];
+  out.push({ c: "good", t: "Projeção do faturamento", h: `Tende a <b>${brl(end.v)}</b> em ${fLblAt(FIN.length + 5)} (${pct(end.v / FIN[FIN.length - 1].receita - 1)}), faixa de ${brl(end.lo)} a ${brl(end.hi)}.`, p: `Faturamento projetado em ${brl(end.v)} para ${fLblAt(FIN.length + 5)}.` });
+  FINS = out;
+  document.getElementById("f-ins").innerHTML = out.map(x => `<div class="fin-i ${x.c}"><div class="it">${x.t}</div>${x.h}</div>`).join("");
+}
+function finSummary(){
+  const i = FS.idx, d = FIN[i];
+  const moves = ["receita", "lucroLiq", "margemBruta", "margemLiq", "opex", "ticketMedio"].map(k => { const b = fBase(i, k); if (b == null) return null; const dl = fDelta(k, d[k], b);
+    const rel = dl.isPct ? dl.diff * 10 : dl.pct !== undefined ? dl.pct : dl.diff / d.receita; return { k, dl, sc: rel * FM[k].dir }; }).filter(Boolean);
+  document.getElementById("f-sum-sub").textContent = `${d.ext} contra ${FCMP[FS.cmp]}`;
+  if (!moves.length) { FSUM = null; document.getElementById("f-sum").innerHTML = `<div><div class="sb">Sem base de comparação para este mês.</div></div>`; return; }
+  const best = [...moves].sort((a, b) => b.sc - a.sc)[0], worst = [...moves].sort((a, b) => a.sc - b.sc)[0];
+  const att = d.margemLiq < d.b.margemLiq ? { t: `Margem líquida ${fpct(d.margemLiq)}`, b: `Abaixo da meta de ${fpct(d.b.margemLiq)}. ${d.cmv > d.b.cmv ? "O CMV acima da meta é o principal motivo." : "As despesas acima da meta pesam no resultado."}` }
+    : { t: "Concentração de clientes", b: "Poucos clientes explicam a maior parte do crescimento. Acompanhe os que estão reduzindo compras." };
+  FSUM = [
+    best.sc > 0 ? { c: "good", h: "▲ O que melhorou", t: `${FM[best.k].l} ${best.dl.txt}`, b: `${fFmt(best.k, fBase(i, best.k))} → ${fFmt(best.k, d[best.k])}.` } : { c: "", h: "▲ O que melhorou", t: "Nenhum indicador melhorou", b: `O movimento menos desfavorável foi ${FM[best.k].l} (${best.dl.txt}).` },
+    { c: "bad", h: "▼ O que piorou", t: `${FM[worst.k].l} ${worst.dl.txt}`, b: worst.sc < 0 ? `${fFmt(worst.k, fBase(i, worst.k))} → ${fFmt(worst.k, d[worst.k])}.` : "Nenhum indicador piorou; este foi o avanço mais fraco." },
+    { c: "warn", h: "● Exige atenção", t: att.t, b: att.b },
+  ];
+  document.getElementById("f-sum").innerHTML = FSUM.map(s => `<div class="${s.c}"><div class="sh">${s.h}</div><div class="stt">${s.t}</div><div class="sb">${s.b}</div></div>`).join("");
+}
+function finMetricDrill(k){
+  const m = FM[k], i = FS.idx, hasB = !m.noB, fmtAx = v => m.t === "pct" ? fpct(v) : brl(v).replace("R$ ", "");
+  const W = 520, H = 220, pl = 58, pr = 10, pt = 12, pb = 26, pw = W - pl - pr, ph = H - pt - pb, vals = FIN.map(r => r[k]), bv = hasB ? FIN.map(r => r.b[k]) : [];
+  let mn = Math.min(...vals, ...bv), mx = Math.max(...vals, ...bv); const pd = (mx - mn) * 0.1 || 1; mn -= pd; mx += pd;
+  const x = j => pl + j / (FIN.length - 1) * pw, y = v => pt + ph - (v - mn) / (mx - mn) * ph;
+  let s = ""; for (let q = 0; q <= 3; q++) { const gv = mn + (mx - mn) * q / 3; s += `<line x1="${pl}" x2="${W - pr}" y1="${y(gv)}" y2="${y(gv)}" stroke="var(--hair)"/><text class="ax" x="${pl - 6}" y="${y(gv) + 3}" text-anchor="end">${fmtAx(gv)}</text>`; }
+  FIN.forEach((r, j) => { if (j % 4 === 0 || j === FIN.length - 1) s += `<text class="ax" x="${x(j)}" y="${H - 7}" text-anchor="middle">${r.lbl}</text>`; });
+  s += `<line x1="${x(i)}" x2="${x(i)}" y1="${pt}" y2="${pt + ph}" stroke="var(--accent)" opacity=".4"/>`;
+  if (hasB) s += `<polyline points="${bv.map((v, j) => `${x(j).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="var(--ink-2)" stroke-width="1.8" stroke-dasharray="5 4"/>`;
+  s += `<polyline points="${vals.map((v, j) => `${x(j).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${m.dir < 0 ? "#f08a24" : "var(--accent)"}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${x(i)}" cy="${y(vals[i])}" r="5" fill="${m.dir < 0 ? "#f08a24" : "var(--accent)"}" stroke="#fff" stroke-width="2"/>`;
+  let rows = ""; for (let j = i; j >= Math.max(0, i - 11); j--) { const r = FIN[j], mo = j ? fDelta(k, r[k], FIN[j - 1][k]) : null, bd = hasB ? fDelta(k, r[k], r.b[k]) : null;
+    rows += `<tr ${j === i ? 'style="font-weight:800;background:var(--surface-2)"' : ""}><td>${r.lbl}</td><td class="n">${fFmt(k, r[k], true)}</td><td class="n">${mo ? fChip(mo) : "—"}</td>${hasB ? `<td class="n">${fFmt(k, r.b[k], true)}</td><td class="n">${bd ? fChip(bd) : "—"}</td>` : ""}</tr>`; }
+  const w12 = FIN.slice(Math.max(0, i - 11), i + 1).map(r => r[k]);
+  openDrawer(m.l, `Histórico de 24 meses · ${FIN[i].ext} em destaque`, `
+    <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)"><span>━ ${m.l}</span>${hasB ? "<span>┅ Meta</span>" : ""}</div>
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${s}</svg>
+    <div class="note">Média dos últimos 12 meses: <b>${fFmt(k, avg(w12))}</b>.${i >= 12 ? ` Contra ${FIN[i - 12].lbl}: ${fChip(fDelta(k, FIN[i][k], FIN[i - 12][k]))}` : ""}${k === "caixa" ? ` Geração média de ${brl(FIN[i].geracao)}/mês, com investimentos de ${brl(FIN[i].capex)} no mês.` : ""}${k === "margemBruta" && i === FIN.length - 1 ? ` O MAE detectou reajustes de ${A.reajRec.map(r => esc(r.f.nome)).join(" e ")} no período.` : ""}</div>
+    <div class="tbl-wrap"><table class="list" style="min-width:0"><thead><tr><th>Mês</th><th class="n">Atual</th><th class="n">vs ant.</th>${hasB ? '<th class="n">Meta</th><th class="n">vs meta</th>' : ""}</tr></thead><tbody>${rows}</tbody></table></div>`);
+}
+function finSegDrill(k){
+  const s = FSEGS.find(x => x.k === k), i = FS.idx, d = FIN[i];
+  const W = 520, H = 200, pl = 58, pr = 10, pt = 12, pb = 26, pw = W - pl - pr, ph = H - pt - pb, vals = FIN.map(r => r.seg[k].r), bv = FIN.map(r => r.bseg[k].r);
+  let mn = Math.min(...vals, ...bv), mx = Math.max(...vals, ...bv); const pd = (mx - mn) * 0.1; mn -= pd; mx += pd;
+  const x = j => pl + j / (FIN.length - 1) * pw, y = v => pt + ph - (v - mn) / (mx - mn) * ph;
+  let sv = ""; for (let q = 0; q <= 3; q++) { const gv = mn + (mx - mn) * q / 3; sv += `<line x1="${pl}" x2="${W - pr}" y1="${y(gv)}" y2="${y(gv)}" stroke="var(--hair)"/><text class="ax" x="${pl - 6}" y="${y(gv) + 3}" text-anchor="end">${brl(gv).replace("R$ ", "")}</text>`; }
+  FIN.forEach((r, j) => { if (j % 4 === 0 || j === FIN.length - 1) sv += `<text class="ax" x="${x(j)}" y="${H - 7}" text-anchor="middle">${r.lbl}</text>`; });
+  sv += `<polyline points="${bv.map((v, j) => `${x(j)},${y(v)}`).join(" ")}" fill="none" stroke="var(--ink-2)" stroke-width="1.8" stroke-dasharray="5 4"/><polyline points="${vals.map((v, j) => `${x(j)},${y(v)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2.6"/><circle cx="${x(i)}" cy="${y(vals[i])}" r="5" fill="${s.color}" stroke="#fff" stroke-width="2"/>`;
+  const cl = i >= 18 ? s.ids.map(id => byId(CLIENTES, id)).sort((a, b) => b.rec[i - 18] - a.rec[i - 18]) : [];
+  openDrawer(`Segmento ${k}`, `Faturamento, margem e clientes · ${d.ext}`, `
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${sv}</svg>
+    <div class="note">Faturamento de <b>${brlFull(d.seg[k].r)}</b> no mês (${Math.round(d.seg[k].r / d.receita * 100)}% do total), margem bruta de <b>${fpct((d.seg[k].r - d.seg[k].c) / d.seg[k].r)}</b>. Meta do mês: ${brlFull(d.bseg[k].r)}.${i >= 12 ? ` Crescimento anual de <b>${pct(d.seg[k].r / FIN[i - 12].seg[k].r - 1)}</b>.` : ""}</div>
+    ${cl.length ? `<div><div class="sec-t">Clientes do segmento</div><div class="tbl-wrap"><table class="list" style="min-width:0"><thead><tr><th>Cliente</th><th class="n">${d.lbl}</th><th class="n">vs mês ant.</th></tr></thead><tbody>${cl.map(c => { const v = c.rec[i - 18], p = i >= 19 ? c.rec[i - 19] : null;
+      return `<tr data-act="cliente:${c.id}"><td><b>${esc(c.nome)}</b></td><td class="n">${brl(v)}</td><td class="n">${p != null ? `<span class="${v >= p ? "up" : "down"}">${pct(v / p - 1, 0)}</span>` : "—"}</td></tr>`; }).join("")}</tbody></table></div></div>` : ""}`);
+}
+function finRenderAll(first){
+  document.getElementById("f-ctx").textContent = `${FIN[FS.idx].ext} vs ${FCMP[FS.cmp]}`;
+  finPerceived(); finTiles(); finRatios(); finVar(); finBridge(); finSegs(); finInsights(); finSummary(); finTrend(first);
+  if (first) { document.getElementById("f-scrub").value = FS.idx; finScrub(); }
+}
+function finWire(){
+  document.getElementById("f-mes").addEventListener("change", e => { FS.idx = +e.target.value; finRenderAll(false); });
+  document.querySelectorAll("#f-cmp button").forEach(b => b.addEventListener("click", () => { FS.cmp = b.dataset.c; document.querySelectorAll("#f-cmp button").forEach(x => x.classList.toggle("on", x === b)); finRenderAll(false); }));
+  document.getElementById("f-leg").innerHTML = FTS.map(s => `<button data-s="${s.k}" class="${FS.hidden[s.k] ? "off" : ""}"><span class="dt" style="background:${s.c}"></span>${FM[s.k].l}</button>`).join("") + `<span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);padding:4px 8px"><span class="dash"></span>projeção</span>`;
+  document.querySelectorAll("#f-leg button").forEach(b => b.addEventListener("click", () => { const k = b.dataset.s; FS.hidden[k] = !FS.hidden[k]; if (FTS.every(s => FS.hidden[s.k])) FS.hidden[k] = false; b.classList.toggle("off", !!FS.hidden[k]); finTrend(false); }));
+  document.getElementById("f-scrub").addEventListener("input", finScrub);
+  if (FDL) { document.getElementById("f-exp").hidden = false; document.getElementById("f-csv").addEventListener("click", () => finSave("csv")); document.getElementById("f-pdf").addEventListener("click", () => finSave("pdf")); }
+  if (FSAMPLE) document.getElementById("f-ai").classList.add("show");
+  document.getElementById("f-ai-btn").addEventListener("click", finParecer);
+  document.getElementById("f-ai-stop").addEventListener("click", () => fAiCtl && fAiCtl.abort());
+  finRenderAll(true);
+}
+
+/* ---- exportação e parecer (capacidades do Artifact) ---- */
+const FRT = (typeof window.claude !== "undefined" && window.claude && typeof window.claude.use === "function") ? window.claude : null;
+let FDL = null, FSAMPLE = null, fAiCtl = null;
+if (FRT) {
+  FRT.use("downloads").then(dl => { FDL = dl; if (dl && ROUTE === "financeiro") render(); }).catch(() => {});
+  FRT.use("sample").then(s => { FSAMPLE = s; if (s && ROUTE === "financeiro") document.getElementById("f-ai")?.classList.add("show"); }).catch(() => {});
+}
+function finCSV(){
+  const ks = ["receita", "cmv", "lucroBruto", "margemBruta", "opex", "lucroOp", "margemOp", "impostos", "lucroLiq", "margemLiq", "ticketMedio", "caixa", "geracao"];
+  const cell = (k, v) => FM[k].t === "pct" ? (v * 100).toFixed(2).replace(".", ",") : String(Math.round(v));
+  const head = ["Mês", ...ks.map(k => FM[k].l + (FM[k].t === "pct" ? " %" : "")), ...FSEGS.map(s => "Faturamento " + s.k), "Meta faturamento", "Meta lucro líquido"];
+  return "﻿" + [head.join(";"), ...FIN.map(r => [r.lbl, ...ks.map(k => cell(k, r[k])), ...FSEGS.map(s => r.seg[s.k].r), Math.round(r.b.receita), Math.round(r.b.lucroLiq)].join(";"))].join("\r\n");
+}
+const fSafe = s => String(s).replace(/<[^>]+>/g, "").replace(/−/g, "-").replace(/▲/g, "+").replace(/▼/g, "-").replace(/[■●✦]/g, "").replace(/→/g, "->").replace(/[“”]/g, '"').replace(/…/g, "...").replace(/[  ]/g, " ");
+function finPDF(){
+  const J = window.jspdf && window.jspdf.jsPDF; if (!J) throw new Error("jspdf");
+  const doc = new J({ unit: "mm", format: "a4" }), i = FS.idx, d = FIN[i], W = 210, M = 14; let y;
+  doc.setFillColor(45, 63, 214); doc.rect(0, 0, W, 30, "F"); doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.text(fSafe(`MAE · Financeiro · ${EMPRESA}`), M, 14);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text(fSafe(`${d.ext} | comparado com ${FCMP[FS.cmp]} | dados de exemplo`), M, 22);
+  y = 40; const kp = ["receita", "lucroLiq", "caixa", "margemBruta", "margemLiq", "opex"], bw = (W - 2 * M - 8) / 3;
+  kp.forEach((k, n) => { const cx = M + (n % 3) * (bw + 4), cy = y + Math.floor(n / 3) * 22, dl = fDelta(k, d[k], fBase(i, k));
+    doc.setFillColor(243, 245, 250); doc.roundedRect(cx, cy, bw, 18, 2, 2, "F"); doc.setTextColor(86, 96, 126); doc.setFontSize(8); doc.text(fSafe(FM[k].l), cx + 3, cy + 5);
+    doc.setTextColor(15, 26, 51); doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text(fSafe(fFmt(k, d[k], true)), cx + 3, cy + 11.5); doc.setFont("helvetica", "normal");
+    if (dl) { doc.setFontSize(8); doc.setTextColor(...(dl.fav === null ? [86, 96, 126] : dl.fav ? [20, 155, 95] : [229, 72, 77])); doc.text(fSafe(`${dl.txt} vs ${FCMP[FS.cmp]}`), cx + 3, cy + 16); } });
+  y += 50; doc.setTextColor(15, 26, 51); doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("Análise de variação", M, y); y += 6;
+  const cols = [M, M + 88, M + 122, M + 156, W - M]; doc.setFontSize(8); doc.setTextColor(152, 160, 184); ["Linha", "Atual", FHEAD[FS.cmp], "Var.", "Var. %"].forEach((h, k) => doc.text(fSafe(h), cols[k], y, { align: k ? "right" : "left" }));
+  y += 2; doc.setDrawColor(216, 221, 234); doc.line(M, y, W - M, y); y += 5;
+  FVROWS.forEach(([k, cls]) => { const b = fBase(i, k), dl = fDelta(k, d[k], b); doc.setFont("helvetica", cls === "total" ? "bold" : "normal"); doc.setFontSize(9); doc.setTextColor(15, 26, 51);
+    doc.text(fSafe(FM[k].l), cols[0] + (cls === "sub" ? 3 : 0), y); doc.text(fSafe(fFmt(k, d[k], true)), cols[1], y, { align: "right" }); doc.text(fSafe(fFmt(k, b, true)), cols[2], y, { align: "right" });
+    if (dl) { doc.setTextColor(...(dl.fav === null ? [86, 96, 126] : dl.fav ? [20, 155, 95] : [229, 72, 77])); if (FM[k].t !== "pct") doc.text(fSafe((dl.diff >= 0 ? "+" : "-") + brlFull(Math.abs(dl.diff))), cols[3], y, { align: "right" }); doc.text(fSafe(dl.txt), cols[4], y, { align: "right" }); }
+    y += 6; });
+  y += 4; doc.setTextColor(15, 26, 51); doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("Faturamento e lucro - 12 meses", M, y); y += 4;
+  const win = FIN.slice(Math.max(0, i - 11), i + 1), mxv = Math.max(...win.map(r => r.receita)), ch = { x: M, y, w: W - 2 * M, h: 40 }, bwc = ch.w / win.length * 0.6;
+  win.forEach((r, k) => { const cx = ch.x + ch.w / win.length * (k + 0.5), hh = r.receita / mxv * (ch.h - 6), lh = Math.max(0, r.lucroLiq) / mxv * (ch.h - 6);
+    doc.setFillColor(...(k === win.length - 1 ? [45, 63, 214] : [190, 198, 250])); doc.rect(cx - bwc / 2, ch.y + ch.h - hh, bwc, hh, "F"); doc.setFillColor(20, 155, 95); doc.rect(cx - bwc / 4, ch.y + ch.h - lh, bwc / 2, lh, "F");
+    doc.setFontSize(6.5); doc.setFont("helvetica", "normal"); doc.setTextColor(86, 96, 126); doc.text(fSafe(r.lbl), cx, ch.y + ch.h + 4, { align: "center" }); });
+  y += ch.h + 11;
+  const sec = (t, items) => { if (!items || !items.length) return; if (y > 250) { doc.addPage(); y = 20; } doc.setTextColor(15, 26, 51); doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text(fSafe(t), M, y); y += 6;
+    items.forEach(it => { if (y > 275) { doc.addPage(); y = 20; } if (it.h) { doc.setFont("helvetica", "bold"); doc.setFontSize(9.5); doc.setTextColor(15, 26, 51); doc.text(fSafe(it.h), M, y); y += 4.6; }
+      doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(86, 96, 126); const ls = doc.splitTextToSize(fSafe(it.b), W - 2 * M); doc.text(ls, M, y); y += ls.length * 4.2 + 2.5; }); };
+  sec("Resumo executivo", (FSUM || []).map(s => ({ h: s.h + ": " + s.t, b: s.b })));
+  sec("Insights financeiros", FINS.map(x => ({ h: x.t, b: x.p })));
+  const ai = document.getElementById("f-ai-out").textContent.trim(); if (ai) sec("Parecer (Claude)", [{ b: ai }]);
+  const pgs = doc.getNumberOfPages(); for (let p = 1; p <= pgs; p++) { doc.setPage(p); doc.setFontSize(7.5); doc.setTextColor(152, 160, 184); doc.text(fSafe(`MAE Financeiro - ${d.lbl} - página ${p} de ${pgs}`), W - M, 292, { align: "right" }); }
+  return doc.output("arraybuffer");
+}
+async function finSave(kind){
+  const note = document.getElementById("f-note"), fn = `mae-financeiro-${FIN[FS.idx].lbl.replace("/", "-").toLowerCase()}.${kind}`; let data;
+  try { data = kind === "csv" ? finCSV() : finPDF(); } catch (e) { note.textContent = e.message === "jspdf" ? "O gerador de PDF não carregou. Recarregue a página." : "Não foi possível montar o arquivo."; return; }
+  note.textContent = "Aguardando sua confirmação…";
+  try { await FDL.save({ filename: fn, data }); note.textContent = `${fn} salvo.`; }
+  catch (e) { const c = e && e.code; note.textContent = c === "declined" ? "Exportação cancelada." : c === "rate_limited" ? "Já há uma confirmação aberta. Tente em instantes." : "Não foi possível exportar nesta visualização.";
+    if (["unavailable", "not_granted", "capability_disabled", "capability_removed"].includes(c)) { FDL = null; document.getElementById("f-exp").hidden = true; } }
+}
+async function finParecer(){
+  if (!FSAMPLE) return; const out = document.getElementById("f-ai-out"), st = document.getElementById("f-ai-st"), btn = document.getElementById("f-ai-btn"), stop = document.getElementById("f-ai-stop"), i = FS.idx, d = FIN[i];
+  const linhas = FVROWS.map(([k]) => { const b = fBase(i, k), dl = fDelta(k, d[k], b); return `${FM[k].l}: atual ${fFmt(k, d[k], true)}; base ${fFmt(k, b, true)}; variação ${dl ? dl.txt : "n/d"}`; }).join("\n");
+  const prompt = `Você é o diretor financeiro da ${EMPRESA}, uma distribuidora de alimentos B2B. Escreva um parecer executivo em português do Brasil sobre ${d.ext}, comparando com ${FCMP[FS.cmp]}.
+Regras: no máximo 180 palavras; 3 parágrafos curtos (desempenho, causas, próximos passos); cite números exatos; nada de conselho genérico; texto simples sem markdown nem títulos.
+
+Resultado:
+${linhas}
+
+Segmentos: ${FSEGS.map(s => `${s.k} ${brlFull(d.seg[s.k].r)} (margem ${fpct((d.seg[s.k].r - d.seg[s.k].c) / d.seg[s.k].r)})`).join("; ")}
+Caixa ${brlFull(d.caixa)}; geração média ${brlFull(d.geracao)}/mês.
+Sinais do MAE: ${SIGNALS.map(s => s.t).join("; ")}.
+Insights: ${FINS.map(x => x.p).join(" ")}`;
+  fAiCtl = new AbortController(); btn.disabled = true; stop.hidden = false; out.textContent = ""; st.textContent = "Pensando…";
+  try { const { truncated } = await FSAMPLE(prompt, { signal: fAiCtl.signal, onText: ({ text }) => { out.textContent = text; st.textContent = "Escrevendo…"; } });
+    st.textContent = truncated ? "Parecer cortado no limite de tamanho." : `Parecer de ${d.lbl} vs ${FCMP[FS.cmp]}. Entra no PDF.`; }
+  catch (e) { out.textContent = e && e.text ? e.text : ""; st.textContent = e && e.code === "cancelled" ? "Parado." : e && e.code === "rate_limited" ? "Limite de uso atingido. Tente mais tarde." : "Não foi possível gerar o parecer agora.";
+    if (e && ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(e.code)) document.getElementById("f-ai").classList.remove("show"); }
+  finally { btn.disabled = false; stop.hidden = true; }
+}
+
+addMarginSignal();
 /* ================= VIEWS ================= */
 function vVisao(){
   const h = new Date().getHours(), saud = h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
   const hero = SIGNALS[0], pend = recsBy("pendente");
   const rows = [
-    { ic: "💰", a: "Receita", s: `<span class="${A.varMes >= 0 ? "up" : "down"}">${A.varMes >= 0 ? "↑" : "↓"} ${pct(A.varMes).replace(/[+−]/, "")}</span> vs agosto · ${brl(A.fatAtual)}`, r: "insights" },
+    { ic: "💰", a: "Faturamento", s: `<span class="${A.varMes >= 0 ? "up" : "down"}">${A.varMes >= 0 ? "↑" : "↓"} ${pct(A.varMes).replace(/[+−]/, "")}</span> vs agosto · ${brl(A.fatAtual)}`, r: "financeiro" },
+    { ic: "📈", a: "Lucro", s: (() => { const d = FIN[FIN.length - 1], p = FIN[FIN.length - 2]; return `${brl(d.lucroLiq)} · margem ${fpct(d.margemLiq)} · <span class="${d.margemBruta >= p.margemBruta ? "up" : "down"}">bruta ${(d.margemBruta - p.margemBruta >= 0 ? "+" : "−") + Math.abs((d.margemBruta - p.margemBruta) * 100).toFixed(1).replace(".", ",")} p.p.</span>`; })(), r: "financeiro" },
     { ic: "👥", a: "Clientes", s: `${A.reduz.length} em atenção · ${A.ativos} ativos`, r: "clientes" },
     { ic: "🤝", a: "Fornecedores", s: `${A.reajRec.length} reajustes detectados · ${A.atrasoForn.length} com atrasos`, r: "fornecedores" },
     { ic: "📦", a: "Produtos", s: `${A.prodQueda.length} em queda · ${A.prodAlta.length} em alta`, r: "produtos" },
@@ -781,7 +1301,7 @@ function vDados(){
 }
 
 /* ================= PERGUNTE À EMPRESA ================= */
-const SUGS = ["Quais clientes reduziram compras?", "Quanto faturamos com o Mercado Bom Preço nos últimos 6 meses?", "Quais fornecedores tiveram aumento de preço?", "Por que nosso faturamento mudou este mês?", "Quais contratos vencem este mês?", "Quais produtos estão em queda?"];
+const SUGS = ["Qual foi o lucro de setembro?", "Quais clientes reduziram compras?", "Quanto faturamos com o Mercado Bom Preço nos últimos 6 meses?", "Quais fornecedores tiveram aumento de preço?", "Por que nosso faturamento mudou este mês?", "Quais contratos vencem este mês?", "Quais produtos estão em queda?"];
 let ASKED = null;
 function norm(s){ return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
 function answer(q){
@@ -789,6 +1309,9 @@ function answer(q){
   const cli = CLIENTES.find(c => n.includes(norm(c.nome)) || norm(c.nome).split(" ").filter(w => w.length > 4).some(w => n.includes(w)));
   if (cli && /(fatur|compr|venda|quanto)/.test(n)) return { a: `Nos últimos 6 meses (abr–set) faturamos <b>${brlFull(sum(cli.rec))}</b> com ${esc(cli.nome)}. Em setembro foram ${brlFull(cli.rec[5])}, ${pct(cli.rec[5] / cli.rec[4] - 1, 0)} em relação a agosto.`,
     ev: MESES.map((m, i) => `${m}: ${brlFull(cli.rec[i])}`), src: ["Planilha de vendas"], link: `cliente:${cli.id}` };
+  if (/(lucro|margem)/.test(n)) { const d = FIN[FIN.length - 1], p = FIN[FIN.length - 2];
+    return { a: `Em setembro o lucro líquido foi de <b>${brlFull(d.lucroLiq)}</b> (margem líquida de ${fpct(d.margemLiq)}), contra ${brlFull(p.lucroLiq)} em agosto e meta de ${brlFull(d.b.lucroLiq)}. A margem bruta foi de ${fpct(p.margemBruta)} para ${fpct(d.margemBruta)} porque o CMV subiu ${pct(d.cmv / p.cmv - 1)}.`,
+      ev: [`Faturamento: ${brlFull(d.receita)}`, `CMV: ${brlFull(d.cmv)}`, `Despesas operacionais: ${brlFull(d.opex)}`, `Impostos: ${brlFull(d.impostos)}`, `Lucro líquido: ${brlFull(d.lucroLiq)}`], src: ["Planilha de vendas", "Compras e fornecedores"], link: "go:financeiro" }; }
   if (/(reduz|diminu|cair|caiu|queda)/.test(n) && /client/.test(n)) return { a: `${A.reduz.length} clientes reduziram compras de forma relevante (≥ 20%): ${A.reduz.map(x => `<b>${esc(x.c.nome)}</b> (${pct(x.var, 0)})`).join(", ")}. Juntos são <b>${brl(A.reduzPerda)}/mês</b> a menos.`,
     ev: A.reduz.map(x => `${x.c.nome}: média ${brl(x.base)} → ${brl(x.rec)}`), src: ["Planilha de vendas", "WhatsApp"], link: "go:clientes" };
   if (/fornecedor/.test(n) && /(preco|aument|reajust)/.test(n)) return { a: `${A.reajustes.filter(r => r.n).length} fornecedores reajustaram preços em 8 meses. O maior foi <b>${esc(A.reajMulti[0].f.nome)}</b>: ${A.reajMulti[0].n} reajustes, ${pct(A.reajMulti[0].alta, 0)} acumulado.`,
@@ -815,7 +1338,7 @@ function vPergunte(){
 }
 
 /* ================= RENDER ================= */
-const VIEWS = { visao: vVisao, clientes: vClientes, fornecedores: vFornecedores, produtos: vProdutos, contratos: vContratos, conversas: vConversas, insights: vInsights, recomendacoes: vRecs, acoes: vAcoes, resultados: vResultados, aprendizado: vAprendizado, pergunte: vPergunte, dados: vDados };
+const VIEWS = { visao: vVisao, financeiro: vFinanceiro, clientes: vClientes, fornecedores: vFornecedores, produtos: vProdutos, contratos: vContratos, conversas: vConversas, insights: vInsights, recomendacoes: vRecs, acoes: vAcoes, resultados: vResultados, aprendizado: vAprendizado, pergunte: vPergunte, dados: vDados };
 function countUp(el, target, fmt, dur = 900){ if (!el) return; if (REDUCE) { el.textContent = fmt(target); return; } const t0 = performance.now();
   (function st(now){ const t = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - t, 3); el.textContent = fmt(target * e); if (t < 1) requestAnimationFrame(st); })(performance.now()); }
 function render(){
@@ -829,6 +1352,7 @@ function render(){
   if (ROUTE === "conversas") document.querySelectorAll("#conv-f button").forEach(b => b.addEventListener("click", () => { document.querySelectorAll("#conv-f button").forEach(x => x.classList.toggle("on", x === b)); const t = b.dataset.t;
     document.querySelectorAll("#conv-list > div").forEach(el => el.hidden = t !== "todas" && !el.dataset.tags.split(",").includes(t)); }));
   if (ROUTE === "recomendacoes") document.querySelectorAll("#rec-tabs button").forEach(b => b.addEventListener("click", () => { REC_TAB = b.dataset.k; render(); }));
+  if (ROUTE === "financeiro") finWire();
   if (ROUTE === "pergunte") document.getElementById("ask-form").addEventListener("submit", e => { e.preventDefault(); const q = document.getElementById("ask-in").value.trim(); if (q) ask(q); });
 }
 render();

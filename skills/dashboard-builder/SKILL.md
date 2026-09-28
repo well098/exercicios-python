@@ -1,7 +1,7 @@
 ---
 name: dashboard-builder
 description: >-
-  Constrói dashboards e painéis interativos de nível analista sênior para qualquer domínio (finanças, operações, produto, vendas, marketing, RH, SaaS, projetos como o MAE) como página HTML única e publicável, com KPIs hierarquizados, comparação com período anterior, ano anterior e meta, análise de variação, drill-down, projeção, insights calculados, exportação CSV/PDF e animações. Use esta skill sempre que o usuário pedir um dashboard, painel, cockpit, relatório interativo, visão de KPIs, métricas, indicadores, analytics ou "tela para acompanhar" números, ou quando colar um prompt de dashboard, mesmo que não diga "dashboard" (ex.: "quero ver receita x despesa por mês", "monta uma visão do funil", "acompanhar SLA do suporte"). Também para auditar ou elevar um dashboard existente.
+  Constrói dashboards e painéis interativos de nível analista sênior para qualquer domínio (finanças, operações, produto, vendas, marketing, RH, SaaS, projetos como o MAE) como página HTML única e publicável, com KPIs hierarquizados, comparação com período anterior, ano anterior e meta, análise de variação, drill-down, projeção, insights calculados, exportação CSV/PDF e animações. Use esta skill sempre que o usuário pedir um dashboard, painel, cockpit, relatório interativo, visão de KPIs, métricas, indicadores, analytics ou "tela para acompanhar" números, ou quando colar um prompt de dashboard, mesmo que não diga "dashboard" (ex.: "quero ver receita x despesa por mês", "monta uma visão do funil", "acompanhar SLA do suporte"). Também para painéis de comando orientados a sinais ("o que o sistema percebeu", recomendações com aprovação, como no MAE) e para auditar ou elevar um dashboard existente.
 ---
 
 # Dashboard Builder
@@ -37,6 +37,7 @@ Pergunte só o que bloqueia de verdade. Placeholders do tipo `[TIPO DE NEGÓCIO]
   ```
   O contrato completo está em `references/engine-config.md`. Exemplos prontos: finanças no próprio motor (`assets/engine/dashboard-engine.html`), operações e suporte em `assets/examples/ops.config.js` (mensal, metas, minutos, NPS) e projeto por sprint em `assets/examples/project-sprints.config.js` (períodos rotulados, dias, métrica neutra, CPI/EAC).
 - **Caminho B: padrão sob medida.** Quando a visualização central não é uma série temporal: fluxo de dinheiro (Sankey), orçado × realizado por item (bullet), simulador com sliders e cenários, patrimônio editável, varredura de anomalias. Parta do template mais próximo em `assets/templates/` (índice em `references/patterns.md`) e adapte, mantendo as regras desta skill.
+- **Caminho C: painel de comando orientado a sinais.** Quando o produto precisa dizer *o que olhar agora* (sistema de inteligência, copiloto de operação, MAE): o sinal com evidência, impacto e recomendação vem antes do número, e há um ciclo de aprovação humana (recomendação → aprovação → ação → resultado → aprendizado). Parta de `assets/templates/signal-command-center.html` e leia `references/signal-first.md`.
 - **Combinação**: gere pelo motor e acrescente uma seção sob medida copiando o padrão do template.
 
 ### 3. Desenhar
@@ -78,6 +79,7 @@ Em ambientes sem Playwright: `npm i playwright` (ou aponte `PW_CHROMIUM` para um
 | `references/design-system.md` | Paletas aprovadas, tokens, layout, tipografia, como criar paleta nova |
 | `references/data-rules.md` | Unidades, formatação, variação, comparação, projeção, regras dos insights |
 | `references/capabilities.md` | Exportar CSV/PDF e parecer com Claude dentro do Artifact |
+| `references/signal-first.md` | Caminho C: painel de sinais, evidências, confiança, ciclo de aprovação |
 | `references/pitfalls.md` | Bugs que já aconteceram e como evitar |
 | `references/prompts.md` | Os 10 prompts originais mapeados e modelos de prompt para outros domínios |
 | `references/porting.md` | Levar os padrões para React/Next ou outro frontend |

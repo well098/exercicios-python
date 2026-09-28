@@ -39,7 +39,7 @@ O template traz um seletor de tema no menu com 5 opções: **bege** (padrão), b
 
 ## Marca
 
-A marca do MAE está em `assets/brand/mae-logo.svg`, em vetor. O símbolo são duas fitas em Λ formando o M, com gradiente ciano `#14e0d2` → azul `#2f8bff` → violeta `#8a4bff`. O nome é M, Λ (A sem travessão) e E, em traço na cor do texto do tema (`currentColor`). No template, `LOGO_SYM` e `LOGO_WORD` montam o menu (no celular aparece só o símbolo), o favicon é o símbolo em data URI e o PDF abre com uma faixa escura e o símbolo desenhado com linhas. Os gradientes dos temas (`--hero`, `--fhero`, `--falt`) seguem as cores do símbolo.
+Use sempre os **arquivos oficiais** da marca (fonte: `docs/brand/BRANDBOOK.md` do repositório `well098/mae`), nunca uma logo redesenhada. O template traz cópias em `assets/templates/brand/`: `mae-logo-light.png` (temas claros), `mae-logo-dark.png` (tema preto e cabeçalho do PDF) e `mae-icon.png` (celular e favicon). Ao publicar como Artifact, envie a pasta junto com `files` (`brand/...`). Cores oficiais: ciano `#0AE5E2`, azul `#259EF8`, violeta `#5B5CF7`, navy `#0B1D56`; os gradientes dos temas (`--hero`, `--fhero`, `--falt`) partem delas.
 
 ## Demonstração × dados reais
 

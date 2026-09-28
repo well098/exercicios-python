@@ -66,6 +66,74 @@
   .theme-pick button.on { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
   @media (max-width: 900px) { .theme-pick { padding: 0 4px; } .theme-pick .tl-l { display: none; } }
   body { transition: background-color .3s, color .3s; }
+  /* tema fixo no topo (celular) */
+  .theme-fab, .theme-pop { display: none; }
+  @media (max-width: 900px) {
+    .side .theme-pick { display: none; }
+    .side { padding-right: 62px; }
+    .theme-fab { display: block; position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); right: 12px; z-index: 40; width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--hair-2), var(--shadow-sm); cursor: pointer; padding: 0; }
+    .theme-pop.open { display: flex; position: fixed; top: calc(56px + env(safe-area-inset-top, 0px)); right: 12px; z-index: 41; flex-direction: column; gap: 2px; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow); padding: 8px; min-width: 170px; }
+    .theme-pop button { display: flex; align-items: center; gap: 10px; border: 0; background: transparent; padding: 9px 10px; border-radius: 10px; font-weight: 700; font-size: 13.5px; cursor: pointer; text-align: left; }
+    .theme-pop button.on { background: var(--accent-soft); color: var(--accent); }
+    .theme-pop i { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--hair-2); flex-shrink: 0; }
+  }
+  /* demonstração x dados reais */
+  .demo-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); background: var(--warn-soft); border: 1px dashed var(--warn); border-radius: 12px; padding: 8px 12px; }
+  .demo-bar b { color: var(--warn); letter-spacing: .06em; text-transform: uppercase; font-size: 11px; }
+  .demo-bar button { border: 0; background: transparent; color: var(--accent); font-weight: 700; cursor: pointer; padding: 0; font-size: 12.5px; margin-left: auto; }
+  .demo-pill { display: inline-block; font-size: 9.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; background: var(--warn-soft); color: var(--warn); border-radius: 999px; padding: 2px 8px; margin-top: 3px; }
+  /* herói: observação → evidência → impacto → próxima ação */
+  .hero .risk { font-size: 14px; opacity: .95; margin: -4px 0 12px; }
+  .hero .hstep { font-size: 10.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; opacity: .7; margin: 4px 0 6px; }
+  .hero .evchips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .hero .evchips span { font-size: 11.5px; font-weight: 700; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.18); border-radius: 999px; padding: 4px 10px; }
+  /* sinais: por quê, impacto e o que fazer */
+  .sig .sfz { font-size: 12px; color: var(--mae); font-weight: 700; margin-top: 3px; }
+  .sig .go { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+  .sig .simp { font-size: 13px; color: var(--ink); font-weight: 800; }
+  @media (max-width: 600px) { .sig { grid-template-columns: 4px 1fr; } .sig .go { grid-column: 2; flex-direction: row; align-items: center; justify-content: space-between; } .sig .simp small { display: inline; margin-left: 4px; } }
+  @media (max-width: 900px) { .brand .demo-pill { display: none; } }
+  .sig .simp small { font-size: 10.5px; color: var(--muted); font-weight: 700; display: block; text-align: right; }
+  table.today .tsrc { font-size: 10.5px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+  /* cadeia de raciocínio */
+  .flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; }
+  .flow .fs { background: var(--surface-2); border: 1px solid var(--hair); border-radius: 12px; padding: 9px 11px; min-width: 120px; flex: 1 1 130px; text-align: left; font: inherit; color: inherit; }
+  .flow button.fs { cursor: pointer; } .flow button.fs:hover { border-color: var(--accent); }
+  .flow .fs .fl { font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .flow .fs .fv { font-size: 12.5px; font-weight: 700; margin-top: 3px; line-height: 1.35; }
+  .flow .fs.hl { background: var(--mae-soft); border-color: transparent; } .flow .fs.hl .fl { color: var(--mae); }
+  .flow .fs.wait { background: var(--warn-soft); border-color: transparent; } .flow .fs.wait .fl { color: var(--warn); }
+  .flow .ar { align-self: center; color: var(--muted); font-weight: 800; }
+  @media (max-width: 600px) { .flow .ar { display: none; } .flow .fs { flex-basis: 45%; } }
+  .cycle span.done { background: var(--good-soft); color: var(--good); }
+  .chain { display: flex; flex-direction: column; gap: 10px; border: 1px solid var(--hair); border-radius: 14px; padding: 12px; }
+  .chain .cl { font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .chain .ci { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; font-size: 13.5px; font-weight: 700; }
+  .chain .rec { border: 0; padding: 0; }
+  /* dados & integrações */
+  .know { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  @media (max-width: 960px) { .know { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 480px) { .know { grid-template-columns: repeat(2, 1fr); } }
+  .know .k { background: var(--surface-2); border-radius: 14px; padding: 12px; }
+  .know .kv { font-size: 22px; font-weight: 800; letter-spacing: -.02em; } .know .kl { font-size: 12px; color: var(--ink-2); } .know .ks { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+  .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 700px) { .modes { grid-template-columns: 1fr; } }
+  .modes > div { border-radius: 14px; padding: 13px 14px; font-size: 12.5px; line-height: 1.55; color: var(--ink-2); }
+  .modes .md { background: var(--warn-soft); } .modes .mr { background: var(--good-soft); }
+  .modes h3 { margin: 0 0 6px; font-size: 13.5px; color: var(--ink); }
+  .modes ul { margin: 0; padding-left: 18px; }
+  .synclist { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+  .synclist div { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; font-size: 12px; color: var(--ink-2); }
+  .synclist b { display: block; color: var(--ink); font-size: 13px; }
+  /* company dna */
+  .dna { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  @media (max-width: 420px) { .dna { grid-template-columns: 1fr; } }
+  .trait { text-align: left; border: 1px solid var(--hair); background: var(--surface); border-radius: 16px; padding: 14px; cursor: pointer; display: flex; flex-direction: column; gap: 7px; font: inherit; color: inherit; transition: border-color .15s, transform .15s; }
+  .trait:hover { border-color: var(--mae); transform: translateY(-2px); }
+  .trait .tt { font-weight: 800; font-size: 14px; line-height: 1.35; }
+  .trait .td { font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
+  .trait .tb { font-size: 11.5px; color: var(--mae); font-weight: 800; }
+  .trait .tf { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: auto; }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
   html, body { margin: 0; height: 100%; }
@@ -357,11 +425,18 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-/* ================= DADOS DE EXEMPLO (empresa fictícia) ================= */
-const EMPRESA = "Aurora Distribuidora", USUARIO = "João";
-const HOJE = new Date(2026, 8, 28);
+/* ================= FONTE DE DADOS =================
+   DEMO é uma empresa fictícia, usada só para demonstração. Em uma conta real, o
+   backend injeta window.MAE_DATA com o mesmo formato, montado apenas com as fontes
+   daquele tenant. As duas origens nunca se misturam: com MAE_DATA presente, nada
+   do DEMO é lido. */
 const MESES = ["Abr", "Mai", "Jun", "Jul", "Ago", "Set"];
 const d = (dia, mes = 9) => new Date(2026, mes - 1, dia);
+const DEMO = (() => {
+const EMPRESA = "Aurora Distribuidora", USUARIO = "João";
+const HOJE = new Date(2026, 8, 28);
+// condições comerciais típicas por cliente (prazo em dias, desconto em %), usadas nos pedidos
+const COND = { c1: [28, 2], c2: [21, 3], c3: [21, 2], c4: [14, 0], c5: [30, 1], c6: [21, 2], c7: [21, 3], c8: [28, 1], c9: [14, 0], c10: [30, 2], c11: [14, 0], c12: [21, 0] };
 
 const CLIENTES = [
   { id: "c1", nome: "Mercado Bom Preço", seg: "Supermercado", fone: "(11) 98812-4410", rec: [58, 61, 60, 63, 44, 38], ult: d(19), prods: ["p1", "p2", "p5", "p6"], contratoAno: 2027,
@@ -392,6 +467,11 @@ const CLIENTES = [
     conv: [{ dt: d(24), txt: "O leite chegou com atraso pela terceira vez no mês.", tags: ["reclamação"], tema: "atraso" }] },
   { id: "c12", nome: "Mini Mercado Esquina", seg: "Mercado", fone: "(11) 96543-1120", rec: [6, 6, 7, 6, 6, 6], ult: d(18), prods: ["p2", "p5"], contratoAno: 2027, conv: [] },
 ].map(c => ({ ...c, rec: c.rec.map(v => v * 1000) }));
+// um pedido consolidado por cliente e mês (6 meses): base para prazos e descontos
+const PEDIDOS = CLIENTES.flatMap(c => c.rec.map((v, i) => {
+  const [pz, ds] = COND[c.id], n = +c.id.slice(1);
+  return { cli: c.id, mes: i, valor: v, prazo: pz + ((n + i) % 3 === 0 ? 7 : 0), desc: c.id === "c1" && i >= 4 ? 5 : ds + ((n * 7 + i * 3) % 4 === 0 ? 1 : 0) };
+}));
 
 const FORNECEDORES = [
   { id: "f1", nome: "Laticínios Serra", cat: "Laticínios", preco: [100, 100, 104, 104, 108, 108, 108, 113], part: 0.58, atrasos: 1, compras: 52000 },
@@ -412,12 +492,48 @@ const PRODUTOS = [
   { id: "p8", nome: "Leite UHT 1L", cat: "Laticínios", qtd: [2400, 2450, 2500, 2560, 2650, 2760], forn: "f1" },
 ];
 const FONTES = [
-  { nome: "WhatsApp Business", tipo: "Conversas", status: "live", sinc: "tempo real", vol: "1.284 mensagens em 30 dias" },
-  { nome: "Planilha de vendas", tipo: "Excel", status: "ok", sinc: "há 2 horas", vol: "6 meses · 12 clientes · 8 produtos" },
-  { nome: "Cadastro de clientes", tipo: "CSV", status: "ok", sinc: "há 1 dia", vol: "12 clientes · 5 contratos" },
-  { nome: "Compras e fornecedores", tipo: "CSV", status: "stale", sinc: "há 4 dias", vol: "6 fornecedores · 8 meses de preços" },
-  { nome: "ERP", tipo: "Integração", status: "off", sinc: "não conectado", vol: "estoque e notas fiscais ficam fora da análise" },
+  { nome: "WhatsApp Business", tipo: "Conversas", status: "live", sinc: "tempo real", ult: "28/09 08:41", vol: "1.284 mensagens em 30 dias" },
+  { nome: "Planilha de vendas", tipo: "Excel", status: "ok", sinc: "há 2 horas", ult: "28/09 08:32", vol: "6 meses · 12 clientes · 8 produtos" },
+  { nome: "Cadastro de clientes", tipo: "CSV", status: "ok", sinc: "há 1 dia", ult: "27/09 08:30", vol: "12 clientes · 12 contratos" },
+  { nome: "Compras e fornecedores", tipo: "Excel", status: "stale", sinc: "há 4 dias", ult: "24/09 08:31", vol: "6 fornecedores · 8 meses de preços" },
+  { nome: "ERP", tipo: "Integração", status: "off", sinc: "não conectado", ult: "—", vol: "estoque e notas fiscais ficam fora da análise" },
 ];
+// última sincronização por conjunto de dados (o que alimenta cada entidade)
+const SYNC = [
+  { ds: "Vendas", ult: "28/09 08:32", fonte: "Planilha de vendas" },
+  { ds: "Clientes", ult: "27/09 08:30", fonte: "Cadastro de clientes" },
+  { ds: "Contratos", ult: "27/09 08:30", fonte: "Cadastro de clientes" },
+  { ds: "Compras e preços", ult: "24/09 08:31", fonte: "Compras e fornecedores" },
+  { ds: "Conversas", ult: "tempo real", fonte: "WhatsApp Business" },
+  { ds: "Estoque e notas", ult: "sem fonte", fonte: "ERP (não conectado)" },
+];
+const IMPORTS = [
+  { dt: "28/09 08:32", fonte: "Planilha de vendas", arq: "vendas_2026-09.xlsx", lin: 72, st: "ok", obs: "72 linhas lidas, 0 rejeitadas" },
+  { dt: "27/09 08:30", fonte: "Cadastro de clientes", arq: "clientes.csv", lin: 12, st: "ok", obs: "1 cliente novo (Buffet Estrela)" },
+  { dt: "24/09 08:31", fonte: "Compras e fornecedores", arq: "compras_2026-08.xlsx", lin: 51, st: "aviso", obs: "48 lidas, 3 sem categoria foram ignoradas" },
+  { dt: "01/09 09:10", fonte: "Planilha de vendas", arq: "vendas_2026-08.xlsx", lin: 60, st: "ok", obs: "60 linhas lidas, 0 rejeitadas" },
+  { dt: "02/08 10:05", fonte: "Planilha de vendas", arq: "historico_2024-2026.xlsx", lin: 216, st: "ok", obs: "histórico de 18 meses para o financeiro" },
+];
+const MAPA = [
+  { fonte: "Planilha de vendas", col: "Cliente", ent: "Cliente · nome", st: "auto" },
+  { fonte: "Planilha de vendas", col: "CNPJ", ent: "Cliente · identificador", st: "auto" },
+  { fonte: "Planilha de vendas", col: "Produto / Qtd / Valor", ent: "Venda · produto, quantidade, valor", st: "auto" },
+  { fonte: "Planilha de vendas", col: "Mês ref.", ent: "Venda · período", st: "confirmado" },
+  { fonte: "Cadastro de clientes", col: "Telefone", ent: "Cliente · telefone (liga o WhatsApp ao cliente)", st: "confirmado" },
+  { fonte: "Cadastro de clientes", col: "Fim do contrato", ent: "Contrato · vencimento", st: "auto" },
+  { fonte: "Compras e fornecedores", col: "Fornecedor / Preço unit.", ent: "Fornecedor · preço por mês", st: "auto" },
+  { fonte: "Compras e fornecedores", col: "Categoria", ent: "Fornecedor · categoria", st: "revisar", obs: "3 linhas sem categoria" },
+  { fonte: "WhatsApp Business", col: "Número do contato", ent: "Conversa · cliente", st: "auto" },
+];
+const HISTSYNC = [
+  { dt: "28/09 08:41", ev: "WhatsApp: 14 mensagens novas classificadas (2 reclamações, 1 oportunidade)" },
+  { dt: "28/09 08:32", ev: "Vendas atualizadas: setembro fechado, sinais recalculados" },
+  { dt: "27/09 08:30", ev: "Clientes: 1 novo cadastro, 3 contratos com vencimento em 30 dias" },
+  { dt: "24/09 08:31", ev: "Compras: reajustes de Laticínios Serra e Azeites Mediterrâneo detectados" },
+  { dt: "24/09 08:31", ev: "Compras: 3 linhas ignoradas por falta de categoria" },
+  { dt: "20/09 14:02", ev: "ERP: tentativa de conexão não concluída (credencial ausente)" },
+];
+const LEITURA = { mensagens: 1284, mesesVendas: 6, mesesCompras: 8 };
 // histórico de ciclos anteriores (para o Aprendizado)
 const HIST = [
   { tipo: "contato", titulo: "Contato com Empório Central (queda de compras)", res: "sucesso", det: "voltou a comprar em 12 dias" },
@@ -434,6 +550,10 @@ const HIST = [
   { tipo: "proposta", titulo: "Proposta de linha nova · Empório Central", res: "sem resposta", det: "sem retorno" },
   { tipo: "preco", titulo: "Revisão de preço · óleo de soja", res: "sucesso", det: "volume estabilizou" },
 ];
+return { EMPRESA, USUARIO, HOJE, CLIENTES, FORNECEDORES, PRODUTOS, FONTES, HIST, PEDIDOS, SYNC, IMPORTS, MAPA, HISTSYNC, LEITURA };
+})();
+const DATA = window.MAE_DATA || DEMO, IS_DEMO = DATA === DEMO;
+const { EMPRESA, USUARIO, HOJE, CLIENTES, FORNECEDORES, PRODUTOS, FONTES, HIST, PEDIDOS = [], SYNC = [], IMPORTS = [], MAPA = [], HISTSYNC = [], LEITURA = {} } = DATA;
 const TIPO_LBL = { contato: "Contato com cliente", renovacao: "Renovação de contrato", cotacao: "Cotação de fornecedor", proposta: "Proposta comercial", preco: "Revisão de preço" };
 
 /* ================= utilidades ================= */
@@ -516,23 +636,24 @@ function buildSignals(){
   if (A.reduz.length) S.push({ id: "s-reduz", sev: "crit", area: "clientes", fontes: ["Planilha de vendas", "WhatsApp"],
     t: `${A.reduz.length} clientes importantes estão reduzindo compras`,
     d: `Média de ago–set ${pct(avg(A.reduz.map(x => x.var)), 0)} abaixo de abr–jul · ${A.reduzPreco.length} mencionaram preço nas conversas`,
-    imp: A.reduzPerda, n: 3 });
+    imp: A.reduzPerda, n: 3, fazer: "Revisar a negociação com esses clientes antes do próximo ciclo de pedidos",
+    evid: [`📈 histórico de vendas · ${MESES.length} meses`, "💬 conversas no WhatsApp", "⇄ comparação ago–set × abr–jul"] });
   if (A.contratos.length) S.push({ id: "s-contr", sev: "warn", area: "contratos", fontes: ["Cadastro de clientes", "Planilha de vendas"],
-    t: `${A.contratos.length} contratos vencem nos próximos 30 dias`, d: `${A.contratos.map(c => c.nome + " (" + dia(c.contrato) + ")").join(", ")} · ${brl(A.contratosValor)}/ano em jogo`, imp: A.contratosValor / 12, n: 2 });
+    t: `${A.contratos.length} contratos vencem nos próximos 30 dias`, d: `${A.contratos.map(c => c.nome + " (" + dia(c.contrato) + ")").join(", ")} · ${brl(A.contratosValor)}/ano em jogo`, imp: A.contratosValor / 12, n: 2, fazer: "Iniciar as renovações, começando pelo maior contrato" });
   if (A.recl.length) S.push({ id: "s-recl", sev: "warn", area: "conversas", fontes: ["WhatsApp"],
-    t: `${A.recl.length} reclamações esta semana, ${A.reclAtraso.length} sobre atraso na entrega`, d: `${A.atrasoForn.map(f => f.nome).join(", ")} registrou ${A.atrasoForn.map(f => f.atrasos).join(", ")} atrasos em 60 dias`, n: 2 });
+    t: `${A.recl.length} reclamações esta semana, ${A.reclAtraso.length} sobre atraso na entrega`, d: `${A.atrasoForn.map(f => f.nome).join(", ")} registrou ${A.atrasoForn.map(f => f.atrasos).join(", ")} atrasos em 60 dias`, n: 2, fazer: "Cobrar a transportadora e avisar os clientes afetados" });
   if (A.reajMulti.length) { const r = A.reajMulti[0]; S.push({ id: "s-forn", sev: "warn", area: "fornecedores", fontes: ["Compras e fornecedores"],
-    t: `${r.f.nome} reajustou preços ${r.n} vezes em 8 meses`, d: `Alta acumulada de ${pct(r.alta, 0)} · representa ${pct(r.f.part, 0).replace("+", "")} das compras de ${r.f.cat.toLowerCase()}`, n: 1 }); }
+    t: `${r.f.nome} reajustou preços ${r.n} vezes em 8 meses`, d: `Alta acumulada de ${pct(r.alta, 0)} · representa ${pct(r.f.part, 0).replace("+", "")} das compras de ${r.f.cat.toLowerCase()}`, n: 1, fazer: "Cotar um fornecedor alternativo" }); }
   if (A.prodQueda.length) { const p = A.prodQueda[0]; S.push({ id: "s-prod", sev: "info", area: "produtos", fontes: ["Planilha de vendas", "WhatsApp"],
-    t: `${p.p.nome} caiu ${pct(-p.v, 0).replace("+", "")} nas vendas`, d: `Clientes citaram preço ${p.mencPreco} vezes e concorrente ${p.mencConc} vez${p.mencConc > 1 ? "es" : ""} ao falar desse produto`, n: 2 }); }
+    t: `${p.p.nome} caiu ${pct(-p.v, 0).replace("+", "")} nas vendas`, d: `Clientes citaram preço ${p.mencPreco} vezes e concorrente ${p.mencConc} vez${p.mencConc > 1 ? "es" : ""} ao falar desse produto`, n: 2, fazer: "Revisar preço e margem do produto" }); }
   if (A.oport.length) S.push({ id: "s-oport", sev: "good", area: "clientes", fontes: ["WhatsApp"],
-    t: `${A.oport.length} oportunidades identificadas nas conversas`, d: `${A.oport.map(m => m.c.nome).join(" e ")} · potencial de ${brl(A.oportValor)}`, imp: A.oportValor, n: 1 });
+    t: `${A.oport.length} oportunidades identificadas nas conversas`, d: `${A.oport.map(m => m.c.nome).join(" e ")} · potencial de ${brl(A.oportValor)}`, imp: A.oportValor, n: 1, fazer: "Enviar proposta de volume", unico: true });
   return S;
 }
 const SIGNALS = buildSignals();
 function addMarginSignal(){
   const d = FIN[FIN.length - 1], p = FIN[FIN.length - 2], dm = d.margemBruta - p.margemBruta;
-  if (dm < -0.003) SIGNALS.splice(1, 0, { id: "s-marg", sev: "warn", area: "financeiro", fontes: ["Planilha de vendas", "Compras e fornecedores"], t: `Margem bruta caiu ${Math.abs(dm * 100).toFixed(1).replace(".", ",")} p.p. em setembro`, d: `Faturamento ${pct(d.receita / p.receita - 1)}, mas o CMV subiu ${pct(d.cmv / p.cmv - 1)} com os reajustes de ${A.reajRec.map(r => r.f.nome).join(" e ")}`, imp: (p.margemBruta - d.margemBruta) * d.receita, n: 2 });
+  if (dm < -0.003) SIGNALS.splice(1, 0, { id: "s-marg", sev: "warn", area: "financeiro", fontes: ["Planilha de vendas", "Compras e fornecedores"], t: `Margem bruta caiu ${Math.abs(dm * 100).toFixed(1).replace(".", ",")} p.p. em setembro`, d: `Faturamento ${pct(d.receita / p.receita - 1)}, mas o CMV subiu ${pct(d.cmv / p.cmv - 1)} com os reajustes de ${A.reajRec.map(r => r.f.nome).join(" e ")}`, imp: (p.margemBruta - d.margemBruta) * d.receita, n: 2, fazer: "Decidir entre repassar o reajuste ou renegociar com os fornecedores" });
 }
 
 function buildRecs(){
@@ -587,7 +708,7 @@ const NAV = [
   { g: "", items: [{ id: "visao", ic: "◉", l: "Visão geral" }] },
   { g: "Negócio", items: [{ id: "financeiro", ic: "💰", l: "Financeiro" }] },
   { g: "Operação", items: [{ id: "clientes", ic: "👥", l: "Clientes" }, { id: "fornecedores", ic: "🤝", l: "Fornecedores" }, { id: "produtos", ic: "📦", l: "Produtos" }, { id: "contratos", ic: "📄", l: "Contratos" }, { id: "conversas", ic: "💬", l: "Conversas" }] },
-  { g: "Inteligência", items: [{ id: "insights", ic: "✦", l: "Insights" }, { id: "recomendacoes", ic: "🎯", l: "Recomendações" }, { id: "acoes", ic: "⚙", l: "Ações" }, { id: "resultados", ic: "📊", l: "Resultados" }, { id: "aprendizado", ic: "📈", l: "Aprendizado" }, { id: "dna", ic: "🧬", l: "Company DNA", soon: true }] },
+  { g: "Inteligência", items: [{ id: "insights", ic: "✦", l: "Insights" }, { id: "recomendacoes", ic: "🎯", l: "Recomendações" }, { id: "acoes", ic: "⚙", l: "Ações" }, { id: "resultados", ic: "📊", l: "Resultados" }, { id: "aprendizado", ic: "📈", l: "Aprendizado" }, { id: "dna", ic: "🧬", l: "Company DNA" }] },
   { g: "", items: [{ id: "pergunte", ic: "🧠", l: "Pergunte à empresa", ask: true }] },
   { g: "Dados", items: [{ id: "dados", ic: "📥", l: "Dados & integrações" }, { id: "config", ic: "⚙", l: "Configurações", soon: true }] },
 ];
@@ -595,27 +716,46 @@ let ROUTE = (location.hash || "").replace("#", "") || "visao";
 function renderNav(){
   const badge = { visao: SIGNALS.filter(s => s.sev === "crit").length, recomendacoes: recsBy("pendente").length, acoes: recsBy("aprovada").length + recsBy("executada").length };
   document.getElementById("side").innerHTML = `
-    <div class="brand"><div class="logo">MAE</div><div><div class="nm">MAE</div><div class="tg">Motor de Adaptação Empresarial</div></div></div>
+    <div class="brand"><div class="logo">MAE</div><div><div class="nm">MAE</div><div class="tg">Motor de Adaptação Empresarial</div>${IS_DEMO ? '<span class="demo-pill">Demonstração</span>' : ""}</div></div>
     ${NAV.map(g => `<div class="nav-group">${g.g ? `<div class="gl">${g.g}</div>` : ""}${g.items.map(it => `
       <button class="nav-item ${it.ask ? "ask" : ""} ${ROUTE === it.id ? "on" : ""}" data-r="${it.id}" ${it.soon ? "disabled" : ""}>
         <span class="ic">${it.ic}</span>${it.l}${it.soon ? '<span class="soon">em breve</span>' : badge[it.id] ? `<span class="badge ${it.id === "visao" ? "" : "soft"}">${badge[it.id]}</span>` : ""}</button>`).join("")}</div>`).join("")}
     <div class="theme-pick" role="radiogroup" aria-label="Tema"><span class="tl-l">Tema</span>${THEMES.map(t => `<button role="radio" aria-checked="${THEME === t.id}" class="${THEME === t.id ? "on" : ""}" data-theme-id="${t.id}" title="${t.l}" aria-label="${t.l}" style="background:${t.sw}"></button>`).join("")}</div>
-    <div class="side-foot">${EMPRESA} · dados de exemplo<br><button id="reset">Reiniciar demonstração</button></div>`;
+    <div class="side-foot">${EMPRESA} · ${IS_DEMO ? "dados fictícios" : "dados das suas fontes"}${IS_DEMO ? '<br><button id="reset">Reiniciar demonstração</button>' : ""}</div>`;
+  renderThemeFab();
   document.querySelectorAll(".nav-item[data-r]").forEach(b => b.addEventListener("click", () => { if (!b.disabled) go(b.dataset.r); }));
   document.querySelectorAll("[data-theme-id]").forEach(b => b.addEventListener("click", () => { setTheme(b.dataset.themeId); renderNav(); toast("Tema " + THEMES.find(t => t.id === THEME).l.toLowerCase() + " aplicado."); }));
-  document.getElementById("reset").addEventListener("click", () => { ST = freshState(); save(); render(); toast("Demonstração reiniciada."); });
+  document.getElementById("reset")?.addEventListener("click", () => { ST = freshState(); save(); render(); toast("Demonstração reiniciada."); });
+}
+// no celular o seletor sai do menu rolável e vira um botão fixo no topo
+function renderThemeFab(){
+  let fab = document.getElementById("theme-fab"), pop = document.getElementById("theme-pop");
+  if (!fab) {
+    fab = document.createElement("button"); fab.id = "theme-fab"; fab.className = "theme-fab"; fab.setAttribute("aria-haspopup", "true"); fab.setAttribute("aria-expanded", "false");
+    pop = document.createElement("div"); pop.id = "theme-pop"; pop.className = "theme-pop"; pop.setAttribute("role", "menu");
+    document.body.append(fab, pop);
+    fab.addEventListener("click", e => { e.stopPropagation(); const o = pop.classList.toggle("open"); fab.setAttribute("aria-expanded", o); });
+    document.addEventListener("click", e => { if (!pop.contains(e.target)) { pop.classList.remove("open"); fab.setAttribute("aria-expanded", "false"); } });
+  }
+  const cur = THEMES.find(t => t.id === THEME);
+  fab.style.background = cur.sw; fab.title = "Tema: " + cur.l; fab.setAttribute("aria-label", "Trocar tema (atual: " + cur.l + ")");
+  pop.innerHTML = THEMES.map(t => `<button role="menuitemradio" aria-checked="${THEME === t.id}" class="${THEME === t.id ? "on" : ""}" data-tp="${t.id}"><i style="background:${t.sw}"></i>${t.l}</button>`).join("");
+  pop.querySelectorAll("[data-tp]").forEach(b => b.addEventListener("click", () => { setTheme(b.dataset.tp); pop.classList.remove("open"); renderNav(); toast("Tema " + THEMES.find(t => t.id === THEME).l.toLowerCase() + " aplicado."); }));
 }
 function go(r){ ROUTE = r; try { history.replaceState(null, "", "#" + r); } catch (e) {} closeDrawer(); render(); document.querySelector(".main").scrollTo?.(0, 0); window.scrollTo(0, 0); }
 
 /* ================= GAVETA ================= */
-function openDrawer(t, s, html){
+let DR_FN = null; // reabre a gaveta atual depois de mudar o estado do ciclo
+function refreshDrawer(){ if (DR_FN && document.getElementById("drawer").classList.contains("open")) DR_FN(); }
+function openDrawer(t, s, html, refresh){
+  DR_FN = refresh || null;
   document.getElementById("dr-t").textContent = t; document.getElementById("dr-s").textContent = s;
   document.getElementById("dr-b").innerHTML = html; document.getElementById("dr-b").scrollTop = 0;
   document.getElementById("drawer").classList.add("open"); document.getElementById("drawer").setAttribute("aria-hidden", "false");
   document.getElementById("backdrop").classList.add("open"); document.getElementById("dr-x").focus();
   wire(document.getElementById("dr-b"));
 }
-function closeDrawer(){ document.getElementById("drawer").classList.remove("open"); document.getElementById("drawer").setAttribute("aria-hidden", "true"); document.getElementById("backdrop").classList.remove("open"); }
+function closeDrawer(){ DR_FN = null; document.getElementById("drawer").classList.remove("open"); document.getElementById("drawer").setAttribute("aria-hidden", "true"); document.getElementById("backdrop").classList.remove("open"); }
 document.getElementById("dr-x").addEventListener("click", closeDrawer);
 document.getElementById("backdrop").addEventListener("click", closeDrawer);
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeDrawer(); });
@@ -657,9 +797,19 @@ function perceivedCliente(c){
 }
 function openCliente(id){
   const c = byId(CLIENTES, id), tot6 = sum(c.rec), share = c.rec[5] / A.fatAtual;
-  const rec = ST.recs.find(r => r.alvo === id && r.status === "pendente");
+  const recs = ST.recs.filter(r => r.alvo === id);
+  const base = avg(c.rec.slice(0, 4)), v = (avg(c.rec.slice(4)) - base) / base, rz = A.reduz.find(x => x.c.id === id);
+  const npr = c.conv.filter(m => m.tags.includes("preço")).length, nco = c.conv.filter(m => m.tags.includes("concorrente")).length;
+  const pot = sum(c.conv.filter(m => m.tags.includes("oportunidade")).map(m => m.valor || 0));
   openDrawer(c.nome, `${c.seg} · ${c.fone} · cliente desde 2024`, `
+    <div class="kpis">
+      <div class="kpi"><div class="kl">Compras (ago–set × abr–jul)</div><div class="kv ${v < 0 ? "down" : "up"}">${v < 0 ? "↓" : "↑"} ${pct(v, 0).replace(/[+−]/, "")}</div></div>
+      <div class="kpi"><div class="kl">Conversas</div><div class="kv">${npr ? `${npr} citaram preço` : `${c.conv.length} recentes`}</div></div>
+      <div class="kpi"><div class="kl">Concorrente</div><div class="kv">${nco ? `${nco} ${nco > 1 ? "menções" : "menção"}` : "nenhuma menção"}</div></div>
+      <div class="kpi"><div class="kl">${rz ? "Impacto estimado" : pot ? "Potencial" : "Impacto"}</div><div class="kv">${rz ? brl(rz.perda) + "/mês" : pot ? brl(pot) : "—"}</div></div>
+    </div>
     <div class="perceived"><div class="pt" style="display:block">✦ O que o MAE percebeu</div>${perceivedCliente(c).map(t => `<div>${esc(t)}</div>`).join("")}</div>
+    ${recs.length ? chainFor(recs) : ""}
     <div class="kpis">
       <div class="kpi"><div class="kl">Faturamento 6 meses</div><div class="kv">${brl(tot6)}</div></div>
       <div class="kpi"><div class="kl">Mês atual</div><div class="kv">${brl(c.rec[5])}</div></div>
@@ -667,10 +817,9 @@ function openCliente(id){
       <div class="kpi"><div class="kl">Da receita</div><div class="kv">${(share * 100).toFixed(1).replace(".", ",")}%</div></div>
     </div>
     <div><div class="sec-t">Compras por mês</div>${bars(c.rec, MESES, "var(--accent)", 4)}</div>
-    ${rec ? `<div class="note">O MAE tem uma recomendação aguardando aprovação para este cliente: <b>${esc(rec.t)}</b>. <button class="btn ghost sm" data-act="rec:${rec.id}">Ver recomendação ›</button></div>` : ""}
     <div><div class="sec-t">Conversas (${c.conv.length})</div><div style="display:flex;flex-direction:column;gap:8px">${c.conv.length ? c.conv.map(m => convHTML({ ...m, c })).join("") : '<div class="empty">Nenhuma conversa nos últimos 30 dias.</div>'}</div></div>
     <div><div class="sec-t">Produtos que compra</div><div style="display:flex;gap:6px;flex-wrap:wrap">${c.prods.map(p => `<button class="tag" style="border:0;cursor:pointer" data-act="prod:${p}">${esc(byId(PRODUTOS, p).nome)}</button>`).join("")}</div></div>
-    <div class="note">Contrato: ${c.contrato ? `<b>vence em ${dia(c.contrato)}</b> (${diasAte(c.contrato)} dias)` : "vigente até 2027"}.</div>`);
+    <div class="note">Contrato: ${c.contrato ? `<b>vence em ${dia(c.contrato)}</b> (${diasAte(c.contrato)} dias)` : "vigente até 2027"}. Fontes deste perfil: planilha de vendas, cadastro de clientes e WhatsApp.</div>`, () => openCliente(id));
 }
 function openFornecedor(id){
   const f = byId(FORNECEDORES, id), r = A.reajustes.find(x => x.f.id === id);
@@ -682,7 +831,8 @@ function openFornecedor(id){
   openDrawer(f.nome, `${f.cat} · compras de ${brl(f.compras)}/mês`, `
     <div class="perceived"><div class="pt" style="display:block">✦ O que o MAE percebeu</div>${perc.map(t => `<div>${esc(t)}</div>`).join("")}</div>
     <div><div class="sec-t">Índice de preço (fev = 100)</div>${bars(f.preco, labels, "var(--warn)", 0).replace(/R\$ /g, "")}</div>
-    <div class="note">Fonte: planilha de compras e fornecedores, sincronizada <b>há 4 dias</b>. Reajustes posteriores podem não aparecer.</div>`);
+    ${chainFor(ST.recs.filter(r => r.alvo === id))}
+    <div class="note">Fonte: planilha de compras e fornecedores, sincronizada <b>há 4 dias</b>. Reajustes posteriores podem não aparecer.</div>`, () => openFornecedor(id));
 }
 function openProduto(id){
   const x = A.prods.find(p => p.p.id === id), p = x.p, f = byId(FORNECEDORES, p.forn);
@@ -696,7 +846,8 @@ function openProduto(id){
     </div>
     <div><div class="sec-t">Unidades vendidas por mês</div>${bars(p.qtd, MESES, x.v < 0 ? "var(--crit)" : "var(--good)", 5).replace(/R\$ /g, "").replace(/ mil/g, "k")}</div>
     <div><div class="sec-t">Quem compra (${compradores.length})</div><div style="display:flex;gap:6px;flex-wrap:wrap">${compradores.map(c => `<button class="tag" style="border:0;cursor:pointer" data-act="cliente:${c.id}">${esc(c.nome)}</button>`).join("")}</div></div>
-    ${menc.length ? `<div><div class="sec-t">Conversas sobre o produto</div><div style="display:flex;flex-direction:column;gap:8px">${menc.map(m => convHTML(m, true)).join("")}</div></div>` : ""}`);
+    ${chainFor(ST.recs.filter(r => r.alvo === id))}
+    ${menc.length ? `<div><div class="sec-t">Conversas sobre o produto</div><div style="display:flex;flex-direction:column;gap:8px">${menc.map(m => convHTML(m, true)).join("")}</div></div>` : ""}`, () => openProduto(id));
 }
 function evidenceList(sigId){
   const ev = [];
@@ -733,16 +884,19 @@ function openEvidencias(sigId){
     <div class="note">Confiança <span class="tag ${c.c}">${c.l}</span> · sustentado por <b>${s.n} tipo${s.n > 1 ? "s" : ""} de evidência</b> vindos de: ${s.fontes.join(", ")}.</div>
     <div>${evidenceList(sigId).map(e => `<div class="ev"><div class="ei">${e.i}</div><div><div class="et">${esc(e.t)}</div><div class="ed">${esc(e.d)}</div></div></div>`).join("")}</div>
     ${sigId === "s-marg" ? `<button class="btn p sm" data-act="go:financeiro">Abrir o financeiro ›</button>` : ""}
-    ${sigId === "s-reduz" ? `<div style="display:flex;gap:8px;flex-wrap:wrap">${A.reduz.map(x => `<button class="btn r sm" data-act="cliente:${x.c.id}">Abrir ${esc(x.c.nome)}</button>`).join("")}</div>` : ""}`);
+    ${sigId === "s-reduz" ? `<div style="display:flex;gap:8px;flex-wrap:wrap">${A.reduz.map(x => `<button class="btn r sm" data-act="cliente:${x.c.id}">Abrir ${esc(x.c.nome)}</button>`).join("")}</div>` : ""}
+    ${s.fazer ? `<div><div class="sec-t">O que fazer</div><div class="note">${esc(s.fazer)}${s.imp ? ` · ${s.sev === "good" ? "potencial" : "em jogo"}: <b>${brl(s.imp)}${s.unico ? "" : "/mês"}</b>` : ""}</div></div>` : ""}
+    ${(() => { const rs = ST.recs.filter(r => r.sig === sigId); return rs.length ? `<div><div class="sec-t">Recomendações ligadas a este sinal</div><div style="display:flex;flex-direction:column;gap:10px">${chainFor(rs)}</div></div>` : ""; })()}`, () => openEvidencias(sigId));
 }
 function openRec(id){
   const r = ST.recs.find(x => x.id === id), s = SIGNALS.find(x => x.id === r.sig);
   openDrawer("Recomendação", r.t, `
-    <div class="cycle"><span>Insight</span>→<span class="hl">Recomendação</span>→<span>Aprovação</span>→<span>Ação</span>→<span>Resultado</span></div>
     <div><div class="sec-t">Por que o MAE recomenda</div><ul style="margin:0;padding-left:18px;line-height:1.7;color:var(--ink-2)">${r.porque.map(p => `<li>${esc(p)}</li>`).join("")}</ul></div>
     <div class="note">Impacto estimado <b>${brl(r.imp)}${r.tipo === "renovacao" ? "/ano" : r.tipo === "proposta" ? "" : "/mês"}</b> · confiança <span class="tag ${conf(r.n).c}">${conf(r.n).l}</span> · histórico: ações de "${TIPO_LBL[r.tipo].toLowerCase()}" deram certo em <b>${Math.round(rate(r.tipo) * 100)}%</b> das vezes.</div>
     <div><div class="sec-t">Ação proposta</div><div class="draft" style="background:var(--surface-2);border-radius:12px;padding:12px;border-left:3px solid var(--mae);font-size:13px;line-height:1.55">${esc(r.msg)}</div></div>
-    ${s ? `<button class="btn r sm" data-act="evid:${s.id}">Ver evidências do sinal</button>` : ""}`);
+    ${cycleSteps(r)}
+    <div class="rec" style="border:0;padding:0"><div class="acts">${recActs(r, r.status)}</div></div>
+    ${s ? `<button class="btn r sm" data-act="evid:${s.id}">Ver evidências do sinal</button>` : ""}`, () => openRec(id));
 }
 
 /* ================= CICLO: aprovar → executar → resultado ================= */
@@ -752,7 +906,7 @@ function rate(tipo){
 }
 function approve(id, el){
   const r = ST.recs.find(x => x.id === id); const card = el.closest(".rec");
-  const done = () => { r.status = "aprovada"; r.aprovadaEm = Date.now(); save(); render(); toast("Aprovada. A ação ficou pronta em Ações, aguardando execução."); };
+  const done = () => { r.status = "aprovada"; r.aprovadaEm = Date.now(); save(); render(); refreshDrawer(); toast("Aprovada. A ação ficou pronta em Ações, aguardando execução."); };
   if (card && !REDUCE) { card.classList.add("leaving"); setTimeout(done, 320); } else done();
 }
 function showReject(id, el){
@@ -760,26 +914,30 @@ function showReject(id, el){
   box.innerHTML = `<div class="reject-box" style="width:100%"><label style="font-size:12px;font-weight:700" for="rj-${id}">Por que rejeitar? O MAE usa isso para aprender.</label>
     <select id="rj-${id}"><option>Já tratado por outro canal</option><option>Não faz sentido para este cliente</option><option>Momento errado</option><option>Evidência insuficiente</option><option>Outro motivo</option></select>
     <div style="display:flex;gap:8px"><button class="btn r sm" id="rjc-${id}">Cancelar</button><button class="btn p sm" id="rjo-${id}">Confirmar rejeição</button></div></div>`;
-  document.getElementById("rjc-" + id).addEventListener("click", () => render());
+  document.getElementById("rjc-" + id).addEventListener("click", () => { render(); refreshDrawer(); });
   document.getElementById("rjo-" + id).addEventListener("click", () => {
-    const r = ST.recs.find(x => x.id === id); r.status = "rejeitada"; r.motivo = document.getElementById("rj-" + id).value; save(); render(); toast("Rejeitada. Motivo registrado para o aprendizado.");
+    const r = ST.recs.find(x => x.id === id); r.status = "rejeitada"; r.motivo = document.getElementById("rj-" + id).value; save(); render(); refreshDrawer(); toast("Rejeitada. Motivo registrado para o aprendizado.");
   });
 }
-function execute(id){ const r = ST.recs.find(x => x.id === id); r.status = "executada"; save(); render(); toast("Ação registrada como executada (simulado no protótipo)."); }
+function execute(id){ const r = ST.recs.find(x => x.id === id); r.status = "executada"; save(); render(); refreshDrawer(); toast("Ação registrada como executada (simulado no protótipo)."); }
 function recordResult(id, res){
   const r = ST.recs.find(x => x.id === id); r.status = "concluida"; r.res = res;
-  ST.results.push({ id, tipo: r.tipo, t: r.t, res }); save(); render();
+  ST.results.push({ id, tipo: r.tipo, t: r.t, res }); save(); render(); refreshDrawer();
   toast(res === "sucesso" ? "Resultado registrado: deu certo. O Aprendizado foi atualizado." : "Resultado registrado. O Aprendizado foi atualizado.");
 }
 
 /* ================= COMPONENTES ================= */
-function recCard(r, mode){
-  const c = conf(r.n);
+function recActs(r, mode){
   let acts = "";
   if (mode === "pendente") acts = `<button class="btn g sm" data-act="approve:${r.id}">✓ Aprovar</button><button class="btn r sm" data-act="reject:${r.id}">Rejeitar</button><button class="btn ghost sm" data-act="rec:${r.id}">Detalhes</button>`;
   else if (mode === "aprovada") acts = `<button class="btn p sm" data-act="execute:${r.id}">▶ Executar ação</button><span style="font-size:11.5px;color:var(--muted)">nada é enviado sem este clique</span>`;
   else if (mode === "executada") acts = `<span style="font-size:12px;font-weight:700">Como terminou?</span><button class="btn g sm" data-act="result:${r.id}" data-res="sucesso">Deu certo</button><button class="btn r sm" data-act="result:${r.id}" data-res="recusou">Recusou</button><button class="btn r sm" data-act="result:${r.id}" data-res="sem resposta">Sem resposta</button>`;
   else if (mode === "rejeitada") acts = `<span class="tag">Motivo: ${esc(r.motivo || "—")}</span>`;
+  else if (mode === "concluida") acts = `<span class="tag ${r.res === "sucesso" ? "good" : r.res === "recusou" ? "crit" : ""}">Resultado: ${esc(r.res)}</span>`;
+  return acts;
+}
+function recCard(r, mode){
+  const c = conf(r.n), acts = recActs(r, mode);
   return `<div class="rec reveal">
     <div class="rh"><span class="tag mae">${TIPO_LBL[r.tipo]}</span><span class="tag ${c.c}">Confiança ${c.l.toLowerCase()}</span></div>
     <div class="rt">${esc(r.t)}</div>
@@ -790,8 +948,23 @@ function recCard(r, mode){
 }
 function sigRow(s){
   return `<button class="sig" data-act="evid:${s.id}"><span class="bar sev-${s.sev}"></span>
-    <span><div class="st">${esc(s.t)}</div><div class="sd">${esc(s.d)}</div><div class="src-tag">${s.fontes.map(f => `<span>◦ ${esc(f)}</span>`).join("")}<span class="tag ${conf(s.n).c}" style="margin-left:2px">confiança ${conf(s.n).l.toLowerCase()}</span></div></span>
-    <span class="go">evidências ›</span></button>`;
+    <span><div class="st">${esc(s.t)}</div><div class="sd">${esc(s.d)}</div>${s.fazer ? `<div class="sfz">→ ${esc(s.fazer)}</div>` : ""}<div class="src-tag">${s.fontes.map(f => `<span>◦ ${esc(f)}</span>`).join("")}<span class="tag ${conf(s.n).c}" style="margin-left:2px">confiança ${conf(s.n).l.toLowerCase()}</span></div></span>
+    <span class="go">${s.imp ? `<span class="simp">${brl(s.imp)}${s.unico ? "" : "/mês"}<small>${s.sev === "good" ? "potencial" : "em jogo"}</small></span>` : ""}evidências ›</span></button>`;
+}
+// passo a passo sinal → recomendação → aprovação → ação → resultado
+const STAGE = { pendente: 2, rejeitada: 2, aprovada: 3, executada: 4, concluida: 5 };
+function cycleSteps(r){
+  const st = STAGE[r.status], lbl = ["Insight", "Recomendação", r.status === "rejeitada" ? "Rejeitada" : "Aprovação", "Ação", "Resultado"];
+  return `<div class="cycle">${lbl.map((t, i) => `<span class="${i < st ? "done" : i === st ? "hl" : ""}">${i < st ? "✓ " : ""}${t}</span>`).join("→")}</div>`;
+}
+function chainFor(recs){
+  return recs.map(r => { const s = SIGNALS.find(x => x.id === r.sig);
+    return `<div class="chain">${cycleSteps(r)}
+      ${s ? `<div><div class="cl">Insight</div><div class="ci"><span>${esc(s.t)}</span><button class="btn ghost sm" data-act="evid:${s.id}">Ver evidências ›</button></div></div>` : ""}
+      <div><div class="cl">Recomendação</div>${recCard(r, r.status).replace("rec reveal", "rec")}</div></div>`; }).join("");
+}
+function flow(steps){
+  return `<div class="flow">${steps.map((x, i) => `${i ? '<span class="ar">→</span>' : ""}${x.act ? `<button class="fs ${x.c || ""}" data-act="${x.act}">` : `<div class="fs ${x.c || ""}">`}<div class="fl">${x.l}</div><div class="fv">${x.v}</div>${x.act ? "</button>" : "</div>"}`).join("")}</div>`;
 }
 
 /* ================= FINANCEIRO · Cockpit do CFO Pro dentro do MAE ================= */
@@ -890,6 +1063,7 @@ function fCf(dl){
 function vFinanceiro(){
   return `<div class="head reveal"><div class="eyebrow">Visão do negócio</div><h1>Financeiro</h1>
       <p>Faturamento, lucro, margens e caixa, com comparação, variação e projeção. Clique em qualquer indicador, linha ou segmento para abrir o detalhe.</p></div>
+    <div class="card reveal"><h2>Como o financeiro se conecta ao resto do MAE</h2><p class="cs">O número é o começo. O MAE cruza o financeiro com clientes, conversas e fornecedores até chegar a uma ação que você aprova. Clique em cada etapa.</p>${finChains()}</div>
     <div class="fperc reveal" id="f-perc"></div>
     <div class="fbar reveal" role="toolbar" aria-label="Filtros do financeiro">
       <div class="f"><label for="f-mes">Mês</label><select id="f-mes">${FIN.map((r, i) => `<option value="${i}" ${i === FS.idx ? "selected" : ""}>${r.lbl}</option>`).join("")}</select></div>
@@ -919,6 +1093,22 @@ function vFinanceiro(){
     <div class="card reveal"><h2>Resumo executivo</h2><p class="cs" id="f-sum-sub"></p><div class="fsum" id="f-sum"></div>
       <div class="fai" id="f-ai"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn p sm" id="f-ai-btn">✦ Gerar parecer com Claude</button><button class="btn r sm" id="f-ai-stop" hidden>■ Parar</button><span class="fexp-note" id="f-ai-st">Parecer escrito a partir dos números da tela. Usa o seu plano do Claude.</span></div><div class="fai-out" id="f-ai-out"></div></div>
     </div>`;
+}
+function finChains(){
+  const stLbl = { pendente: "aguardando sua aprovação", aprovada: "aprovada · pronta para executar", executada: "executada · aguardando resultado", rejeitada: "rejeitada", concluida: "concluída" };
+  const step = (r, c) => r ? [{ l: "Recomendação", v: esc(r.t), act: "rec:" + r.id, c: "hl" }, { l: "Humano", v: stLbl[r.status], act: "rec:" + r.id, c: r.status === "pendente" ? "wait" : "" }, { l: "Resultado", v: r.status === "concluida" ? esc(r.res) : "ainda sem resultado", act: r.status === "concluida" ? "go:resultados" : "" }] : [];
+  const rc = ST.recs.find(r => r.sig === "s-reduz"), rf = ST.recs.find(r => r.sig === "s-forn");
+  const d = FIN[FIN.length - 1], p = FIN[FIN.length - 2];
+  const out = [`<div class="sec-t" style="margin-top:4px">Faturamento → clientes → conversas</div>` + flow([
+    { l: "Faturamento", v: `${brl(A.fatAtual)} · ${pct(A.varMes)} no mês` },
+    { l: "Clientes", v: `${A.reduz.length} reduzindo compras · ${brl(A.reduzPerda)}/mês a menos`, act: "go:clientes" },
+    { l: "WhatsApp", v: `${A.reduzPreco.length} citaram preço · ${A.reduzConc.length} citaram concorrente`, act: "go:conversas" },
+    { l: "Padrão", v: "queda + preço + concorrente", act: "evid:s-reduz" }, ...step(rc)])];
+  if (SIGNALS.some(x => x.id === "s-marg")) out.push(`<div class="sec-t" style="margin-top:14px">Margem → custo → fornecedores</div>` + flow([
+    { l: "Margem bruta", v: `${fpct(p.margemBruta)} → ${fpct(d.margemBruta)}` },
+    { l: "CMV", v: `${pct(d.cmv / p.cmv - 1)} vs agosto`, act: "evid:s-marg" },
+    { l: "Fornecedores", v: `reajustes de ${A.reajRec.map(r => esc(r.f.nome)).join(" e ")}`, act: "go:fornecedores" }, ...step(rf)]));
+  return out.join("");
 }
 function finPerceived(){
   const i = FS.idx, d = FIN[i], p = FIN[i - 1];
@@ -1220,46 +1410,49 @@ function vVisao(){
   const h = new Date().getHours(), saud = h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
   const hero = SIGNALS[0], pend = recsBy("pendente");
   const rows = [
-    { ic: "💰", a: "Faturamento", s: `<span class="${A.varMes >= 0 ? "up" : "down"}">${A.varMes >= 0 ? "↑" : "↓"} ${pct(A.varMes).replace(/[+−]/, "")}</span> vs agosto · ${brl(A.fatAtual)}`, r: "financeiro" },
-    { ic: "📈", a: "Lucro", s: (() => { const d = FIN[FIN.length - 1], p = FIN[FIN.length - 2]; return `${brl(d.lucroLiq)} · margem ${fpct(d.margemLiq)} · <span class="${d.margemBruta >= p.margemBruta ? "up" : "down"}">bruta ${(d.margemBruta - p.margemBruta >= 0 ? "+" : "−") + Math.abs((d.margemBruta - p.margemBruta) * 100).toFixed(1).replace(".", ",")} p.p.</span>`; })(), r: "financeiro" },
-    { ic: "👥", a: "Clientes", s: `${A.reduz.length} em atenção · ${A.ativos} ativos`, r: "clientes" },
-    { ic: "🤝", a: "Fornecedores", s: `${A.reajRec.length} reajustes detectados · ${A.atrasoForn.length} com atrasos`, r: "fornecedores" },
-    { ic: "📦", a: "Produtos", s: `${A.prodQueda.length} em queda · ${A.prodAlta.length} em alta`, r: "produtos" },
-    { ic: "📄", a: "Contratos", s: `${A.contratos.length} vencem em 30 dias`, r: "contratos" },
-    { ic: "💬", a: "Conversas", s: `${A.semana.length} assuntos relevantes na semana · ${A.recl.length} reclamações`, r: "conversas" },
-    { ic: "🎯", a: "Recomendações", s: `${pend.length} aguardando aprovação`, r: "recomendacoes" },
+    { ic: "💰", a: "Faturamento", f: "planilha de vendas", s: `<span class="${A.varMes >= 0 ? "up" : "down"}">${A.varMes >= 0 ? "↑" : "↓"} ${pct(A.varMes).replace(/[+−]/, "")}</span> vs agosto · ${brl(A.fatAtual)}`, r: "financeiro" },
+    { ic: "📈", a: "Lucro", f: "vendas + compras", s: (() => { const d = FIN[FIN.length - 1], p = FIN[FIN.length - 2]; return `${brl(d.lucroLiq)} · margem ${fpct(d.margemLiq)} · <span class="${d.margemBruta >= p.margemBruta ? "up" : "down"}">bruta ${(d.margemBruta - p.margemBruta >= 0 ? "+" : "−") + Math.abs((d.margemBruta - p.margemBruta) * 100).toFixed(1).replace(".", ",")} p.p.</span>`; })(), r: "financeiro" },
+    { ic: "👥", a: "Clientes", f: "vendas + WhatsApp", s: `${A.reduz.length} em atenção · ${A.ativos} ativos`, r: "clientes" },
+    { ic: "🤝", a: "Fornecedores", f: "compras (há 4 dias)", s: `${A.reajRec.length} reajustes detectados · ${A.atrasoForn.length} com atrasos`, r: "fornecedores" },
+    { ic: "📦", a: "Produtos", f: "vendas + WhatsApp", s: `${A.prodQueda.length} em queda · ${A.prodAlta.length} em alta`, r: "produtos" },
+    { ic: "📄", a: "Contratos", f: "cadastro de clientes", s: `${A.contratos.length} vencem em 30 dias`, r: "contratos" },
+    { ic: "💬", a: "Conversas", f: "WhatsApp", s: `${A.semana.length} assuntos relevantes na semana · ${A.recl.length} reclamações`, r: "conversas" },
+    { ic: "🎯", a: "Recomendações", f: "MAE", s: `${pend.length} aguardando aprovação`, r: "recomendacoes" },
   ];
   const recent = [...ST.results.slice(-3).reverse().map(x => ({ c: x.res === "sucesso" ? "var(--good)" : "var(--ink-2)", i: x.res === "sucesso" ? "✓" : "•", t: x.t, d: "Resultado: " + x.res })),
     ...HIST.slice(0, 3).map(x => ({ c: x.res === "sucesso" ? "var(--good)" : "var(--ink-2)", i: x.res === "sucesso" ? "✓" : "•", t: x.titulo, d: "Resultado: " + x.det }))].slice(0, 4);
   return `
     <div class="head reveal"><div class="eyebrow">Visão geral · ${EMPRESA}</div>
       <h1>${saud}, ${USUARIO}.</h1>
-      <p>O MAE leu <b>1.284 mensagens</b> (${A.convs.length} com assunto de negócio), 6 meses de vendas e 8 meses de compras, e percebeu algumas coisas importantes na sua operação.</p>
-      <div class="coverage">${FONTES.map(f => `<span class="src"><span class="dot ${f.status}"></span>${f.nome} · ${f.sinc}</span>`).join("")}</div>
+      <p>O MAE leu <b>${num(LEITURA.mensagens || A.convs.length)} mensagens</b> (${A.convs.length} com assunto de negócio), ${LEITURA.mesesVendas || MESES.length} meses de vendas e ${LEITURA.mesesCompras || 8} meses de compras, e percebeu algumas coisas importantes na sua operação.</p>
+      <div class="coverage">${FONTES.map(f => `<span class="src"><span class="dot ${f.status}"></span>${f.nome} · ${f.sinc}</span>`).join("")}<button class="btn ghost sm" data-act="go:dados">De onde vêm esses dados? ›</button></div>
     </div>
 
     <div class="hero reveal">
       <div>
         <div class="lbl"><span class="dot live" style="background:#fff"></span>O MAE percebeu</div>
         <div class="ttl">${esc(hero.t)}</div>
+        ${hero.imp ? `<div class="risk">Isso pode representar até <b>${brl(hero.imp)}/mês</b> em faturamento em risco.</div>` : ""}
+        <div class="hstep">Evidências</div>
         <div class="why">
           ${A.reduz.map(x => `<div><span class="b">↓</span><span><b>${esc(x.c.nome)}</b>: ${pct(x.var, 0)} nas compras (ago–set vs abr–jul)</span></div>`).join("")}
           <div><span class="b">💬</span><span>${A.reduzPreco.length} mencionaram preço nas conversas recentes e ${A.reduzConc.length} citaram concorrente</span></div>
         </div>
+        ${hero.evid ? `<div class="evchips">${hero.evid.map(e => `<span>${esc(e)}</span>`).join("")}</div>` : ""}
       </div>
       <div class="side-box">
-        <div><div class="imp-l">Impacto estimado</div><div class="imp-v" id="hero-imp">${brl(0)}/mês</div></div>
-        <div class="todo"><b>O que fazer:</b> revisar a negociação com esses clientes antes do próximo ciclo de pedidos.</div>
-        <div class="conf">Confiança ${conf(hero.n).l.toLowerCase()} · vendas + conversas + histórico</div>
-        <div class="acts"><button class="btn w sm" data-act="go:clientes">Ver clientes</button><button class="btn wg sm" data-act="evid:${hero.id}">Ver evidências</button></div>
+        <div><div class="hstep">Impacto estimado</div><div class="imp-v" id="hero-imp">${brl(0)}/mês</div></div>
+        <div><div class="hstep">Próxima ação</div><div class="todo">${esc(hero.fazer || "")}.</div></div>
+        <div class="conf">Confiança ${conf(hero.n).l.toLowerCase()} · ${hero.n} tipos de evidência independentes</div>
+        <div class="acts"><button class="btn w sm" data-act="go:clientes">Ver clientes</button><button class="btn wg sm" data-act="evid:${hero.id}">Ver evidências</button>${(() => { const r = ST.recs.find(x => x.sig === hero.id && x.status === "pendente"); return r ? `<button class="btn wg sm" data-act="rec:${r.id}">Ver recomendação</button>` : ""; })()}</div>
       </div>
     </div>
 
     <div class="row2">
-      <div class="card reveal"><h2>🔴 Atenção agora</h2><p class="cs">Ordenado por impacto. Clique para ver as evidências.</p>
+      <div class="card reveal"><h2>🔴 Atenção agora</h2><p class="cs">O que aconteceu, por quê, quanto está em jogo e o que fazer. Clique para ver as evidências e a recomendação.</p>
         ${SIGNALS.slice(1).map(sigRow).join("")}</div>
       <div class="card reveal"><h2>Hoje na sua empresa</h2><p class="cs">Cada área resumida pelo que merece olhar, não por totais.</p>
-        <table class="today"><tbody>${rows.map(r => `<tr data-act="go:${r.r}"><td>${r.ic} ${r.a}</td><td>${r.s}</td><td>abrir ›</td></tr>`).join("")}</tbody></table>
+        <table class="today"><tbody>${rows.map(r => `<tr data-act="go:${r.r}"><td>${r.ic} ${r.a}<div class="tsrc">fonte: ${r.f}</div></td><td>${r.s}</td><td>abrir ›</td></tr>`).join("")}</tbody></table>
         <div class="note" style="margin-top:12px">A receita cresceu ${pct(A.varMes)}, porém os <b>4 clientes que mais cresceram somam ${brl(A.top4v)}</b>, mais que todo o crescimento líquido de ${brl(A.fatAtual - A.fatAnt)}, porque ${A.reduz.length} clientes caíram.</div>
       </div>
     </div>
@@ -1360,17 +1553,118 @@ function vAprendizado(){
       <div class="note" style="margin-top:12px">Renovações antecipadas deram certo em <b>${Math.round(rate("renovacao") * 100)}%</b> das vezes; contatos por queda de compras em <b>${Math.round(rate("contato") * 100)}%</b>. Por isso o MAE sugere renovar com antecedência de 30 dias.</div></div>
     <div class="card reveal"><h2>Rejeições e motivos</h2><p class="cs">O que você recusou também ensina</p>${rej.length ? rej.map(r => `<div class="ev"><div class="ei">✕</div><div><div class="et">${esc(r.t)}</div><div class="ed">Motivo: ${esc(r.motivo)}</div></div></div>`).join("") : '<div class="empty">Nenhuma rejeição registrada ainda.</div>'}</div>`;
 }
+let DADOS_TAB = "fontes";
+function knowCounts(){
+  const vendas = PEDIDOS.length || CLIENTES.length * MESES.length, itens = PRODUTOS.length * MESES.length, precos = FORNECEDORES.length * 8, msgs = LEITURA.mensagens || A.convs.length;
+  return { vendas, itens, precos, msgs, fin: FIN.length, contratos: CLIENTES.filter(c => c.contrato || c.contratoAno).length, registros: vendas + itens + precos + msgs + CLIENTES.length + FIN.length };
+}
 function vDados(){
-  return `<div class="head reveal"><div class="eyebrow">Dados</div><h1>Dados & integrações</h1><p>O MAE fica por cima dos sistemas que a empresa já usa. Aqui você vê o que está conectado, quando sincronizou e o que ainda falta.</p></div>
-    <div class="card reveal"><div class="tbl-wrap"><table class="list"><thead><tr><th>Fonte</th><th>Tipo</th><th>Status</th><th>Última sincronização</th><th>Dados</th></tr></thead><tbody>
-    ${FONTES.map(f => `<tr style="cursor:default"><td><b>${f.nome}</b></td><td>${f.tipo}</td><td><span class="dot ${f.status}"></span> ${f.status === "off" ? "não conectado" : f.status === "stale" ? "desatualizado" : "conectado"}</td><td>${f.sinc}</td><td>${f.vol}</td></tr>`).join("")}</tbody></table></div>
-    <div class="note" style="margin-top:12px"><b>Cobertura:</b> sem o ERP, o MAE não vê estoque nem notas fiscais, então sinais de ruptura e margem por produto ficam fora da análise. A planilha de compras está com 4 dias de atraso: reajustes recentes podem não aparecer.</div></div>
-    <div class="card reveal"><h2>Adicionar fonte</h2><p class="cs">No produto final: Excel/CSV, WhatsApp, ERP, CRM, APIs e bancos de dados</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">${["Excel / CSV", "WhatsApp", "ERP", "CRM", "API", "Banco de dados"].map(x => `<span class="tag" style="padding:7px 12px">${x}</span>`).join("")}</div></div>`;
+  const k = knowCounts();
+  const tabs = [["fontes", "Fontes"], ["imports", "Importações"], ["mapa", "Mapeamento"], ["hist", "Histórico"]];
+  let body = "";
+  if (DADOS_TAB === "fontes") body = `<div class="tbl-wrap"><table class="list"><thead><tr><th>Fonte</th><th>Tipo</th><th>Status</th><th>Última sincronização</th><th>Dados</th></tr></thead><tbody>
+    ${FONTES.map(f => `<tr style="cursor:default"><td><b>${f.nome}</b></td><td>${f.tipo}</td><td><span class="dot ${f.status}"></span> ${f.status === "off" ? "não conectado" : f.status === "stale" ? "desatualizado" : f.status === "live" ? "conectado" : "atualizado"}</td><td>${f.ult || f.sinc} <span style="color:var(--muted)">· ${f.sinc}</span></td><td>${f.vol}</td></tr>`).join("")}</tbody></table></div>
+    <div class="sec-t" style="margin-top:16px">Última sincronização por conjunto de dados</div>
+    <div class="synclist">${SYNC.map(x => `<div><b>${x.ds}</b>${x.ult} · ${x.fonte}</div>`).join("")}</div>
+    <div class="note" style="margin-top:12px"><b>Cobertura:</b> sem o ERP, o MAE não vê estoque nem notas fiscais, então sinais de ruptura e margem por produto ficam fora da análise. A planilha de compras está com 4 dias de atraso: reajustes recentes podem não aparecer.</div>`;
+  else if (DADOS_TAB === "imports") body = `<div class="tbl-wrap"><table class="list"><thead><tr><th>Quando</th><th>Fonte</th><th>Arquivo</th><th class="n">Linhas</th><th>Status</th><th>Detalhe</th></tr></thead><tbody>
+    ${IMPORTS.map(x => `<tr style="cursor:default"><td>${x.dt}</td><td>${x.fonte}</td><td><code>${esc(x.arq)}</code></td><td class="n">${num(x.lin)}</td><td><span class="tag ${x.st === "ok" ? "good" : "warn"}">${x.st === "ok" ? "importado" : "com aviso"}</span></td><td>${esc(x.obs)}</td></tr>`).join("")}</tbody></table></div>`;
+  else if (DADOS_TAB === "mapa") body = `<p class="cs" style="margin-top:0">Como cada coluna das suas fontes vira uma entidade do MAE. Mapeamentos automáticos podem ser corrigidos; os confirmados por você não mudam sozinhos.</p><div class="tbl-wrap"><table class="list"><thead><tr><th>Fonte</th><th>Coluna / campo</th><th>Vira no MAE</th><th>Status</th></tr></thead><tbody>
+    ${MAPA.map(x => `<tr style="cursor:default"><td>${x.fonte}</td><td><b>${esc(x.col)}</b></td><td>${esc(x.ent)}</td><td><span class="tag ${x.st === "confirmado" ? "good" : x.st === "revisar" ? "warn" : "info"}">${x.st === "auto" ? "automático" : x.st === "revisar" ? "revisar" : "confirmado"}</span>${x.obs ? ` <span style="font-size:11.5px;color:var(--muted)">${esc(x.obs)}</span>` : ""}</td></tr>`).join("")}</tbody></table></div>`;
+  else body = `<div class="timeline">${HISTSYNC.map(x => `<div class="tl"><div class="ti" style="background:var(--accent)">⟳</div><div><div class="tt">${esc(x.ev)}</div><div class="td">${x.dt}</div></div></div>`).join("")}</div>`;
+  return `<div class="head reveal"><div class="eyebrow">Dados</div><h1>Dados & integrações</h1><p>De onde o MAE tirou tudo o que mostra: o que está conectado, quando sincronizou, como cada coluna foi interpretada e o que ainda falta.</p></div>
+    <div class="card reveal"><h2>O MAE conhece</h2><p class="cs">Tudo o que está na análise hoje. Se não está aqui, o MAE não usa.</p>
+      <div class="know">
+        <div class="k"><div class="kv">${num(CLIENTES.length)}</div><div class="kl">clientes</div><div class="ks">cadastro + vendas</div></div>
+        <div class="k"><div class="kv">${num(FORNECEDORES.length)}</div><div class="kl">fornecedores</div><div class="ks">compras</div></div>
+        <div class="k"><div class="kv">${num(PRODUTOS.length)}</div><div class="kl">produtos</div><div class="ks">vendas</div></div>
+        <div class="k"><div class="kv">${num(k.contratos)}</div><div class="kl">contratos</div><div class="ks">cadastro</div></div>
+        <div class="k"><div class="kv">${num(k.msgs)}</div><div class="kl">conversas</div><div class="ks">${A.convs.length} com assunto de negócio</div></div>
+        <div class="k"><div class="kv">${num(k.registros)}</div><div class="kl">registros</div><div class="ks">soma de tudo ao lado</div></div>
+      </div>
+      <div class="note" style="margin-top:12px">Como contamos os registros: ${num(k.vendas)} pedidos + ${num(k.itens)} vendas por produto e mês + ${num(k.precos)} preços de fornecedor + ${num(k.msgs)} mensagens + ${num(CLIENTES.length)} cadastros + ${num(k.fin)} meses de financeiro = <b>${num(k.registros)}</b>.</div></div>
+    <div class="card reveal"><div class="chips" id="dados-tabs" style="max-width:100%;overflow-x:auto">${tabs.map(([t, l]) => `<button data-t="${t}" class="${DADOS_TAB === t ? "on" : ""}">${l}</button>`).join("")}</div><div style="margin-top:14px">${body}</div></div>
+    <div class="card reveal"><h2>Modo: ${IS_DEMO ? "demonstração" : "sua empresa"} <span class="tag ${IS_DEMO ? "warn" : "good"}" style="vertical-align:middle">${IS_DEMO ? "dados fictícios" : "dados reais"}</span></h2>
+      <p class="cs">Demonstração e dados reais nunca se misturam.</p>
+      <div class="modes">
+        <div class="md"><h3>Demonstração</h3><ul><li>Empresa fictícia (${esc(DEMO.EMPRESA)}), com números gerados para mostrar o MAE funcionando.</li><li>Fica só no navegador e pode ser reiniciada.</li><li>Nunca entra na análise de uma empresa real.</li></ul></div>
+        <div class="mr"><h3>Sua empresa</h3><ul><li>Somente dados das fontes conectadas desta conta.</li><li>Cada número leva a fonte e a data da sincronização.</li><li>Sem fonte, o MAE mostra "sem dados" em vez de preencher.</li></ul></div>
+      </div>
+      <div class="sec-t" style="margin-top:14px">Por trás de cada tela</div>
+      ${flow(["Fontes", "Motor de dados", "Entidades", "Memória", "Padrões", "Insights", "Recomendações", "Você aprova", "Ação", "Resultado", "Aprendizado"].map((l, i) => ({ l: String(i + 1).padStart(2, "0"), v: l, c: l === "Você aprova" ? "wait" : "" })))}</div>
+    <div class="card reveal"><h2>Adicionar fonte</h2><p class="cs">No produto final: Excel/CSV, WhatsApp, ERP, CRM, APIs, documentos e bancos de dados</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${["Excel / CSV", "WhatsApp", "ERP", "CRM", "API", "Documentos", "Banco de dados"].map(x => `<span class="tag" style="padding:7px 12px">${x}</span>`).join("")}</div></div>`;
+}
+/* ================= COMPANY DNA ================= */
+// cada traço é calculado dos dados e diz quantas ocorrências o sustentam; sem ocorrências suficientes, o MAE diz que ainda não sabe
+function dnaTraits(){
+  const T = [], occ = (n, u) => `${num(n)} ${u}`;
+  // modelo comercial
+  const segR = FSEGS.map(sg => ({ k: sg.k, r: sum(sg.ids.map(id => byId(CLIENTES, id).rec[5])), r0: sum(sg.ids.map(id => byId(CLIENTES, id).rec[0])) })).sort((a, b) => b.r - a.r);
+  T.push({ g: "comercial", t: `${Math.round(A.concPct * 100)}% da receita vem de 3 clientes`, d: `${A.conc.map(c => c.nome).join(", ")}. Perder um deles pesa mais que qualquer queda de produto.`, base: occ(PEDIDOS.length, "pedidos"), fontes: ["Planilha de vendas"], n: 1,
+    ev: A.conc.map(c => `${c.nome}: ${brl(c.rec[5])} em setembro (${(c.rec[5] / A.fatAtual * 100).toFixed(1).replace(".", ",")}% da receita)`) });
+  T.push({ g: "comercial", t: `${segR[0].k} é o maior segmento; ${[...segR].sort((a, b) => (b.r / b.r0) - (a.r / a.r0))[0].k} é o que mais cresce`, d: `Participação no mês: ${segR.map(x => `${x.k} ${Math.round(x.r / A.fatAtual * 100)}%`).join(" · ")}.`, base: occ(PEDIDOS.length, "pedidos"), fontes: ["Planilha de vendas", "Cadastro de clientes"], n: 2,
+    ev: segR.map(x => `${x.k}: ${brl(x.r0)} em abril → ${brl(x.r)} em setembro (${pct(x.r / x.r0 - 1, 0)})`) });
+  const idx = FIN.map((r, i) => { const w = FIN.slice(Math.max(0, i - 6), i + 7); return r.receita / avg(w.map(x => x.receita)) - 1; });
+  const moy = {}; FIN.forEach((r, i) => { const m = r.lbl.slice(0, 3); (moy[m] = moy[m] || []).push(idx[i]); });
+  const rep2 = Object.entries(moy).filter(([, v]) => v.length >= 2 && v.every(x => x > 0.02));
+  T.push({ g: "comercial", t: rep2.length ? `Pico recorrente em ${rep2.map(([m]) => m).join(", ")}` : "Sem sazonalidade confirmada ainda", d: rep2.length ? "Os mesmos meses ficaram acima da tendência nos 2 anos." : `Em ${FIN.length} meses nenhum mês ficou acima da tendência nos 2 anos seguidos. O MAE só afirma sazonalidade quando o padrão se repete.`, base: occ(FIN.length, "meses de faturamento"), fontes: ["Planilha de vendas (histórico)"], n: 1,
+    ev: Object.entries(moy).map(([m, v]) => `${m}: ${v.map(x => pct(x, 1)).join(" e ")} em relação à média móvel`) });
+  const cmpT = sum(FORNECEDORES.map(f => f.compras)), topF = [...FORNECEDORES].sort((a, b) => b.compras - a.compras).slice(0, 3);
+  T.push({ g: "comercial", t: `3 fornecedores recorrentes concentram ${Math.round(sum(topF.map(f => f.compras)) / cmpT * 100)}% das compras`, d: topF.map(f => f.nome).join(", ") + ".", base: occ(FORNECEDORES.length * 8, "registros de compra"), fontes: ["Compras e fornecedores"], n: 1,
+    ev: FORNECEDORES.map(f => `${f.nome}: ${brl(f.compras)}/mês (${Math.round(f.compras / cmpT * 100)}%)`) });
+  // padrões operacionais
+  const atrasoConv = A.convs.filter(m => m.tema === "atraso"), vr = A.atrasoForn[0];
+  if (vr) T.push({ g: "operacao", t: `Atrasos de entrega se repetem com ${vr.nome}`, d: `${vr.atrasos} atrasos em 60 dias e ${atrasoConv.length} reclamações de clientes sobre atraso, em ${new Set(atrasoConv.map(m => m.c.id)).size} clientes diferentes.`, base: occ(vr.atrasos + atrasoConv.length, "ocorrências"), fontes: ["Compras e fornecedores", "WhatsApp"], n: 2,
+    ev: [`${vr.nome}: ${vr.atrasos} atrasos registrados em 60 dias`, ...atrasoConv.map(m => `${m.c.nome} · ${dia(m.dt)}: "${m.txt}"`)] });
+  const crit = A.prods.filter(x => x.mencPreco + x.mencConc > 0).sort((a, b) => (b.mencPreco + b.mencConc) - (a.mencPreco + a.mencConc));
+  if (crit.length) T.push({ g: "operacao", t: `${crit[0].p.nome} é o produto mais sensível a preço`, d: `${crit[0].mencPreco} menções a preço e ${crit[0].mencConc} a concorrente; vendas ${pct(crit[0].v, 0)} no último mês.`, base: occ(crit[0].mencPreco + crit[0].mencConc, "menções em conversas"), fontes: ["WhatsApp", "Planilha de vendas"], n: 2,
+    ev: A.convs.filter(m => m.prod === crit[0].p.id).map(m => `${m.c.nome} · ${dia(m.dt)}: "${m.txt}"`) });
+  const nre = sum(A.reajustes.map(r => r.n));
+  T.push({ g: "operacao", t: `Reajustes frequentes em ${A.reajMulti.map(r => r.f.cat.toLowerCase()).join(" e ") || "nenhuma categoria"}`, d: `${A.reajustes.filter(r => r.n).length} fornecedores reajustaram em 8 meses; ${A.reajMulti.map(r => `${r.f.nome} ${r.n} vezes`).join(", ")}.`, base: occ(nre, "reajustes"), fontes: ["Compras e fornecedores"], n: 1,
+    ev: A.reajustes.filter(r => r.n).map(r => `${r.f.nome}: ${r.n} reajuste(s), ${pct(r.alta, 0)} acumulado`) });
+  const ren = HIST.filter(h => h.tipo === "renovacao");
+  T.push({ g: "operacao", t: "Contratos renovados com antecedência fecham", d: `${ren.filter(h => h.res === "sucesso").length} de ${ren.length} renovações antecipadas deram certo. ${A.contratos.length} contratos vencem nos próximos 30 dias.`, base: occ(ren.length, "renovações"), fontes: ["Histórico de ações", "Cadastro de clientes"], n: 2,
+    ev: ren.map(h => `${h.titulo}: ${h.det}`) });
+  // preferências
+  const descs = PEDIDOS.map(x => x.desc), comDesc = descs.filter(x => x > 0);
+  if (PEDIDOS.length) T.push({ g: "pref", t: `Desconto típico de ${avg(comDesc).toFixed(1).replace(".", ",")}%, máximo de ${Math.max(...descs)}%`, d: `${comDesc.length} de ${PEDIDOS.length} pedidos tiveram desconto. O de 5% aconteceu só com ${esc(byId(CLIENTES, PEDIDOS.find(x => x.desc === Math.max(...descs)).cli).nome)}, depois da queda de compras.`, base: occ(PEDIDOS.length, "pedidos"), fontes: ["Planilha de vendas"], n: 1,
+    ev: [0, 1, 2, 3, 4, 5].map(v => `${v}% de desconto: ${descs.filter(x => x === v).length} pedidos`).filter(t => !t.includes(": 0 pedidos")) });
+  const pz = PEDIDOS.map(x => x.prazo);
+  if (PEDIDOS.length) T.push({ g: "pref", t: `Prazo médio de ${Math.round(avg(pz))} dias`, d: `Varia de ${Math.min(...pz)} a ${Math.max(...pz)} dias. Hotelaria e eventos recebem os prazos mais longos.`, base: occ(PEDIDOS.length, "pedidos"), fontes: ["Planilha de vendas"], n: 1,
+    ev: [...new Set(CLIENTES.map(c => c.seg))].map(sg => { const v = PEDIDOS.filter(x => byId(CLIENTES, x.cli).seg === sg).map(x => x.prazo); return `${sg}: ${Math.round(avg(v))} dias em média (${v.length} pedidos)`; }) });
+  const pref = FORNECEDORES.filter(f => f.part >= 0.55 && f.part < 1);
+  T.push({ g: "pref", t: `Fornecedores preferenciais: ${pref.map(f => f.nome).join(", ")}`, d: "Cada um fica com mais da metade das compras da sua categoria.", base: occ(pref.length * 8, "meses de compras"), fontes: ["Compras e fornecedores"], n: 1,
+    ev: pref.map(f => `${f.nome}: ${Math.round(f.part * 100)}% de ${f.cat.toLowerCase()}`) });
+  const citou = CLIENTES.filter(c => c.conv.some(m => m.tags.includes("concorrente"))), caiu = citou.filter(c => A.reduz.some(x => x.c.id === c.id));
+  T.push({ g: "pref", t: `Quem cita concorrente reduz compras: ${caiu.length} de ${citou.length}`, d: "Menção a concorrente no WhatsApp tem antecedido queda de compras. Por isso ela pesa na confiança dos sinais.", base: occ(citou.length, citou.length === 1 ? "cliente" : "clientes"), fontes: ["WhatsApp", "Planilha de vendas"], n: 2, pouco: citou.length < 5,
+    ev: citou.map(c => `${c.nome}: citou concorrente; compras ${pct((avg(c.rec.slice(4)) - avg(c.rec.slice(0, 4))) / avg(c.rec.slice(0, 4)), 0)}`) });
+  const ct = [...HIST, ...ST.results].filter(h => h.tipo === "contato");
+  T.push({ g: "pref", t: `Contato rápido recupera clientes em ${Math.round(rate("contato") * 100)}% dos casos`, d: "Taxa de sucesso dos contatos feitos depois de uma queda de compras, incluindo os resultados que você registrou.", base: occ(ct.length, "contatos"), fontes: ["Histórico de ações", "Seu feedback"], n: 2,
+    ev: ct.map(h => `${h.titulo || h.t}: ${h.det || h.res}`) });
+  const rej = ST.recs.filter(r => r.status === "rejeitada");
+  if (rej.length) { const byM = {}; rej.forEach(r => byM[r.motivo] = (byM[r.motivo] || 0) + 1); const top = Object.entries(byM).sort((a, b) => b[1] - a[1])[0];
+    T.push({ g: "pref", t: `Você rejeita principalmente por "${top[0].toLowerCase()}"`, d: "O MAE usa seus motivos para ajustar o momento e o tipo das próximas recomendações.", base: occ(rej.length, rej.length === 1 ? "rejeição" : "rejeições"), fontes: ["Seu feedback"], n: 1, ev: rej.map(r => `${r.t}: ${r.motivo}`) }); }
+  return T.map((x, i) => ({ ...x, id: "t" + i }));
+}
+let DNA = [];
+function vDna(){
+  DNA = dnaTraits();
+  const G = [["comercial", "Modelo comercial", "Como a empresa vende: clientes, segmentos, sazonalidade e fornecedores recorrentes"], ["operacao", "Padrões operacionais", "O que se repete na operação: atrasos, produtos críticos, reajustes e contratos"], ["pref", "Preferências e comportamento", "Como a empresa negocia e decide: descontos, prazos, fornecedores preferidos e o que funciona"]];
+  return `<div class="head reveal"><div class="eyebrow">Inteligência</div><h1>🧬 Company DNA</h1><p>O que o MAE aprendeu sobre a sua empresa. Cada traço mostra em quantas ocorrências se baseia e de onde veio; nada aqui é opinião. Clique para ver as ocorrências.</p></div>
+    ${G.map(([g, t, sub]) => `<div class="card reveal"><h2>${t}</h2><p class="cs">${sub}</p><div class="dna">${DNA.filter(x => x.g === g).map(x => `<button class="trait" data-trait="${x.id}">
+      <div class="tt">${esc(x.t)}</div><div class="td">${esc(x.d)}</div><div class="tb">Identificado com base em ${x.base}${x.pouco ? " · amostra pequena" : ""}</div>
+      <div class="tf">${x.fontes.map(f => `<span class="tag">${esc(f)}</span>`).join("")}<span class="tag ${conf(x.n).c}">confiança ${conf(x.n).l.toLowerCase()}</span></div></button>`).join("")}</div></div>`).join("")}
+    <div class="note reveal">O DNA se atualiza a cada sincronização e a cada resultado que você registra. Quando um padrão tem poucas ocorrências, o MAE avisa ("amostra pequena") em vez de tratar como regra.</div>`;
+}
+function openTrait(id){
+  const x = DNA.find(t => t.id === id);
+  openDrawer("Company DNA", x.t, `<div class="perceived"><div class="pt" style="display:block">✦ Como o MAE chegou nisso</div><div>${esc(x.d)}</div><div>Base: ${esc(x.base)} · fontes: ${esc(x.fontes.join(", "))}.</div></div>
+    <div><div class="sec-t">Ocorrências observadas (${x.ev.length})</div>${x.ev.map(e => `<div class="ev"><div class="ei">▪</div><div><div class="ed" style="margin:0">${esc(e)}</div></div></div>`).join("")}</div>`);
 }
 
 /* ================= PERGUNTE À EMPRESA ================= */
-const SUGS = ["Qual foi o lucro de setembro?", "Quais clientes reduziram compras?", "Quanto faturamos com o Mercado Bom Preço nos últimos 6 meses?", "Quais fornecedores tiveram aumento de preço?", "Por que nosso faturamento mudou este mês?", "Quais contratos vencem este mês?", "Quais produtos estão em queda?"];
+const SUGS = ["Qual foi o lucro de setembro?", "Quais clientes estão comprando menos?", "Quanto faturamos com o Mercado Bom Preço nos últimos 6 meses?", "Quais fornecedores aumentaram preços este ano?", "O que o MAE aprendeu sobre a empresa?", "De onde vêm os dados?", "Por que nosso faturamento mudou este mês?", "Quais contratos vencem este mês?", "Quais produtos estão em queda?"];
 let ASKED = null;
 function norm(s){ return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
 function answer(q){
@@ -1381,13 +1675,18 @@ function answer(q){
   if (/(lucro|margem)/.test(n)) { const d = FIN[FIN.length - 1], p = FIN[FIN.length - 2];
     return { a: `Em setembro o lucro líquido foi de <b>${brlFull(d.lucroLiq)}</b> (margem líquida de ${fpct(d.margemLiq)}), contra ${brlFull(p.lucroLiq)} em agosto e meta de ${brlFull(d.b.lucroLiq)}. A margem bruta foi de ${fpct(p.margemBruta)} para ${fpct(d.margemBruta)} porque o CMV subiu ${pct(d.cmv / p.cmv - 1)}.`,
       ev: [`Faturamento: ${brlFull(d.receita)}`, `CMV: ${brlFull(d.cmv)}`, `Despesas operacionais: ${brlFull(d.opex)}`, `Impostos: ${brlFull(d.impostos)}`, `Lucro líquido: ${brlFull(d.lucroLiq)}`], src: ["Planilha de vendas", "Compras e fornecedores"], link: "go:financeiro" }; }
-  if (/(reduz|diminu|cair|caiu|queda)/.test(n) && /client/.test(n)) return { a: `${A.reduz.length} clientes reduziram compras de forma relevante (≥ 20%): ${A.reduz.map(x => `<b>${esc(x.c.nome)}</b> (${pct(x.var, 0)})`).join(", ")}. Juntos são <b>${brl(A.reduzPerda)}/mês</b> a menos.`,
+  if (/(reduz|diminu|cair|caiu|queda|menos)/.test(n) && /client/.test(n)) return { a: `${A.reduz.length} clientes reduziram compras de forma relevante (≥ 20%): ${A.reduz.map(x => `<b>${esc(x.c.nome)}</b> (${pct(x.var, 0)})`).join(", ")}. Juntos são <b>${brl(A.reduzPerda)}/mês</b> a menos.`,
     ev: A.reduz.map(x => `${x.c.nome}: média ${brl(x.base)} → ${brl(x.rec)}`), src: ["Planilha de vendas", "WhatsApp"], link: "go:clientes" };
   if (/fornecedor/.test(n) && /(preco|aument|reajust)/.test(n)) return { a: `${A.reajustes.filter(r => r.n).length} fornecedores reajustaram preços em 8 meses. O maior foi <b>${esc(A.reajMulti[0].f.nome)}</b>: ${A.reajMulti[0].n} reajustes, ${pct(A.reajMulti[0].alta, 0)} acumulado.`,
     ev: A.reajustes.filter(r => r.n).map(r => `${r.f.nome}: ${r.n} reajuste(s), ${pct(r.alta, 0)}`), src: ["Compras e fornecedores (sincronizado há 4 dias)"], link: "go:fornecedores" };
   if (/fatur|receita/.test(n)) { const neg = A.contrib.filter(x => x.v < 0), posv = sum(A.contrib.filter(x => x.v > 0).map(x => x.v));
     return { a: `O faturamento foi de ${brl(A.fatAnt)} em agosto para <b>${brl(A.fatAtual)}</b> em setembro (${pct(A.varMes)}). Os clientes que cresceram somaram ${brl(posv)}, puxados por ${A.top4.slice(0, 2).map(x => `<b>${esc(x.c.nome)}</b> (+${brl(x.v)})`).join(" e ")}. As quedas somaram ${brl(-sum(neg.map(x => x.v)))}, principalmente ${neg.sort((a, b) => a.v - b.v).slice(0, 2).map(x => `<b>${esc(x.c.nome)}</b> (${brl(x.v)})`).join(" e ")}.`,
       ev: A.contrib.slice(0, 4).concat(A.contrib.slice(-3)).map(x => `${x.c.nome}: ${x.v >= 0 ? "+" : ""}${brl(x.v)}`), src: ["Planilha de vendas"], link: "go:insights" }; }
+  if (/(aprend|dna|conhece.*empresa|padr)/.test(n)) { const T = dnaTraits();
+    return { a: `O MAE identificou <b>${T.length} traços</b> da empresa. Os mais fortes: ${T.filter(x => x.n >= 2).slice(0, 3).map(x => `<b>${esc(x.t)}</b> (${esc(x.base)})`).join("; ")}.`, ev: T.map(x => `${x.t} · ${x.base}`), src: [...new Set(T.flatMap(x => x.fontes))], link: "go:dna" }; }
+  if (/(de onde|fonte|dados .*vem|sincroniz|integra)/.test(n)) { const k = knowCounts();
+    return { a: `Tudo vem de ${FONTES.filter(f => f.status !== "off").length} fontes conectadas: ${FONTES.filter(f => f.status !== "off").map(f => `<b>${esc(f.nome)}</b> (${f.sinc})`).join(", ")}. Hoje são <b>${num(k.registros)} registros</b>. ${FONTES.filter(f => f.status === "off").map(f => esc(f.nome)).join(", ")} ainda não está conectado, então estoque e notas fiscais ficam fora.`,
+      ev: SYNC.map(x => `${x.ds}: ${x.ult} · ${x.fonte}`), src: FONTES.filter(f => f.status !== "off").map(f => f.nome), link: "go:dados" }; }
   if (/contrato/.test(n)) return { a: `${A.contratos.length} contratos vencem nos próximos 30 dias: ${A.contratos.map(c => `<b>${esc(c.nome)}</b> em ${dia(c.contrato)}`).join(", ")}.`, ev: A.contratos.map(c => `${c.nome}: ${brl(c.rec[5] * 12)}/ano`), src: ["Cadastro de clientes"], link: "go:contratos" };
   if (/produto/.test(n)) return { a: `${A.prodQueda.length} produtos estão em queda: ${A.prodQueda.map(x => `<b>${esc(x.p.nome)}</b> (${pct(x.v, 0)})`).join(", ")}.${A.prodQueda[0].mencPreco ? ` No ${esc(A.prodQueda[0].p.nome)}, clientes citaram preço ${A.prodQueda[0].mencPreco} vezes.` : ""}`,
     ev: A.prodQueda.map(x => `${x.p.nome}: set ${num(x.p.qtd[5])} un. vs média ${num(avg(x.p.qtd.slice(2, 5)))}`), src: ["Planilha de vendas", "WhatsApp"], link: "go:produtos" };
@@ -1400,20 +1699,22 @@ function vPergunte(){
     ans = r ? `<div class="card answer reveal"><div class="q">${esc(ASKED)}</div><div class="a">${r.a}</div>
       <div><div class="sec-t">Evidências usadas</div>${r.ev.map(e => `<div class="ev"><div class="ei">▪</div><div><div class="ed" style="margin:0">${esc(e)}</div></div></div>`).join("")}</div>
       <div class="srcs">Fontes: ${r.src.map(s => `<span class="tag">${esc(s)}</span>`).join("")}<button class="btn ghost sm" data-act="${r.link}">abrir ›</button></div></div>`
-      : `<div class="card answer reveal"><div class="q">${esc(ASKED)}</div><div class="a">Não encontrei dados suficientes para responder com segurança. No protótipo, o MAE responde perguntas sobre faturamento por cliente, clientes em queda, reajustes de fornecedores, contratos e produtos. No produto final, essa área usa o motor de perguntas do backend do MAE.</div></div>`; }
+      : `<div class="card answer reveal"><div class="q">${esc(ASKED)}</div><div class="a">Não encontrei dados suficientes para responder com segurança. No protótipo, o MAE responde perguntas sobre faturamento por cliente, lucro, clientes em queda, reajustes de fornecedores, contratos, produtos, o DNA da empresa e a origem dos dados. No produto final, essa área usa o motor de perguntas do backend do MAE.</div></div>`; }
   return `<div class="head reveal"><div class="eyebrow">🧠 Pergunte à empresa</div><h1>O que você quer saber?</h1><p>O MAE responde a partir dos dados disponíveis e mostra as evidências. Se não houver dado suficiente, ele diz isso em vez de inventar.</p></div>
     <form class="ask-box reveal" id="ask-form"><input id="ask-in" placeholder="Ex.: quanto faturamos com o Hotel Vista Mar?" aria-label="Pergunta" value="${ASKED ? esc(ASKED) : ""}"><button class="btn p" type="submit">Perguntar</button></form>
     <div class="sugs reveal">${SUGS.map(q => `<button class="sug" data-act="ask:${encodeURIComponent(q)}">${esc(q)}</button>`).join("")}</div>${ans}`;
 }
 
 /* ================= RENDER ================= */
-const VIEWS = { visao: vVisao, financeiro: vFinanceiro, clientes: vClientes, fornecedores: vFornecedores, produtos: vProdutos, contratos: vContratos, conversas: vConversas, insights: vInsights, recomendacoes: vRecs, acoes: vAcoes, resultados: vResultados, aprendizado: vAprendizado, pergunte: vPergunte, dados: vDados };
+const VIEWS = { visao: vVisao, financeiro: vFinanceiro, clientes: vClientes, fornecedores: vFornecedores, produtos: vProdutos, contratos: vContratos, conversas: vConversas, insights: vInsights, recomendacoes: vRecs, acoes: vAcoes, resultados: vResultados, aprendizado: vAprendizado, pergunte: vPergunte, dados: vDados, dna: vDna };
 function countUp(el, target, fmt, dur = 900){ if (!el) return; if (REDUCE) { el.textContent = fmt(target); return; } const t0 = performance.now();
   (function st(now){ const t = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - t, 3); el.textContent = fmt(target * e); if (t < 1) requestAnimationFrame(st); })(performance.now()); }
 function render(){
   if (!VIEWS[ROUTE]) ROUTE = "visao";
   renderNav();
-  const v = document.getElementById("view"); v.innerHTML = VIEWS[ROUTE](); wire(v);
+  const v = document.getElementById("view");
+  v.innerHTML = (IS_DEMO ? `<div class="demo-bar"><b>Demonstração</b><span>Dados fictícios de ${esc(EMPRESA)}. Numa conta real, o MAE usa apenas as fontes conectadas da sua empresa.</span>${ROUTE !== "dados" ? '<button data-act="go:dados">Ver de onde vêm os dados ›</button>' : ""}</div>` : "") + VIEWS[ROUTE]();
+  wire(v);
   [...v.querySelectorAll(".reveal")].forEach((el, i) => { el.style.animationDelay = REDUCE ? "0ms" : (i * 60) + "ms"; el.classList.add("in"); });
   if (ROUTE === "visao") countUp(document.getElementById("hero-imp"), SIGNALS[0].imp, x => brl(x) + "/mês");
   if (ROUTE === "aprendizado") requestAnimationFrame(() => requestAnimationFrame(() => v.querySelectorAll(".lf").forEach(el => el.style.width = el.dataset.w + "%")));
@@ -1422,6 +1723,8 @@ function render(){
     document.querySelectorAll("#conv-list > div").forEach(el => el.hidden = t !== "todas" && !el.dataset.tags.split(",").includes(t)); }));
   if (ROUTE === "recomendacoes") document.querySelectorAll("#rec-tabs button").forEach(b => b.addEventListener("click", () => { REC_TAB = b.dataset.k; render(); }));
   if (ROUTE === "financeiro") finWire();
+  if (ROUTE === "dados") document.querySelectorAll("#dados-tabs button").forEach(b => b.addEventListener("click", () => { DADOS_TAB = b.dataset.t; render(); }));
+  if (ROUTE === "dna") v.querySelectorAll("[data-trait]").forEach(b => b.addEventListener("click", () => openTrait(b.dataset.trait)));
   if (ROUTE === "pergunte") document.getElementById("ask-form").addEventListener("submit", e => { e.preventDefault(); const q = document.getElementById("ask-in").value.trim(); if (q) ask(q); });
 }
 render();

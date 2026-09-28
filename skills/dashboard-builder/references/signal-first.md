@@ -18,6 +18,25 @@ O número vira **evidência**, não manchete.
 7. **Ciclo recente**: ações e resultados.
 8. **Atalho para perguntas**: sugestões clicáveis.
 
+## Área financeira dentro do painel de sinais
+
+Sinal sem número não convence o dono da empresa: ele quer ver faturamento e lucro. O template traz a tela **Financeiro** com a profundidade do Cockpit do CFO Pro:
+- KPIs em 3 níveis (faturamento, lucro líquido, caixa → margens, despesas, ticket médio → índices);
+- filtros de mês e de base (mês anterior, ano anterior, meta), variação com formatação condicional, ponte do lucro;
+- tendência de 24 meses com projeção e scrubber, faturamento por segmento com detalhe até o cliente;
+- resumo executivo, parecer com Claude, CSV e PDF.
+
+O que a diferencia do motor isolado:
+- abre com **"O que o MAE percebeu no financeiro"** (margem, concentração do crescimento, lucro vs meta), no mesmo tom dos sinais;
+- os números saem das **mesmas entidades** do resto do painel (o faturamento dos últimos meses é a soma dos clientes), então tudo bate entre telas;
+- quedas de margem viram **sinal na tela inicial**, com evidências ligando CMV a reajustes de fornecedores, e o "Pergunte à empresa" responde sobre lucro e margem.
+
+Para outro domínio, troque `FSEGS` (segmentos e quais entidades compõem cada um) e as premissas de custo em `FIN`.
+
+## Temas
+
+O template traz um seletor de tema no menu com 5 opções: **bege** (padrão), branco, preto, azul e vermelho. Cada tema é um bloco `:root[data-theme="…"]` que redefine os tokens, inclusive os gradientes (`--hero`, `--fhero`, `--falt`, `--hero-glow`). A escolha fica salva em `localStorage` (`mae-theme`). Texto sobre fundo colorido continua `#fff`; todo o resto usa tokens, para que nenhum tema quebre o contraste. O preto é opcional: o padrão continua claro.
+
 ## Regras
 
 - **Todo sinal é calculado dos dados**, por uma função com limiar explícito (ex.: média de 2 meses ≥ 20% abaixo da de 4 meses, entre clientes com base ≥ R$ 15 mil). Nunca escreva sinais fixos no HTML: os números precisam bater entre a tela inicial, as listas, os perfis e as respostas.

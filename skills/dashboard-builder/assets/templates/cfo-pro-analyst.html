@@ -1,0 +1,1110 @@
+<title>Cockpit do CFO Pro</title>
+<style>
+  /* ===== PALETA do Cockpit do CFO (tema claro travado) ===== */
+  :root {
+    color-scheme: light;
+    --bg: #f3f1fb;
+    --surface: #ffffff;
+    --surface-2: #f7f5fe;
+    --ink: #241a4d;
+    --ink-2: #6b6396;
+    --muted: #a49dc4;
+    --hair: #ece9f7;
+    --hair-2: #ddd8f0;
+
+    --violet: #6a4bff;
+    --magenta: #ff4d9d;
+    --orange: #ff7a1a;
+    --cyan: #12b5dc;
+    --lime: #23c552;
+    --amber: #f0a500;
+
+    --good: #12a150; --good-rgb: 18,161,80; --good-soft: #e4f8ec;
+    --bad: #e5194b;  --bad-rgb: 229,25,75;  --bad-soft: #ffe6ec;
+    --warn: #c98200; --warn-soft: #fff3d6;
+
+    --grad-hero: linear-gradient(140deg, #7b5cff 0%, #b84dff 55%, #ff5db1 100%);
+    --grad-cash: linear-gradient(155deg, #17c8e6 0%, #4b7bff 60%, #7b5cff 100%);
+    --grad-accent: linear-gradient(90deg, #ff4d9d, #ff7a1a);
+
+    --shadow: 0 2px 8px rgba(60,40,120,0.06), 0 18px 44px rgba(60,40,120,0.10);
+    --shadow-sm: 0 1px 4px rgba(60,40,120,0.08);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(1100px 520px at 0% -10%, rgba(122,92,255,0.16), transparent 60%),
+      radial-gradient(900px 480px at 100% 0%, rgba(255,77,157,0.12), transparent 55%);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-variant-numeric: tabular-nums;
+    padding-inline: 20px; padding-block: 26px; min-height: 100%;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+  button { font: inherit; }
+  :focus-visible { outline: 2px solid var(--violet); outline-offset: 2px; }
+
+  /* topo */
+  .topbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 14px; }
+  .eyebrow { font-size: 11.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
+    background: var(--grad-accent); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .topbar h1 { font-size: 28px; margin: 5px 0 0; letter-spacing: -0.025em; }
+  .topbar .sub { font-size: 13px; color: var(--ink-2); margin-top: 3px; }
+  .exports { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn { font-size: 12.5px; font-weight: 700; border: 0; border-radius: 11px; padding: 10px 15px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px; transition: transform .12s, background .2s, box-shadow .2s; }
+  .btn:active { transform: scale(.97); }
+  .btn.dark { background: var(--ink); color: #fff; box-shadow: var(--shadow-sm); }
+  .btn.dark:hover { background: var(--violet); }
+  .btn.ghost { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+  .btn.ghost:hover { background: var(--surface-2); }
+  .btn[disabled] { opacity: .55; cursor: default; }
+  .export-note { font-size: 11.5px; color: var(--ink-2); min-height: 14px; text-align: right; }
+
+  /* filtros */
+  .filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; background: var(--surface); border-radius: 16px;
+    padding: 10px 14px; box-shadow: var(--shadow-sm); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
+  .filters .f { display: flex; align-items: center; gap: 8px; }
+  .filters label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .filters select { font-size: 13px; font-weight: 600; color: var(--ink); background: var(--surface-2); border: 1px solid var(--hair-2);
+    border-radius: 9px; padding: 7px 10px; }
+  .seg { display: inline-flex; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 2px; }
+  .seg button { font-size: 12.5px; font-weight: 700; white-space: nowrap; padding: 7px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-2); cursor: pointer; }
+  .seg button.on { background: var(--violet); color: #fff; box-shadow: 0 4px 12px rgba(106,75,255,.3); }
+  .filters .spacer { flex: 1; }
+  @media (max-width: 480px) { .seg button { padding: 7px 9px; font-size: 12px; } .filters .f { flex-wrap: wrap; } }
+  .filters .ctx { font-size: 12px; color: var(--ink-2); }
+
+  /* hierarquia */
+  .tier-label { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+    display: flex; align-items: center; gap: 10px; margin-bottom: -6px; }
+  .tier-label::after { content: ""; flex: 1; height: 1px; background: var(--hair-2); }
+
+  .reveal { opacity: 0; transform: translateY(14px) scale(.985); }
+  .reveal.in { animation: pop .55s cubic-bezier(.2,.8,.25,1) forwards; }
+  @keyframes pop { to { opacity: 1; transform: none; } }
+
+  .t1 { display: grid; grid-template-columns: 1.35fr 1fr 1fr; gap: 14px; }
+  @media (max-width: 900px) { .t1 { grid-template-columns: 1fr; } }
+  .t2 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .t2 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 440px) { .t2 { grid-template-columns: 1fr; } }
+
+  .tile { background: var(--surface); border-radius: 20px; padding: 18px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+    display: flex; flex-direction: column; gap: 5px; cursor: pointer; border: 0; text-align: left; color: inherit; width: 100%;
+    transition: transform .15s, box-shadow .15s; }
+  .tile:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(60,40,120,.1), 0 24px 50px rgba(60,40,120,.14); }
+  .tile .tl { font-size: 12px; font-weight: 600; color: var(--ink-2); display: flex; justify-content: space-between; gap: 8px; }
+  .tile .tl .drill { font-size: 10.5px; font-weight: 700; color: var(--muted); letter-spacing: .03em; }
+  .tile .tv { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
+  .tile .td { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 12px; margin-top: 2px; }
+  .tile.hero { background: var(--grad-hero); color: #fff; box-shadow: 0 12px 30px rgba(122,60,255,0.30); }
+  .tile.hero .tl, .tile.hero .tl .drill { color: rgba(255,255,255,.85); }
+  .tile.hero .tv { font-size: 44px; }
+  .tile.cash { background: var(--grad-cash); color: #fff; box-shadow: 0 12px 30px rgba(30,120,255,0.26); }
+  .tile.cash .tl, .tile.cash .tl .drill { color: rgba(255,255,255,.85); }
+  .tile.t2t .tv { font-size: 24px; }
+  .chip { font-size: 11.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .chip.good { background: var(--good-soft); color: var(--good); }
+  .chip.bad { background: var(--bad-soft); color: var(--bad); }
+  .chip.neutral { background: var(--surface-2); color: var(--ink-2); }
+  .on-color .chip { background: rgba(255,255,255,.2); color: #fff; }
+  .tile .cmp-lbl { font-size: 11px; opacity: .8; }
+  .tile .spark { margin-top: auto; padding-top: 8px; }
+  .tile .foot { font-size: 11.5px; opacity: .85; margin-top: auto; padding-top: 6px; }
+
+  .ratios { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 900px) { .ratios { grid-template-columns: repeat(2, 1fr); } }
+  .ratio { background: var(--surface); border-radius: 16px; padding: 13px 15px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 3px;
+    border-left: 4px solid var(--hair-2); }
+  .ratio.good { border-left-color: var(--good); } .ratio.bad { border-left-color: var(--bad); } .ratio.warn { border-left-color: var(--amber); }
+  .ratio .rl { font-size: 11.5px; color: var(--ink-2); font-weight: 600; }
+  .ratio .rv { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+  .ratio .rn { font-size: 11px; color: var(--muted); }
+
+  .card { background: var(--surface); border-radius: 20px; padding: 20px; box-shadow: var(--shadow); min-width: 0; }
+  .card h2 { font-size: 15px; margin: 0 0 3px; letter-spacing: -0.01em; }
+  .card .csub { font-size: 12px; color: var(--muted); margin: 0 0 14px; }
+  .grid-2 { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; }
+  @media (max-width: 960px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* tabela de variação */
+  .table-wrap { overflow-x: auto; }
+  table.var { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 520px; }
+  table.var th { font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700;
+    text-align: right; padding: 6px 8px; border-bottom: 2px solid var(--hair-2); }
+  table.var th:first-child { text-align: left; }
+  table.var td { padding: 8px; text-align: right; border-bottom: 1px solid var(--hair); white-space: nowrap; }
+  table.var td:first-child { text-align: left; font-weight: 600; }
+  table.var tr.sub td:first-child { font-weight: 500; color: var(--ink-2); padding-left: 18px; }
+  table.var tr.total td { font-weight: 800; }
+  table.var tbody tr { cursor: pointer; transition: background .12s; }
+  table.var tbody tr:hover { background: var(--surface-2); }
+  table.var td.cf { font-weight: 700; border-radius: 6px; }
+
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .ax { fill: var(--muted); font-size: 10.5px; }
+  .grid-line { stroke: var(--hair); stroke-width: 1; }
+  .chart-wrap { position: relative; overflow-x: auto; }
+  .tooltip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; font-size: 11.5px; padding: 8px 10px;
+    border-radius: 9px; opacity: 0; transition: opacity .12s; white-space: nowrap; z-index: 9; line-height: 1.55; box-shadow: var(--shadow); }
+  .legend { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+  .legend button { font-size: 12px; background: transparent; border: 0; cursor: pointer; color: var(--ink-2); display: flex; align-items: center; gap: 6px;
+    padding: 4px 8px; border-radius: 8px; }
+  .legend button:hover { background: var(--surface-2); }
+  .legend button.off { opacity: .35; }
+  .legend .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .legend .dash { width: 16px; border-top: 2px dashed var(--ink-2); display: inline-block; }
+
+  .scrub-row { display: flex; align-items: center; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
+  .scrub-row input[type=range] { flex: 1; min-width: 180px; -webkit-appearance: none; appearance: none; height: 6px; border-radius: 6px; background: var(--hair); cursor: pointer; }
+  .scrub-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 3px solid var(--violet); box-shadow: var(--shadow-sm); }
+  .scrub-row input[type=range]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 3px solid var(--violet); }
+  .scrub-read { display: flex; gap: 16px; flex-wrap: wrap; }
+  .scrub-read .sr { display: flex; flex-direction: column; }
+  .scrub-read .sr .t { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .scrub-read .sr .v { font-size: 15px; font-weight: 800; }
+  .proj-tag { font-size: 10px; font-weight: 800; color: var(--violet); background: #ece8ff; padding: 2px 7px; border-radius: 6px; margin-left: 6px; vertical-align: middle; }
+
+  /* segmentos */
+  .segrow { display: grid; grid-template-columns: 110px 1fr auto; gap: 12px; align-items: center; padding: 10px 8px; border-radius: 12px; cursor: pointer;
+    border: 0; background: transparent; width: 100%; text-align: left; color: inherit; transition: background .15s; }
+  .segrow:hover { background: var(--surface-2); }
+  .segrow .sn { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+  .segrow .st { display: block; height: 14px; background: var(--surface-2); border-radius: 7px; overflow: hidden; }
+  .segrow .sf { display: block; height: 100%; width: 0; border-radius: 7px; transition: width 1s cubic-bezier(.2,.8,.25,1); }
+  .segrow .sv { font-size: 12.5px; text-align: right; }
+  .segrow .sv b { font-size: 13.5px; }
+  .segrow .sv span { display: block; font-size: 11px; color: var(--muted); }
+  .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex-shrink: 0; }
+
+  /* insights */
+  .ins-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  @media (max-width: 760px) { .ins-list { grid-template-columns: 1fr; } }
+  .ins { background: var(--surface-2); border-radius: 14px; padding: 14px 15px; border-left: 4px solid var(--violet); font-size: 13px; line-height: 1.55; color: var(--ink-2);
+    opacity: 0; transform: translateY(10px); }
+  .ins.in { animation: pop .45s cubic-bezier(.2,.8,.25,1) forwards; }
+  .ins.good { border-left-color: var(--good); } .ins.bad { border-left-color: var(--bad); } .ins.warn { border-left-color: var(--amber); }
+  .ins .it { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--ink); margin-bottom: 4px; }
+  .ins b { color: var(--ink); }
+  .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
+  @media (max-width: 760px) { .summary { grid-template-columns: 1fr; } }
+  .sum { border-radius: 14px; padding: 14px; background: var(--surface-2); }
+  .sum .sh { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+  .sum.good .sh { color: var(--good); } .sum.bad .sh { color: var(--bad); } .sum.warn .sh { color: var(--warn); }
+  .sum .st { font-size: 14.5px; font-weight: 700; margin: 6px 0 3px; }
+  .sum .sb { font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
+  .ai-box { margin-top: 14px; border-radius: 14px; border: 1px dashed var(--hair-2); padding: 14px; display: none; }
+  .ai-box.show { display: block; }
+  .ai-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .ai-out { margin-top: 10px; font-size: 13px; line-height: 1.6; color: var(--ink); white-space: pre-wrap; }
+  .ai-out:empty { display: none; }
+  .ai-status { font-size: 12px; color: var(--ink-2); }
+
+  /* auditoria */
+  details.audit { background: var(--surface-2); border-radius: 14px; padding: 12px 16px; margin-top: 10px; }
+  details.audit summary { cursor: pointer; font-weight: 700; font-size: 13.5px; list-style: none; display: flex; align-items: center; gap: 8px; }
+  details.audit summary::-webkit-details-marker { display: none; }
+  details.audit summary::before { content: "▸"; color: var(--violet); transition: transform .2s; display: inline-block; }
+  details.audit[open] summary::before { transform: rotate(90deg); }
+  details.audit ol, details.audit ul { margin: 10px 0 2px; padding-left: 20px; font-size: 13px; line-height: 1.6; color: var(--ink-2); }
+  details.audit li b { color: var(--ink); }
+
+  /* drawer */
+  .backdrop { position: fixed; inset: 0; background: rgba(36,26,77,.28); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 40; }
+  .backdrop.open { opacity: 1; pointer-events: auto; }
+  .drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(560px, 100%); background: var(--surface); z-index: 41;
+    box-shadow: -20px 0 50px rgba(36,26,77,.18); transform: translateX(104%); transition: transform .32s cubic-bezier(.2,.8,.25,1);
+    display: flex; flex-direction: column; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .drawer.open { transform: none; }
+  .drawer .dh { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 20px 20px 10px; border-bottom: 1px solid var(--hair); }
+  .drawer .dh h3 { margin: 0; font-size: 18px; letter-spacing: -0.02em; }
+  .drawer .dh p { margin: 3px 0 0; font-size: 12.5px; color: var(--ink-2); }
+  .drawer .close { border: 0; background: var(--surface-2); border-radius: 10px; width: 36px; height: 36px; cursor: pointer; font-size: 16px; color: var(--ink); flex-shrink: 0; }
+  .drawer .db { overflow-y: auto; padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+  table.dt { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.dt th { font-size: 10.5px; text-transform: uppercase; color: var(--muted); text-align: right; padding: 5px 6px; border-bottom: 2px solid var(--hair-2); }
+  table.dt th:first-child, table.dt td:first-child { text-align: left; }
+  table.dt td { padding: 7px 6px; text-align: right; border-bottom: 1px solid var(--hair); white-space: nowrap; }
+  table.dt tr.sel td { background: #f0edff; font-weight: 700; }
+  .dnote { font-size: 12.5px; color: var(--ink-2); background: var(--surface-2); border-radius: 12px; padding: 11px 13px; line-height: 1.55; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .ins { opacity: 1 !important; transform: none !important; animation: none !important; }
+    .drawer, .backdrop, .segrow .sf { transition: none !important; }
+  }
+  footer.note { font-size: 11.5px; color: var(--muted); text-align: center; }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <div class="eyebrow">Executive Cockpit · nível analista</div>
+      <h1>Cockpit do CFO</h1>
+      <div class="sub">Clique em qualquer indicador, linha ou segmento para abrir o detalhe. Tudo responde aos filtros.</div>
+    </div>
+    <div>
+      <div class="exports">
+        <button class="btn ghost" id="btn-csv" hidden>⭳ Exportar CSV</button>
+        <button class="btn dark" id="btn-pdf" hidden>⭳ Relatório PDF</button>
+      </div>
+      <div class="export-note" id="export-note"></div>
+    </div>
+  </div>
+
+  <div class="filters" role="toolbar" aria-label="Filtros">
+    <div class="f"><label for="f-month">Mês</label><select id="f-month"></select></div>
+    <div class="f"><label>Comparar com</label>
+      <div class="seg" id="f-cmp">
+        <button data-c="mom" class="on">Mês anterior</button>
+        <button data-c="yoy">Ano anterior</button>
+        <button data-c="bud">Orçado</button>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="ctx" id="f-ctx"></div>
+  </div>
+
+  <div class="tier-label">1 · Resultado</div>
+  <div class="t1" id="t1"></div>
+
+  <div class="tier-label">2 · Rentabilidade & custos</div>
+  <div class="t2" id="t2"></div>
+
+  <div class="tier-label">3 · Índices & fôlego</div>
+  <div class="ratios" id="ratios"></div>
+
+  <div class="grid-2">
+    <div class="card reveal">
+      <h2>Análise de variação</h2>
+      <p class="csub" id="var-sub"></p>
+      <div class="table-wrap"><table class="var" id="var-table"></table></div>
+    </div>
+    <div class="card reveal">
+      <h2>Ponte do lucro líquido</h2>
+      <p class="csub" id="bridge-sub"></p>
+      <div class="chart-wrap">
+        <svg id="bridge" viewBox="0 0 560 300" style="width:100%;height:auto;display:block"></svg>
+        <div class="tooltip" id="bridge-tt"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <h2>Tendência de 24 meses & projeção de 6 meses</h2>
+    <p class="csub">Projeção por regressão linear dos últimos 12 meses, com faixa de confiança de 80%. Clique na legenda para ocultar séries; arraste para percorrer.</p>
+    <div class="legend" id="trend-legend">
+      <button data-s="receita"><span class="dot" style="background:var(--violet)"></span>Receita</button>
+      <button data-s="opex"><span class="dot" style="background:var(--orange)"></span>Despesas operacionais</button>
+      <button data-s="lucroLiq"><span class="dot" style="background:var(--good)"></span>Lucro líquido</button>
+      <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);padding:4px 8px"><span class="dash"></span>projeção</span>
+    </div>
+    <div class="chart-wrap">
+      <svg id="trend" viewBox="0 0 1180 300" style="width:100%;height:auto;display:block"></svg>
+    </div>
+    <div class="scrub-row">
+      <input type="range" id="scrub" min="0" max="29" step="1" value="23" aria-label="Mês na linha do tempo">
+      <div class="scrub-read" id="scrub-read"></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card reveal">
+      <h2>Receita por segmento</h2>
+      <p class="csub" id="seg-sub"></p>
+      <div id="segments"></div>
+    </div>
+    <div class="card reveal">
+      <h2>Insights do analista</h2>
+      <p class="csub">Calculados a partir dos dados do mês e da base de comparação escolhidos</p>
+      <div class="ins-list" id="insights"></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <h2>Resumo do CFO</h2>
+    <p class="csub" id="sum-sub"></p>
+    <div class="summary" id="summary"></div>
+    <div class="ai-box" id="ai-box">
+      <div class="ai-head">
+        <button class="btn dark" id="ai-btn">✦ Gerar parecer com Claude</button>
+        <button class="btn ghost" id="ai-stop" hidden>■ Parar</button>
+        <span class="ai-status" id="ai-status">Um parecer escrito a partir dos números na tela. Usa o seu plano do Claude.</span>
+      </div>
+      <div class="ai-out" id="ai-out"></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <h2>Auditoria do analista</h2>
+    <p class="csub">O que mudou em relação à primeira versão, o que o painel responde e o que ainda falta</p>
+    <details class="audit" open>
+      <summary>5 perguntas que este painel responde</summary>
+      <ol>
+        <li><b>Estamos crescendo mais rápido que no ano passado?</b> E o ritmo está acelerando? Veja o crescimento YoY nos índices e a tendência com projeção.</li>
+        <li><b>Onde o resultado desviou do orçado e qual linha explica o desvio?</b> Veja a tabela de variação e a ponte do lucro.</li>
+        <li><b>Qual segmento puxa o crescimento e qual pesa na margem bruta?</b> Veja a receita por segmento, com detalhe por segmento.</li>
+        <li><b>Quantos meses de caixa temos no ritmo atual de queima, já contando o capex?</b> Veja o card de caixa e o runway.</li>
+        <li><b>Estamos ganhando alavancagem operacional?</b> Veja opex/receita, Rule of 40 e margem operacional contra o mesmo mês do ano anterior.</li>
+      </ol>
+    </details>
+    <details class="audit">
+      <summary>3 lacunas nos dados</summary>
+      <ol>
+        <li><b>Sem unit economics.</b> Faltam MRR, churn, CAC e LTV, então não dá para separar preço de volume nem medir a eficiência de vendas.</li>
+        <li><b>Caixa modelado.</b> O caixa vem de lucro líquido menos capex, sem capital de giro (recebíveis, fornecedores, estoque). O caixa real pode divergir.</li>
+        <li><b>Orçado só por linha do DRE e segmento.</b> Sem centro de custo, o desvio de opex não aponta o responsável.</li>
+      </ol>
+    </details>
+    <details class="audit">
+      <summary>3 melhorias recomendadas</summary>
+      <ol>
+        <li><b>Conectar a fonte real</b> (ERP ou planilha) no lugar dos dados de exemplo, com atualização automática a cada fechamento.</li>
+        <li><b>Decompor a variação da receita</b> em preço, volume e mix, e adicionar a camada de unit economics (MRR, churn, CAC payback).</li>
+        <li><b>Criar alertas automáticos</b> para desvio acima de X% contra o orçado e runway abaixo de N meses, enviados por e-mail ou Slack no fechamento.</li>
+      </ol>
+    </details>
+    <details class="audit">
+      <summary>O que foi removido e adicionado nesta versão</summary>
+      <ul>
+        <li><b>Removido:</b> o gráfico que colocava “Caixa ÷10” no mesmo eixo da receita. A escala dividida fazia o caixa parecer menor do que é. O caixa agora tem card e detalhe próprios.</li>
+        <li><b>Removido:</b> os gauges radiais de margem, que ocupavam um card inteiro para um número só. As margens viraram cards compactos com variação em pontos percentuais e histórico no detalhe.</li>
+        <li><b>Removido:</b> o resumo com texto fixo e os ícones decorativos. O resumo agora é calculado para a base de comparação escolhida.</li>
+        <li><b>Adicionado:</b> hierarquia de KPIs em 3 níveis, comparação MoM, YoY e orçado, tabela de variação com formatação condicional, ponte do lucro, detalhe por segmento, projeção com faixa de confiança, índices (Rule of 40, opex/receita, runway), exportação CSV e PDF e layout para celular.</li>
+      </ul>
+    </details>
+  </div>
+
+  <footer class="note">Dados de exemplo de uma operação com três segmentos. Substitua a função gen() pelos seus números.</footer>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" role="dialog" aria-label="Detalhe">
+  <div class="dh">
+    <div><h3 id="dr-title"></h3><p id="dr-sub"></p></div>
+    <button class="close" id="dr-close" aria-label="Fechar detalhe">✕</button>
+  </div>
+  <div class="db" id="dr-body"></div>
+</aside>
+
+<script>
+// ================== DADOS DE EXEMPLO (24 meses, 3 segmentos) ==================
+const SEGS = [
+  {k:"SaaS",      color:"--violet"},
+  {k:"Serviços",  color:"--cyan"},
+  {k:"Hardware",  color:"--orange"},
+];
+function gen(){
+  const rows=[]; let caixa=4300000;
+  for(let i=0;i<24;i++){
+    const dt=new Date(2024,9+i,1);
+    const m=dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0");
+    const sR=240000*Math.pow(1.03,i)*(1+0.025*Math.sin(i*1.7));
+    const vR=120000*Math.pow(1.012,i)*(1+0.04*Math.sin(i*0.9+1));
+    const hR=58000*Math.pow(1.005,i)*(1+0.2*Math.sin((i+2)*Math.PI/6));
+    const seg={
+      "SaaS":{r:Math.round(sR), c:Math.round(sR*(0.18+0.01*Math.sin(i)))},
+      "Serviços":{r:Math.round(vR), c:Math.round(vR*0.55)},
+      "Hardware":{r:Math.round(hR), c:Math.round(hR*0.70)},
+    };
+    let opex=260000*Math.pow(1.015,i)*(1+0.02*Math.cos(i*1.3)); if(i===19) opex*=1.12;
+    const capex = i===14 ? 260000 : 95000;
+    const bseg={
+      "SaaS":{r:Math.round(235000*Math.pow(1.031,i))},
+      "Serviços":{r:Math.round(125000*Math.pow(1.012,i))},
+      "Hardware":{r:62000},
+    };
+    bseg["SaaS"].c=Math.round(bseg["SaaS"].r*0.17);
+    bseg["Serviços"].c=Math.round(bseg["Serviços"].r*0.52);
+    bseg["Hardware"].c=Math.round(bseg["Hardware"].r*0.68);
+    const r={i, m, seg, bseg, opex:Math.round(opex), capex, bOpex:Math.round(255000*Math.pow(1.016,i))};
+    r.receita=SEGS.reduce((s,x)=>s+seg[x.k].r,0);
+    r.cmv=SEGS.reduce((s,x)=>s+seg[x.k].c,0);
+    r.lucroBruto=r.receita-r.cmv;
+    r.impostos=Math.round(r.receita*0.08);
+    r.lucroOp=r.lucroBruto-r.opex;
+    r.lucroLiq=r.lucroOp-r.impostos;
+    r.margemBruta=r.lucroBruto/r.receita; r.margemOp=r.lucroOp/r.receita; r.margemLiq=r.lucroLiq/r.receita;
+    caixa += r.lucroLiq - r.capex; r.caixa=Math.round(caixa);
+    const bR=SEGS.reduce((s,x)=>s+bseg[x.k].r,0), bC=SEGS.reduce((s,x)=>s+bseg[x.k].c,0);
+    r.b={receita:bR, cmv:bC, lucroBruto:bR-bC, opex:r.bOpex, impostos:Math.round(bR*0.08)};
+    r.b.lucroOp=r.b.lucroBruto-r.b.opex; r.b.lucroLiq=r.b.lucroOp-r.b.impostos;
+    r.b.margemBruta=r.b.lucroBruto/bR; r.b.margemOp=r.b.lucroOp/bR; r.b.margemLiq=r.b.lucroLiq/bR;
+    rows.push(r);
+  }
+  rows.forEach((r,i)=>{
+    const j=Math.max(0,i-3), n=i-j;
+    r.burn = n>0 ? Math.round((rows[j].caixa-r.caixa)/n) : 0;
+    r.runway = r.burn>0 ? r.caixa/r.burn : Infinity;
+  });
+  return rows;
+}
+const D = gen();
+
+// ================== MÉTRICAS ==================
+const MET = {
+  receita:     {l:"Receita",               t:"brl", dir:1},
+  cmv:         {l:"CMV",                   t:"brl", dir:-1},
+  lucroBruto:  {l:"Lucro bruto",           t:"brl", dir:1},
+  opex:        {l:"Despesas operacionais", t:"brl", dir:-1},
+  lucroOp:     {l:"Lucro operacional",     t:"brl", dir:1},
+  impostos:    {l:"Impostos",              t:"brl", dir:-1},
+  lucroLiq:    {l:"Lucro líquido",         t:"brl", dir:1},
+  margemBruta: {l:"Margem bruta",          t:"pct", dir:1},
+  margemOp:    {l:"Margem operacional",    t:"pct", dir:1},
+  margemLiq:   {l:"Margem líquida",        t:"pct", dir:1},
+  caixa:       {l:"Caixa",                 t:"brl", dir:1},
+  burn:        {l:"Queima de caixa (média 3m)", t:"brl", dir:-1},
+};
+const MONTHS_PT=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const MONTHS_FULL=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+function mLabel(m){ const [y,mm]=m.split("-"); return MONTHS_PT[+mm-1]+"/"+y.slice(2); }
+function mLabelIdx(i){ const d=new Date(2024,9+i,1); return MONTHS_PT[d.getMonth()]+"/"+String(d.getFullYear()).slice(2); }
+function mFull(m){ const [y,mm]=m.split("-"); return MONTHS_FULL[+mm-1]+" de "+y; }
+function cvar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function brl(v){ const a=Math.abs(v), s=v<0?"-":""; if(a>=1e6) return s+"R$ "+(a/1e6).toFixed(2).replace(".",",")+"M"; if(a>=1e3) return s+"R$ "+(a/1e3).toFixed(1).replace(".",",")+"k"; return s+"R$ "+a.toFixed(0); }
+function brlFull(v){ return (v<0?"-R$ ":"R$ ")+Math.abs(Math.round(v)).toLocaleString("pt-BR"); }
+function pctS(v,d=1){ return (v*100).toFixed(d).replace(".",",")+"%"; }
+function num(v,d=1){ return v.toFixed(d).replace(".",","); }
+function fmtMet(key,v){ if(v==null||!isFinite(v)) return "—"; return MET[key].t==="pct" ? pctS(v) : brl(v); }
+function fmtMetFull(key,v){ if(v==null||!isFinite(v)) return "—"; return MET[key].t==="pct" ? pctS(v) : brlFull(v); }
+
+// ================== ESTADO ==================
+const state = { idx: D.length-1, cmp: "mom", hidden: {} };
+const CMP_LBL = {mom:"mês anterior", yoy:"mesmo mês do ano anterior", bud:"orçado"};
+
+function baseVal(i,key,cmp=state.cmp){
+  if(cmp==="mom") return i>=1 ? D[i-1][key] : null;
+  if(cmp==="yoy") return i>=12 ? D[i-12][key] : null;
+  if(cmp==="bud") return D[i].b[key] !== undefined ? D[i].b[key] : null;
+  return null;
+}
+function delta(key,cur,base){
+  if(base==null || !isFinite(base) || cur==null) return null;
+  const m=MET[key]; const diff=cur-base;
+  const fav = diff*m.dir > 0 ? true : diff*m.dir < 0 ? false : null;
+  if(m.t==="pct") return {diff, fav, isPct:true, txt:(diff>=0?"+":"−")+num(Math.abs(diff)*100)+" p.p."};
+  if(base===0 || Math.sign(base)!==Math.sign(cur) || Math.abs(base) < Math.abs(cur)*0.25)
+    return {diff, pct:undefined, fav, txt:(diff>=0?"+":"−")+brl(Math.abs(diff))};
+  const p = diff/Math.abs(base);
+  return {diff, pct:p, fav, txt:(diff>=0?"+":"−")+num(Math.abs(p)*100)+"%"};
+}
+function chipHTML(dl){
+  if(!dl) return `<span class="chip neutral">sem base</span>`;
+  const cls = dl.fav===null?"neutral":dl.fav?"good":"bad";
+  const ar = dl.diff>0?"▲":dl.diff<0?"▼":"■";
+  return `<span class="chip ${cls}">${ar} ${dl.txt}</span>`;
+}
+
+// ================== ANIMAÇÃO DE NÚMEROS ==================
+const lastVals={}, handles={};
+function animNum(el,key,target,fmt,dur=750){
+  if(!el) return;
+  if(handles[key]) cancelAnimationFrame(handles[key]);
+  if(!isFinite(target)){ el.textContent=fmt(target); lastVals[key]=0; return; }
+  const from = lastVals[key]!==undefined ? lastVals[key] : 0; lastVals[key]=target;
+  if(REDUCE){ el.textContent=fmt(target); return; }
+  const t0=performance.now();
+  (function step(now){ const t=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-t,3);
+    el.textContent=fmt(from+(target-from)*e);
+    if(t<1) handles[key]=requestAnimationFrame(step); else handles[key]=null; })(performance.now());
+}
+
+function sparkSVG(values, hi, stroke, w=240, h=40){
+  const mn=Math.min(...values), mx=Math.max(...values), r=mx-mn||1, p=3;
+  const x=i=>p+(i/(values.length-1))*(w-2*p), y=v=>h-p-((v-mn)/r)*(h-2*p);
+  const pts=values.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" style="display:block">
+    <polyline points="${pts}" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${x(hi).toFixed(1)}" cy="${y(values[hi]).toFixed(1)}" r="3.2" fill="${stroke}"/>
+  </svg>`;
+}
+
+// ================== TIER 1 / TIER 2 ==================
+function renderTiles(){
+  const i=state.idx, d=D[i];
+  const win=D.slice(Math.max(0,i-11), i+1);
+  const hiIdx=win.length-1;
+  const t1=document.getElementById("t1");
+  const dRec=delta("receita",d.receita,baseVal(i,"receita"));
+  const dLL=delta("lucroLiq",d.lucroLiq,baseVal(i,"lucroLiq"));
+  const dCx=delta("caixa",d.caixa,baseVal(i,"caixa"));
+  const yoy = i>=12 ? (d.receita-D[i-12].receita)/D[i-12].receita : null;
+  t1.innerHTML=`
+    <button class="tile hero on-color reveal" data-metric="receita">
+      <div class="tl"><span>Receita do mês</span><span class="drill">detalhar ›</span></div>
+      <div class="tv" id="v-receita">R$ 0</div>
+      <div class="td">${chipHTML(dRec)}<span class="cmp-lbl">vs ${CMP_LBL[state.cmp]}</span>${yoy!=null&&state.cmp!=="yoy"?`<span class="chip">YoY ${yoy>=0?"+":"−"}${num(Math.abs(yoy)*100)}%</span>`:""}</div>
+      <div class="spark">${sparkSVG(win.map(x=>x.receita),hiIdx,"rgba(255,255,255,.95)")}</div>
+    </button>
+    <button class="tile reveal" data-metric="lucroLiq">
+      <div class="tl"><span>Lucro líquido</span><span class="drill">detalhar ›</span></div>
+      <div class="tv" id="v-lucroLiq" style="color:${d.lucroLiq>=0?cvar('--good'):cvar('--bad')}">R$ 0</div>
+      <div class="td">${chipHTML(dLL)}<span class="cmp-lbl">vs ${CMP_LBL[state.cmp]}</span></div>
+      <div class="foot" style="color:var(--ink-2)">margem líquida <b style="color:var(--ink)">${pctS(d.margemLiq)}</b> · orçado ${brl(d.b.lucroLiq)}</div>
+      <div class="spark">${sparkSVG(win.map(x=>x.lucroLiq),hiIdx,cvar('--good'))}</div>
+    </button>
+    <button class="tile cash on-color reveal" data-metric="caixa">
+      <div class="tl"><span>Caixa & runway</span><span class="drill">detalhar ›</span></div>
+      <div class="tv" id="v-caixa">R$ 0</div>
+      <div class="td">${state.cmp==="bud"?`<span class="chip">sem orçado de caixa</span>`:chipHTML(dCx)}${state.cmp!=="bud"?`<span class="cmp-lbl">vs ${CMP_LBL[state.cmp]}</span>`:""}</div>
+      <div class="foot"><b>${isFinite(d.runway)?num(d.runway,0)+" meses":"sem queima"}</b> de runway · queima ${brl(Math.max(0,d.burn))}/mês (inclui capex)</div>
+      <div class="spark">${sparkSVG(win.map(x=>x.caixa),hiIdx,"rgba(255,255,255,.95)")}</div>
+    </button>`;
+  animNum(document.getElementById("v-receita"),"t-rec",d.receita,brl);
+  animNum(document.getElementById("v-lucroLiq"),"t-ll",d.lucroLiq,brl);
+  animNum(document.getElementById("v-caixa"),"t-cx",d.caixa,brl);
+
+  const t2=document.getElementById("t2");
+  const t2keys=["margemBruta","margemOp","margemLiq","opex"];
+  t2.innerHTML=t2keys.map(k=>{
+    const v=d[k], dl=delta(k,v,baseVal(i,k));
+    const colr = k==="opex" ? cvar('--orange') : cvar('--violet');
+    return `<button class="tile t2t reveal" data-metric="${k}">
+      <div class="tl"><span>${MET[k].l}</span><span class="drill">›</span></div>
+      <div class="tv" id="v-${k}" style="color:${colr}">—</div>
+      <div class="td">${chipHTML(dl)}</div>
+      <div class="spark">${sparkSVG(win.map(x=>x[k]),hiIdx,colr,240,30)}</div>
+    </button>`;
+  }).join("");
+  t2keys.forEach(k=>animNum(document.getElementById("v-"+k),"t2-"+k,d[k],v=>fmtMet(k,v)));
+  document.querySelectorAll("[data-metric]").forEach(el=>el.addEventListener("click",()=>openMetricDrill(el.dataset.metric)));
+}
+
+// ================== ÍNDICES ==================
+function renderRatios(){
+  const i=state.idx, d=D[i];
+  const yoy = i>=12 ? (d.receita-D[i-12].receita)/D[i-12].receita : null;
+  const r40 = yoy!=null ? yoy*100 + d.margemLiq*100 : null;
+  const opexR = d.opex/d.receita;
+  const opexR12 = i>=12 ? D[i-12].opex/D[i-12].receita : null;
+  const items=[
+    {l:"Crescimento da receita YoY", v: yoy==null?"—":(yoy>=0?"+":"−")+num(Math.abs(yoy)*100)+"%", n: yoy==null?"precisa de 12 meses de histórico": `${brl(D[i-12].receita)} → ${brl(d.receita)}`, cls: yoy==null?"":yoy>=0.2?"good":yoy>=0?"warn":"bad"},
+    {l:"Rule of 40", v: r40==null?"—":num(r40,0), n: r40==null?"precisa de 12 meses de histórico": `crescimento ${num(yoy*100,0)} + margem ${num(d.margemLiq*100,0)} · meta ≥ 40`, cls: r40==null?"":r40>=40?"good":r40>=25?"warn":"bad"},
+    {l:"Opex / receita", v: pctS(opexR), n: opexR12==null?"quanto da receita vai para opex": `era ${pctS(opexR12)} há 12 meses · ${opexR<opexR12?"ganhando":"perdendo"} alavancagem`, cls: opexR12==null?"": opexR<opexR12?"good":"bad"},
+    {l:"Runway", v: isFinite(d.runway)?num(d.runway,0)+" meses":"∞", n: `caixa ${brl(d.caixa)} ÷ queima ${brl(Math.max(0,d.burn))}/mês`, cls: !isFinite(d.runway)||d.runway>=24?"good":d.runway>=12?"warn":"bad"},
+  ];
+  document.getElementById("ratios").innerHTML=items.map(it=>`
+    <div class="ratio ${it.cls} reveal"><div class="rl">${it.l}</div><div class="rv">${it.v}</div><div class="rn">${it.n}</div></div>`).join("");
+}
+
+// ================== TABELA DE VARIAÇÃO (formatação condicional) ==================
+const VAR_ROWS=[
+  {k:"receita", cls:"total"}, {k:"cmv", cls:"sub"}, {k:"lucroBruto", cls:"total"}, {k:"margemBruta", cls:"sub"},
+  {k:"opex", cls:"sub"}, {k:"lucroOp", cls:"total"}, {k:"margemOp", cls:"sub"}, {k:"impostos", cls:"sub"},
+  {k:"lucroLiq", cls:"total"}, {k:"margemLiq", cls:"sub"},
+];
+function cfStyle(dl){
+  if(!dl || dl.fav===null) return "";
+  const mag = dl.pct!==undefined ? Math.min(1, Math.abs(dl.pct)/0.15)
+    : (dl.isPct ? Math.min(1, Math.abs(dl.diff)/0.03) : Math.min(1, Math.abs(dl.diff)/(D[state.idx].receita*0.05)));
+  const a=(0.08+0.30*mag).toFixed(2);
+  const rgb = dl.fav ? cvar('--good-rgb') : cvar('--bad-rgb');
+  const col = dl.fav ? cvar('--good') : cvar('--bad');
+  return `background:rgba(${rgb},${a});color:${col}`;
+}
+function renderVariance(){
+  const i=state.idx, d=D[i];
+  document.getElementById("var-sub").textContent =
+    `${mFull(d.m)} contra ${CMP_LBL[state.cmp]}. Cor mais forte = desvio maior. Verde é favorável (custo menor também conta). Clique numa linha para o histórico.`;
+  const tbl=document.getElementById("var-table");
+  let h=`<thead><tr><th>Linha</th><th>Atual</th><th>${state.cmp==="bud"?"Orçado":state.cmp==="yoy"?"Ano ant.":"Mês ant."}</th><th>Var. R$</th><th>Var. %</th></tr></thead><tbody>`;
+  VAR_ROWS.forEach(r=>{
+    const m=MET[r.k], cur=d[r.k], b=baseVal(i,r.k), dl=delta(r.k,cur,b);
+    let varRs="—", varPct="—";
+    if(dl){
+      if(m.t==="pct"){ varRs="—"; varPct=dl.txt; }
+      else { varRs=(dl.diff>=0?"+":"−")+brl(Math.abs(dl.diff)).replace("R$ ","R$ "); varPct=dl.txt; }
+    }
+    const st=cfStyle(dl);
+    h+=`<tr class="${r.cls}" data-metric="${r.k}" tabindex="0">
+      <td>${m.l}</td><td>${fmtMet(r.k,cur)}</td><td>${fmtMet(r.k,b)}</td>
+      <td class="cf" style="${m.t==="pct"?"":st}">${varRs}</td><td class="cf" style="${st}">${varPct}</td></tr>`;
+  });
+  h+="</tbody>";
+  tbl.innerHTML=h;
+  tbl.querySelectorAll("tbody tr").forEach(tr=>{
+    tr.addEventListener("click",()=>openMetricDrill(tr.dataset.metric));
+    tr.addEventListener("keydown",e=>{ if(e.key==="Enter"){ openMetricDrill(tr.dataset.metric); } });
+  });
+}
+
+// ================== PONTE DO LUCRO ==================
+function renderBridge(){
+  const i=state.idx, d=D[i];
+  const svg=document.getElementById("bridge");
+  const sub=document.getElementById("bridge-sub");
+  const b={}; ["receita","cmv","opex","impostos","lucroLiq"].forEach(k=>b[k]=baseVal(i,k));
+  if(b.lucroLiq==null){ sub.textContent="Sem base de comparação para este mês."; svg.innerHTML=`<text class="ax" x="280" y="150" text-anchor="middle">Escolha outro mês ou outra base</text>`; return; }
+  sub.textContent=`Como o lucro líquido saiu de ${brl(b.lucroLiq)} (${CMP_LBL[state.cmp]}) para ${brl(d.lucroLiq)} — cada barra é o efeito de uma linha do DRE.`;
+  const steps=[
+    {l:state.cmp==="bud"?"Orçado":"Base", v:b.lucroLiq, total:true},
+    {l:"Receita", v:d.receita-b.receita},
+    {l:"CMV", v:-(d.cmv-b.cmv)},
+    {l:"Opex", v:-(d.opex-b.opex)},
+    {l:"Impostos", v:-(d.impostos-b.impostos)},
+    {l:"Atual", v:d.lucroLiq, total:true},
+  ];
+  let run=0; const bars=steps.map(s=>{
+    if(s.total){ run=s.v; return {...s, y0:0, y1:s.v}; }
+    const a=run; run+=s.v; return {...s, y0:a, y1:run};
+  });
+  const W=560,H=300,padL=58,padR=14,padT=26,padB=34, plotW=W-padL-padR, plotH=H-padT-padB;
+  const vals=bars.flatMap(x=>[x.y0,x.y1]);
+  let mn=Math.min(0,...vals), mx=Math.max(0,...vals); const pad=(mx-mn)*0.12; mx+=pad; if(mn<0) mn-=pad;
+  const y=v=>padT+plotH-((v-mn)/(mx-mn))*plotH;
+  const slot=plotW/bars.length, bw=slot*0.58;
+  let s="";
+  for(let k=0;k<=4;k++){ const gv=mn+(mx-mn)*(k/4), gy=y(gv); s+=`<line class="grid-line" x1="${padL}" x2="${W-padR}" y1="${gy}" y2="${gy}"/><text class="ax" x="${padL-7}" y="${gy+3}" text-anchor="end">${brl(gv)}</text>`; }
+  s+=`<line x1="${padL}" x2="${W-padR}" y1="${y(0)}" y2="${y(0)}" stroke="${cvar('--hair-2')}" stroke-width="1.4"/>`;
+  bars.forEach((bb,k)=>{
+    const cx=padL+slot*(k+0.5), top=Math.min(y(bb.y0),y(bb.y1)), hh=Math.max(2,Math.abs(y(bb.y1)-y(bb.y0)));
+    const col = bb.total ? cvar('--violet') : bb.v>=0 ? cvar('--good') : cvar('--bad');
+    s+=`<rect class="bb" data-k="${k}" x="${(cx-bw/2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" rx="4" fill="${col}" opacity="${bb.total?1:.88}" style="transform-origin:${cx}px ${y(bb.y0)}px;${REDUCE?"":`animation:grow .6s cubic-bezier(.2,.8,.25,1) ${k*90}ms both`}"/>`;
+    const lbl = bb.total ? brl(bb.v) : (bb.v>=0?"+":"−")+brl(Math.abs(bb.v));
+    s+=`<text class="ax" x="${cx}" y="${(top-6).toFixed(1)}" text-anchor="middle" style="fill:${bb.total?cvar('--ink'):col};font-weight:700">${lbl}</text>`;
+    s+=`<text class="ax" x="${cx}" y="${H-12}" text-anchor="middle">${bb.l}</text>`;
+    if(k<bars.length-1){ const nx=padL+slot*(k+1.5)-bw/2; s+=`<line x1="${(cx+bw/2).toFixed(1)}" x2="${nx.toFixed(1)}" y1="${y(bb.y1)}" y2="${y(bb.y1)}" stroke="${cvar('--hair-2')}" stroke-dasharray="3 3"/>`; }
+  });
+  svg.innerHTML=`<style>@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}</style>`+s;
+  const tt=document.getElementById("bridge-tt");
+  svg.querySelectorAll(".bb").forEach(el=>{
+    el.addEventListener("mouseenter",()=>{
+      const bb=bars[+el.dataset.k];
+      tt.innerHTML = bb.total ? `<b>${bb.l}</b><br>Lucro líquido ${brlFull(bb.v)}` :
+        `<b>Efeito ${bb.l}</b><br>${bb.v>=0?"+":"−"}${brlFull(Math.abs(bb.v))} no lucro<br><span style="opacity:.8">${bb.v>=0?"ajudou":"pesou"} contra ${CMP_LBL[state.cmp]}</span>`;
+      tt.style.opacity=1;
+      const r=svg.getBoundingClientRect(), wr=svg.parentElement.getBoundingClientRect();
+      tt.style.left=(r.left-wr.left+(+el.getAttribute("x"))*(r.width/W))+"px";
+      tt.style.top=(r.top-wr.top+(+el.getAttribute("y"))*(r.height/H)-58)+"px";
+    });
+    el.addEventListener("mouseleave",()=>tt.style.opacity=0);
+  });
+}
+
+// ================== TENDÊNCIA + PROJEÇÃO ==================
+const TREND_SERIES=[{k:"receita",c:"--violet"},{k:"opex",c:"--orange"},{k:"lucroLiq",c:"--good"}];
+function project(key){
+  const last=D.slice(-12).map(r=>r[key]); const n=last.length;
+  const xs=last.map((_,j)=>j); const xm=(n-1)/2, ym=last.reduce((a,b)=>a+b,0)/n;
+  let sxy=0,sxx=0; xs.forEach((x,j)=>{ sxy+=(x-xm)*(last[j]-ym); sxx+=(x-xm)**2; });
+  const slope=sxy/sxx, inter=ym-slope*xm;
+  const resid=Math.sqrt(last.reduce((a,v,j)=>a+(v-(inter+slope*j))**2,0)/(n-2));
+  const out=[];
+  for(let h=1;h<=6;h++){ const x=n-1+h; const v=inter+slope*x; const band=1.28*resid*Math.sqrt(1+1/n+((x-xm)**2)/sxx); out.push({v, lo:v-band, hi:v+band}); }
+  return out;
+}
+let TR=null;
+function renderTrend(animate){
+  const svg=document.getElementById("trend");
+  const W=1180,H=300,padL=62,padR=34,padT=16,padB=30, plotW=W-padL-padR, plotH=H-padT-padB;
+  const N=D.length+6;
+  const P={}; TREND_SERIES.forEach(s=>P[s.k]=project(s.k));
+  const shown=TREND_SERIES.filter(s=>!state.hidden[s.k]);
+  const all=[0]; shown.forEach(s=>{ D.forEach(r=>all.push(r[s.k])); P[s.k].forEach(p=>{all.push(p.lo,p.hi);}); });
+  let mn=Math.min(...all), mx=Math.max(...all); const pad=(mx-mn)*0.06; mx+=pad; if(mn<0) mn-=pad;
+  const x=j=>padL+(j/(N-1))*plotW, y=v=>padT+plotH-((v-mn)/(mx-mn))*plotH;
+  TR={x,y,P,N};
+  let s="";
+  for(let k=0;k<=4;k++){ const gv=mn+(mx-mn)*(k/4), gy=y(gv); s+=`<line class="grid-line" x1="${padL}" x2="${W-padR}" y1="${gy}" y2="${gy}"/><text class="ax" x="${padL-7}" y="${gy+3}" text-anchor="end">${brl(gv)}</text>`; }
+  if(mn<0) s+=`<line x1="${padL}" x2="${W-padR}" y1="${y(0)}" y2="${y(0)}" stroke="${cvar('--hair-2')}" stroke-width="1.4"/>`;
+  // zona de projeção
+  s+=`<rect x="${x(D.length-1)}" y="${padT}" width="${x(N-1)-x(D.length-1)}" height="${plotH}" fill="${cvar('--surface-2')}"/>`;
+  s+=`<text class="ax" x="${(x(D.length-1)+x(N-1))/2}" y="${padT+12}" text-anchor="middle" style="font-weight:700;fill:${cvar('--violet')}">PROJEÇÃO</text>`;
+  for(let j=0;j<N;j++){ if(j%3===0||j===N-1) s+=`<text class="ax" x="${x(j)}" y="${H-8}" text-anchor="middle">${mLabelIdx(j)}</text>`; }
+  // mês selecionado
+  s+=`<line x1="${x(state.idx)}" x2="${x(state.idx)}" y1="${padT}" y2="${padT+plotH}" stroke="${cvar('--violet')}" stroke-width="1" opacity=".35"/>`;
+  shown.forEach((sr,k)=>{
+    const col=cvar(sr.c);
+    const band=P[sr.k];
+    const bandD=`M${x(D.length-1)},${y(D[D.length-1][sr.k])} `+band.map((p,h)=>`L${x(D.length+h)},${y(p.hi)}`).join(" ")+" "+
+      [...band].reverse().map((p,h)=>`L${x(N-1-h)},${y(p.lo)}`).join(" ")+" Z";
+    s+=`<path d="${bandD}" fill="${col}" opacity=".12"/>`;
+    s+=`<polyline class="tl" points="${D.map((r,j)=>`${x(j).toFixed(1)},${y(r[sr.k]).toFixed(1)}`).join(" ")}" fill="none" stroke="${col}" stroke-width="${sr.k==="receita"?3:2.2}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    s+=`<polyline points="${x(D.length-1)},${y(D[D.length-1][sr.k])} ${band.map((p,h)=>`${x(D.length+h).toFixed(1)},${y(p.v).toFixed(1)}`).join(" ")}" fill="none" stroke="${col}" stroke-width="2.2" stroke-dasharray="6 5" stroke-linecap="round"/>`;
+    s+=`<circle id="sd-${sr.k}" r="5" fill="${col}" stroke="#fff" stroke-width="2"/>`;
+  });
+  s+=`<line id="scrub-line" y1="${padT}" y2="${padT+plotH}" stroke="${cvar('--ink-2')}" stroke-dasharray="3 3"/>`;
+  for(let j=0;j<N;j++) s+=`<rect class="hit" data-j="${j}" x="${x(j)-plotW/(N-1)/2}" y="${padT}" width="${plotW/(N-1)}" height="${plotH}" fill="transparent"/>`;
+  svg.innerHTML=s;
+  if(animate && !REDUCE){
+    svg.querySelectorAll(".tl").forEach((el,k)=>{ const len=el.getTotalLength(); el.style.strokeDasharray=len; el.style.strokeDashoffset=len;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.style.transition=`stroke-dashoffset 1.3s ease ${k*0.15}s`; el.style.strokeDashoffset="0"; })); });
+  }
+  svg.querySelectorAll(".hit").forEach(r=>{
+    const set=()=>{ document.getElementById("scrub").value=r.dataset.j; updateScrub(); };
+    r.addEventListener("mousemove",set); r.addEventListener("click",()=>{ set(); if(+r.dataset.j<D.length){ setMonth(+r.dataset.j); } });
+  });
+  updateScrub();
+}
+function valAt(key,j){ return j<D.length ? D[j][key] : TR.P[key][j-D.length].v; }
+function updateScrub(){
+  if(!TR) return;
+  const j=+document.getElementById("scrub").value, {x,y}=TR;
+  const ln=document.getElementById("scrub-line"); ln.setAttribute("x1",x(j)); ln.setAttribute("x2",x(j));
+  TREND_SERIES.forEach(sr=>{ const c=document.getElementById("sd-"+sr.k); if(c){ c.setAttribute("cx",x(j)); c.setAttribute("cy",y(valAt(sr.k,j))); } });
+  const isP=j>=D.length;
+  const rng = k => isP ? ` <span style="font-size:10.5px;color:var(--muted);font-weight:600">${brl(TR.P[k][j-D.length].lo)}–${brl(TR.P[k][j-D.length].hi)}</span>` : "";
+  document.getElementById("scrub-read").innerHTML=`
+    <div class="sr"><span class="t">Mês</span><span class="v">${mLabelIdx(j)}${isP?'<span class="proj-tag">projeção</span>':""}</span></div>
+    <div class="sr"><span class="t">Receita</span><span class="v" style="color:var(--violet)">${brl(valAt("receita",j))}${rng("receita")}</span></div>
+    <div class="sr"><span class="t">Opex</span><span class="v" style="color:var(--orange)">${brl(valAt("opex",j))}</span></div>
+    <div class="sr"><span class="t">Lucro líquido</span><span class="v" style="color:var(--good)">${brl(valAt("lucroLiq",j))}${rng("lucroLiq")}</span></div>`;
+}
+
+// ================== SEGMENTOS ==================
+function segBase(i,k){
+  if(state.cmp==="mom") return i>=1? D[i-1].seg[k].r : null;
+  if(state.cmp==="yoy") return i>=12? D[i-12].seg[k].r : null;
+  return D[i].bseg[k].r;
+}
+function renderSegments(){
+  const i=state.idx, d=D[i];
+  document.getElementById("seg-sub").textContent=`${mFull(d.m)} · participação, margem de contribuição e variação contra ${CMP_LBL[state.cmp]}. Clique para detalhar.`;
+  const max=Math.max(...SEGS.map(s=>d.seg[s.k].r));
+  const box=document.getElementById("segments");
+  box.innerHTML=SEGS.map(s=>{
+    const r=d.seg[s.k].r, c=d.seg[s.k].c, mc=(r-c)/r, share=r/d.receita, b=segBase(i,s.k);
+    const dl = b? {diff:r-b, pct:(r-b)/b, fav: r>b?true:r<b?false:null, txt:(r>=b?"+":"−")+num(Math.abs((r-b)/b)*100)+"%"} : null;
+    return `<button class="segrow" data-seg="${s.k}">
+      <span class="sn"><span class="sw" style="background:var(${s.color})"></span>${s.k}</span>
+      <span class="st"><span class="sf" data-w="${(r/max*100).toFixed(1)}" style="background:var(${s.color})"></span></span>
+      <span class="sv"><b>${brl(r)}</b> ${chipHTML(dl)}<span>${pctS(share,0)} da receita · margem ${pctS(mc,0)}</span></span>
+    </button>`;
+  }).join("");
+  const fills=[...box.querySelectorAll(".sf")];
+  requestAnimationFrame(()=>requestAnimationFrame(()=>fills.forEach((f,k)=>{ if(REDUCE) f.style.width=f.dataset.w+"%"; else setTimeout(()=>f.style.width=f.dataset.w+"%",k*110); })));
+  box.querySelectorAll(".segrow").forEach(b=>b.addEventListener("click",()=>openSegDrill(b.dataset.seg)));
+}
+
+// ================== INSIGHTS + RESUMO ==================
+let INS=[], SUM=[];
+function buildInsights(){
+  const i=state.idx, d=D[i], out=[];
+  // 1. crescimento e aceleração
+  if(i>=6){
+    const g=a=>a.slice(1).map((v,k)=>(v-a[k])/a[k]);
+    const rec=D.slice(i-6,i+1).map(r=>r.receita);
+    const gr=g(rec); const recent=(gr[3]+gr[4]+gr[5])/3, prior=(gr[0]+gr[1]+gr[2])/3;
+    const acc=recent>prior;
+    out.push({cls:acc?"good":"warn", t:"Ritmo de crescimento",
+      h:`Receita cresce em média <b>${num(recent*100)}%/mês</b> nos últimos 3 meses, contra <b>${num(prior*100)}%/mês</b> nos 3 anteriores. O ritmo está ${acc?"<b>acelerando</b>":"<b>desacelerando</b>"}.`,
+      p:`Receita cresce em média ${num(recent*100)}%/mês nos últimos 3 meses, contra ${num(prior*100)}%/mês nos 3 anteriores (${acc?"acelerando":"desacelerando"}).`});
+  }
+  // 2. maior desvio vs base
+  const lines=["receita","cmv","opex","impostos"].map(k=>{ const b=baseVal(i,k); if(b==null) return null; const dl=delta(k,d[k],b); return {k, dl, abs:Math.abs(d[k]-b)}; }).filter(Boolean).sort((a,b)=>b.abs-a.abs);
+  if(lines.length){
+    const L=lines[0];
+    out.push({cls:L.dl.fav?"good":"bad", t:`Maior desvio vs ${CMP_LBL[state.cmp]}`,
+      h:`<b>${MET[L.k].l}</b> variou <b>${L.dl.diff>=0?"+":"−"}${brl(Math.abs(L.dl.diff))}</b> (${L.dl.txt}), ${L.dl.fav?"a favor":"contra"} o resultado. É a linha que mais move o lucro neste comparativo.`,
+      p:`${MET[L.k].l} variou ${L.dl.diff>=0?"+":"-"}${brlFull(Math.abs(L.dl.diff))} (${L.dl.txt.replace("−","-")}), ${L.dl.fav?"a favor":"contra"} o resultado.`});
+  }
+  // 3. alavancagem operacional
+  if(i>=12){
+    const gR=(d.receita-D[i-12].receita)/D[i-12].receita, gO=(d.opex-D[i-12].opex)/D[i-12].opex;
+    const ok=gR>gO;
+    out.push({cls:ok?"good":"bad", t:"Alavancagem operacional",
+      h:`Em 12 meses a receita cresceu <b>${num(gR*100)}%</b> e o opex <b>${num(gO*100)}%</b>. ${ok?`Cada R$ 1 de receita nova custou só R$ ${num(((d.opex-D[i-12].opex)/(d.receita-D[i-12].receita)),2)} de opex.`:"Os custos estão crescendo mais rápido que a receita."}`,
+      p:`Em 12 meses a receita cresceu ${num(gR*100)}% e o opex ${num(gO*100)}%.`});
+  }
+  // 4. segmento que puxa crescimento
+  if(i>=12){
+    const dTot=d.receita-D[i-12].receita;
+    const contrib=SEGS.map(s=>({k:s.k, v:d.seg[s.k].r-D[i-12].seg[s.k].r})).sort((a,b)=>b.v-a.v);
+    const top=contrib[0];
+    out.push({cls:"good", t:"Motor do crescimento",
+      h:`<b>${top.k}</b> respondeu por <b>${brl(top.v)}</b> dos <b>${brl(dTot)}</b> de receita a mais em 12 meses (<b>${pctS(top.v/dTot,0)}</b> do crescimento).`,
+      p:`${top.k} respondeu por ${brlFull(top.v)} dos ${brlFull(dTot)} de receita a mais em 12 meses (${pctS(top.v/dTot,0)}).`});
+  }
+  // 5. margem bruta: efeito mix
+  const hw=d.seg["Hardware"], hwShare=hw.r/d.receita, hwM=(hw.r-hw.c)/hw.r;
+  const mbB=baseVal(i,"margemBruta");
+  out.push({cls: hwShare>0.1?"warn":"good", t:"Mix e margem bruta",
+    h:`Hardware é <b>${pctS(hwShare,0)}</b> da receita com margem de só <b>${pctS(hwM,0)}</b>, contra ${pctS((d.seg["SaaS"].r-d.seg["SaaS"].c)/d.seg["SaaS"].r,0)} no SaaS. A margem bruta consolidada está em <b>${pctS(d.margemBruta)}</b>${mbB!=null?` (${delta("margemBruta",d.margemBruta,mbB).txt} vs ${CMP_LBL[state.cmp]})`:""}.`,
+    p:`Hardware é ${pctS(hwShare,0)} da receita com margem de ${pctS(hwM,0)}; margem bruta consolidada em ${pctS(d.margemBruta)}.`});
+  // 6. caixa
+  const capexMonth=D.slice(0,i+1).reduce((a,r)=>r.capex>a.capex?r:a,D[0]);
+  out.push({cls: !isFinite(d.runway)||d.runway>=24?"good":"warn", t:"Caixa",
+    h:`Queima média de <b>${brl(Math.max(0,d.burn))}/mês</b> nos últimos 3 meses, já com capex. Com <b>${brl(d.caixa)}</b> em caixa, são <b>${isFinite(d.runway)?num(d.runway,0)+" meses":"meses indefinidos"}</b> de runway. O maior desembolso foi em ${mLabel(capexMonth.m)}: ${brl(capexMonth.capex)} de capex.`,
+    p:`Queima média de ${brlFull(Math.max(0,d.burn))}/mês; caixa de ${brlFull(d.caixa)}; runway de ${isFinite(d.runway)?num(d.runway,0)+" meses":"indefinido"}.`});
+  return out;
+}
+function buildSummary(){
+  const i=state.idx, d=D[i];
+  const keys=["receita","lucroBruto","opex","lucroLiq","margemBruta","margemLiq"];
+  const moves=keys.map(k=>{ const b=baseVal(i,k); if(b==null) return null; const dl=delta(k,d[k],b);
+    const rel = MET[k].t==="pct" ? dl.diff*10 : (dl.pct!==undefined ? dl.pct : dl.diff/d.receita);
+    return {k, dl, score: rel*MET[k].dir}; }).filter(Boolean);
+  if(!moves.length) return null;
+  const best=[...moves].sort((a,b)=>b.score-a.score)[0], worst=[...moves].sort((a,b)=>a.score-b.score)[0];
+  let att;
+  if(isFinite(d.runway) && d.runway<24) att={t:`Runway de ${num(d.runway,0)} meses`, b:`Abaixo de 24 meses. Rever o ritmo de capex e de contratação antes do próximo trimestre.`};
+  else if(d.margemLiq < d.b.margemLiq) att={t:`Margem líquida ${pctS(d.margemLiq)}`, b:`Abaixo do orçado de ${pctS(d.b.margemLiq)} (${num((d.b.margemLiq-d.margemLiq)*100)} p.p.). A diferença está em ${d.opex>d.b.opex?"opex acima do plano":"receita abaixo do plano"}.`};
+  else { const hw=d.seg["Hardware"]; att={t:`Hardware com margem de ${pctS((hw.r-hw.c)/hw.r,0)}`, b:`É a linha de menor margem e oscila com a sazonalidade. Vale revisar preço ou migrar clientes para o plano SaaS.`}; }
+  return [
+    {cls:"good", h:"▲ O que melhorou", t:`${MET[best.k].l} ${best.dl.txt}`, b:`Maior movimento favorável contra ${CMP_LBL[state.cmp]}: ${fmtMet(best.k,baseVal(i,best.k))} → ${fmtMet(best.k,d[best.k])}.`},
+    {cls:"bad",  h:"▼ O que piorou",  t:`${MET[worst.k].l} ${worst.dl.txt}`, b: worst.score<0 ? `Maior movimento desfavorável: ${fmtMet(worst.k,baseVal(i,worst.k))} → ${fmtMet(worst.k,d[worst.k])}.` : `Nenhuma linha piorou. Este foi o avanço mais fraco: ${fmtMet(worst.k,baseVal(i,worst.k))} → ${fmtMet(worst.k,d[worst.k])}.`},
+    {cls:"warn", h:"● Exige atenção", t:att.t, b:att.b},
+  ];
+}
+function renderInsights(){
+  INS=buildInsights();
+  const box=document.getElementById("insights");
+  box.innerHTML=INS.map(it=>`<div class="ins ${it.cls}"><div class="it">${it.t}</div>${it.h}</div>`).join("");
+  [...box.children].forEach((el,k)=>{ if(!REDUCE) el.style.animationDelay=(k*90)+"ms"; el.classList.add("in"); });
+  SUM=buildSummary();
+  document.getElementById("sum-sub").textContent=`${mFull(D[state.idx].m)} contra ${CMP_LBL[state.cmp]}`;
+  document.getElementById("summary").innerHTML = SUM ? SUM.map(s=>`<div class="sum ${s.cls}"><div class="sh">${s.h}</div><div class="st">${s.t}</div><div class="sb">${s.b}</div></div>`).join("")
+    : `<div class="sum"><div class="sb">Sem base de comparação para este mês. Escolha “Mês anterior” ou um mês com 12 meses de histórico.</div></div>`;
+}
+
+// ================== DRILL-DOWN (painel lateral) ==================
+function lineChartSVG(series, fmtFn, selIdx){
+  const W=520,H=220,padL=58,padR=10,padT=12,padB=26, plotW=W-padL-padR, plotH=H-padT-padB;
+  const all=series.flatMap(s=>s.values.filter(v=>v!=null));
+  let mn=Math.min(...all), mx=Math.max(...all); const pad=(mx-mn)*0.1||1; mn-=pad; mx+=pad;
+  if(series[0].zero) { mn=Math.min(mn,0); }
+  const n=series[0].values.length, x=j=>padL+(j/(n-1))*plotW, y=v=>padT+plotH-((v-mn)/(mx-mn))*plotH;
+  let s="";
+  for(let k=0;k<=3;k++){ const gv=mn+(mx-mn)*(k/3), gy=y(gv); s+=`<line class="grid-line" x1="${padL}" x2="${W-padR}" y1="${gy}" y2="${gy}"/><text class="ax" x="${padL-6}" y="${gy+3}" text-anchor="end">${fmtFn(gv)}</text>`; }
+  for(let j=0;j<n;j++) if(j%4===0||j===n-1) s+=`<text class="ax" x="${x(j)}" y="${H-7}" text-anchor="middle">${mLabelIdx(j)}</text>`;
+  if(selIdx!=null) s+=`<line x1="${x(selIdx)}" x2="${x(selIdx)}" y1="${padT}" y2="${padT+plotH}" stroke="${cvar('--violet')}" stroke-width="1" opacity=".4"/>`;
+  series.forEach(sr=>{
+    const pts=sr.values.map((v,j)=>v==null?null:`${x(j).toFixed(1)},${y(v).toFixed(1)}`).filter(Boolean).join(" ");
+    s+=`<polyline class="dl" points="${pts}" fill="none" stroke="${sr.color}" stroke-width="${sr.dashed?1.8:2.6}" ${sr.dashed?'stroke-dasharray="5 4"':""} stroke-linecap="round" stroke-linejoin="round"/>`;
+    if(selIdx!=null && sr.values[selIdx]!=null && !sr.dashed) s+=`<circle cx="${x(selIdx)}" cy="${y(sr.values[selIdx])}" r="5" fill="${sr.color}" stroke="#fff" stroke-width="2"/>`;
+  });
+  const leg=series.map(sr=>`<span style="display:inline-flex;align-items:center;gap:6px;margin-right:14px;font-size:12px;color:var(--ink-2)">${sr.dashed?'<span class="dash" style="border-color:'+sr.color+'"></span>':'<span class="dot" style="width:10px;height:10px;border-radius:50%;display:inline-block;background:'+sr.color+'"></span>'}${sr.name}</span>`).join("");
+  return `<div>${leg}</div><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${s}</svg>`;
+}
+function openDrawer(title, sub, html){
+  document.getElementById("dr-title").textContent=title;
+  document.getElementById("dr-sub").textContent=sub;
+  const body=document.getElementById("dr-body"); body.innerHTML=html; body.scrollTop=0;
+  document.getElementById("drawer").classList.add("open"); document.getElementById("drawer").setAttribute("aria-hidden","false");
+  document.getElementById("backdrop").classList.add("open");
+  if(!REDUCE) body.querySelectorAll(".dl").forEach((el,k)=>{ const len=el.getTotalLength(); el.style.strokeDasharray=len; el.style.strokeDashoffset=len;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.style.transition=`stroke-dashoffset 1s ease ${0.15+k*0.1}s`; el.style.strokeDashoffset="0";
+      if(el.getAttribute("stroke-dasharray")==="5 4") setTimeout(()=>{ el.style.strokeDasharray="5 4"; }, 1300); })); });
+  document.getElementById("dr-close").focus();
+}
+function closeDrawer(){ document.getElementById("drawer").classList.remove("open"); document.getElementById("drawer").setAttribute("aria-hidden","true"); document.getElementById("backdrop").classList.remove("open"); }
+document.getElementById("dr-close").addEventListener("click",closeDrawer);
+document.getElementById("backdrop").addEventListener("click",closeDrawer);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeDrawer(); });
+
+function openMetricDrill(key){
+  const m=MET[key], i=state.idx, d=D[i];
+  const hasBud = D[0].b[key]!==undefined;
+  const series=[{name:m.l, color: m.dir<0?cvar('--orange'):cvar('--violet'), values:D.map(r=>r[key]), zero:m.t==="brl"&&D.some(r=>r[key]<0)}];
+  if(hasBud) series.push({name:"Orçado", color:cvar('--ink-2'), values:D.map(r=>r.b[key]), dashed:true});
+  const fmtFn = m.t==="pct" ? v=>pctS(v,0) : brl;
+  const from=Math.max(0,i-11);
+  let rows="";
+  for(let j=i;j>=from;j--){
+    const r=D[j], mom = j>=1? delta(key,r[key],D[j-1][key]) : null, bud = hasBud? delta(key,r[key],r.b[key]) : null;
+    rows+=`<tr class="${j===i?"sel":""}"><td>${mLabel(r.m)}</td><td>${fmtMetFull(key,r[key])}</td><td>${mom?chipHTML(mom):"—"}</td>${hasBud?`<td>${fmtMetFull(key,r.b[key])}</td><td>${bud?chipHTML(bud):"—"}</td>`:""}</tr>`;
+  }
+  const vals=D.slice(from,i+1).map(r=>r[key]);
+  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const best=D.slice(from,i+1).reduce((a,r)=> (r[key]*m.dir>a[key]*m.dir?r:a), D[from]);
+  let note=`Média dos últimos ${vals.length} meses: <b>${fmtMet(key,avg)}</b>. Melhor mês: <b>${mLabel(best.m)}</b> (${fmtMet(key,best[key])}).`;
+  if(key==="caixa") note+=` Queima média de ${brl(Math.max(0,d.burn))}/mês nos últimos 3 meses, já com capex de ${brl(d.capex)} no mês.`;
+  if(key==="opex") note+=` Opex representa ${pctS(d.opex/d.receita)} da receita.`;
+  if(i>=12) note+=` Contra ${mLabel(D[i-12].m)}: ${chipHTML(delta(key,d[key],D[i-12][key]))}.`;
+  openDrawer(m.l, `Histórico de 24 meses · ${mFull(d.m)} em destaque`,
+    `${lineChartSVG(series,fmtFn,i)}
+     <div class="dnote">${note}</div>
+     <div class="table-wrap"><table class="dt"><thead><tr><th>Mês</th><th>Atual</th><th>MoM</th>${hasBud?"<th>Orçado</th><th>vs orç.</th>":""}</tr></thead><tbody>${rows}</tbody></table></div>`);
+}
+function openSegDrill(k){
+  const i=state.idx, seg=SEGS.find(s=>s.k===k);
+  const series=[
+    {name:`Receita ${k}`, color:cvar(seg.color), values:D.map(r=>r.seg[k].r)},
+    {name:"Orçado", color:cvar('--ink-2'), values:D.map(r=>r.bseg[k].r), dashed:true},
+  ];
+  const from=Math.max(0,i-11); let rows="";
+  for(let j=i;j>=from;j--){
+    const r=D[j], sr=r.seg[k], mc=(sr.r-sr.c)/sr.r, share=sr.r/r.receita;
+    const mom = j>=1 ? delta("receita",sr.r,D[j-1].seg[k].r) : null;
+    rows+=`<tr class="${j===i?"sel":""}"><td>${mLabel(r.m)}</td><td>${brlFull(sr.r)}</td><td>${mom?chipHTML(mom):"—"}</td><td>${pctS(mc,0)}</td><td>${pctS(share,0)}</td></tr>`;
+  }
+  const d=D[i], s=d.seg[k];
+  const yoy= i>=12 ? (s.r-D[i-12].seg[k].r)/D[i-12].seg[k].r : null;
+  openDrawer(`Segmento ${k}`, `Receita, margem de contribuição e participação · ${mFull(d.m)}`,
+    `${lineChartSVG(series,brl,i)}
+     <div class="dnote">Receita de <b>${brlFull(s.r)}</b> no mês, com margem de contribuição de <b>${pctS((s.r-s.c)/s.r)}</b> e <b>${pctS(s.r/d.receita)}</b> da receita total.${yoy!=null?` Crescimento YoY de <b>${num(yoy*100)}%</b>.`:""} Orçado do mês: ${brlFull(d.bseg[k].r)}.</div>
+     <div class="table-wrap"><table class="dt"><thead><tr><th>Mês</th><th>Receita</th><th>MoM</th><th>Margem</th><th>Part.</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+}
+
+// ================== FILTROS ==================
+function setMonth(i){ state.idx=i; document.getElementById("f-month").value=i; renderAll(false); }
+const fm=document.getElementById("f-month");
+D.forEach((r,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=mLabel(r.m); fm.appendChild(o); });
+fm.value=state.idx;
+fm.addEventListener("change",()=>setMonth(+fm.value));
+document.querySelectorAll("#f-cmp button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("#f-cmp button").forEach(x=>x.classList.remove("on")); b.classList.add("on");
+  state.cmp=b.dataset.c; renderAll(false);
+}));
+document.querySelectorAll("#trend-legend button").forEach(b=>b.addEventListener("click",()=>{
+  const k=b.dataset.s; state.hidden[k]=!state.hidden[k];
+  if(TREND_SERIES.every(s=>state.hidden[s.k])) state.hidden[k]=false;
+  b.classList.toggle("off",!!state.hidden[k]); renderTrend(false);
+}));
+document.getElementById("scrub").addEventListener("input",updateScrub);
+
+function renderAll(first){
+  const d=D[state.idx];
+  document.getElementById("f-ctx").textContent=`${mFull(d.m)} vs ${CMP_LBL[state.cmp]}`;
+  renderTiles(); renderRatios(); renderVariance(); renderBridge(); renderSegments(); renderInsights();
+  renderTrend(first);
+  if(first){ document.getElementById("scrub").value=state.idx; updateScrub(); }
+  const els=[...document.querySelectorAll(".reveal:not(.in)")];
+  els.forEach((el,k)=>{ if(!REDUCE && first) el.style.animationDelay=(k*60)+"ms"; else el.style.animationDelay="0ms"; el.classList.add("in"); });
+}
+
+// ================== EXPORTAÇÃO (CSV + PDF) ==================
+function buildCSV(){
+  const n=v=>String(Math.round(v)); const p=v=>(v*100).toFixed(2).replace(".",",");
+  const head=["Mês","Receita","Receita SaaS","Receita Serviços","Receita Hardware","CMV","Lucro bruto","Margem bruta %","Opex","Lucro operacional","Margem operacional %","Impostos","Lucro líquido","Margem líquida %","Capex","Caixa","Queima média 3m","Orçado receita","Orçado opex","Orçado lucro líquido"];
+  const lines=[head.join(";")];
+  D.forEach(r=>lines.push([mLabel(r.m), n(r.receita), n(r.seg["SaaS"].r), n(r.seg["Serviços"].r), n(r.seg["Hardware"].r), n(r.cmv), n(r.lucroBruto), p(r.margemBruta),
+    n(r.opex), n(r.lucroOp), p(r.margemOp), n(r.impostos), n(r.lucroLiq), p(r.margemLiq), n(r.capex), n(r.caixa), n(r.burn), n(r.b.receita), n(r.b.opex), n(r.b.lucroLiq)].join(";")));
+  return "﻿"+lines.join("\r\n");
+}
+function pdfSafe(s){ return String(s).replace(/−/g,"-").replace(/[▲]/g,"+").replace(/[▼]/g,"-").replace(/[■●★✦]/g,"").replace(/[“”]/g,'"').replace(/…/g,"...").replace(/→/g,"->").replace(/≥/g,">=").replace(/÷/g,"/").replace(/ | /g," "); }
+function buildPDF(){
+  const J=window.jspdf && window.jspdf.jsPDF; if(!J) throw new Error("jspdf");
+  const doc=new J({unit:"mm", format:"a4"}); const i=state.idx, d=D[i];
+  const W=210, M=14; let y=0;
+  doc.setFillColor(106,75,255); doc.rect(0,0,W,30,"F");
+  doc.setTextColor(255,255,255); doc.setFont("helvetica","bold"); doc.setFontSize(18); doc.text("Cockpit do CFO", M, 14);
+  doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.text(pdfSafe(`${mFull(d.m)}  |  comparado com ${CMP_LBL[state.cmp]}  |  dados de exemplo`), M, 22);
+  y=40;
+  const kp=[["Receita",brlFull(d.receita),delta("receita",d.receita,baseVal(i,"receita"))],["Lucro líquido",brlFull(d.lucroLiq),delta("lucroLiq",d.lucroLiq,baseVal(i,"lucroLiq"))],["Caixa",brlFull(d.caixa),null],
+    ["Margem bruta",pctS(d.margemBruta),delta("margemBruta",d.margemBruta,baseVal(i,"margemBruta"))],["Margem líquida",pctS(d.margemLiq),delta("margemLiq",d.margemLiq,baseVal(i,"margemLiq"))],["Runway",isFinite(d.runway)?num(d.runway,0)+" meses":"sem queima",null]];
+  const bw=(W-2*M-2*4)/3;
+  kp.forEach((k,idx)=>{ const cx=M+(idx%3)*(bw+4), cy=y+Math.floor(idx/3)*22;
+    doc.setFillColor(247,245,254); doc.roundedRect(cx,cy,bw,18,2,2,"F");
+    doc.setTextColor(107,99,150); doc.setFontSize(8); doc.text(pdfSafe(k[0]),cx+3,cy+5);
+    doc.setTextColor(36,26,77); doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text(pdfSafe(k[1]),cx+3,cy+11.5);
+    doc.setFont("helvetica","normal");
+    if(k[2]){ const f=k[2].fav; doc.setFontSize(8); doc.setTextColor(f===null?107:f?18:229, f===null?99:f?161:25, f===null?150:f?80:75); doc.text(pdfSafe(`${k[2].txt} vs ${CMP_LBL[state.cmp]}`),cx+3,cy+16); }
+  });
+  y+=48;
+  doc.setTextColor(36,26,77); doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Análise de variação", M, y); y+=6;
+  const cols=[M, M+62, M+100, M+138, M+170];
+  doc.setFontSize(8); doc.setTextColor(164,157,196);
+  ["Linha","Atual",state.cmp==="bud"?"Orçado":state.cmp==="yoy"?"Ano anterior":"Mês anterior","Var. R$","Var. %"].forEach((h,k)=>doc.text(pdfSafe(h),k===0?cols[k]:cols[k]+26,y,{align:k===0?"left":"right"}));
+  y+=2; doc.setDrawColor(221,216,240); doc.line(M,y,W-M,y); y+=5;
+  VAR_ROWS.forEach(r=>{
+    const m=MET[r.k], cur=d[r.k], b=baseVal(i,r.k), dl=delta(r.k,cur,b);
+    doc.setFont("helvetica", r.cls==="total"?"bold":"normal"); doc.setFontSize(9); doc.setTextColor(36,26,77);
+    doc.text(pdfSafe(m.l), cols[0]+(r.cls==="sub"?3:0), y);
+    doc.text(pdfSafe(fmtMetFull(r.k,cur)), cols[1]+26, y, {align:"right"});
+    doc.text(pdfSafe(fmtMetFull(r.k,b)), cols[2]+26, y, {align:"right"});
+    if(dl){ const f=dl.fav; doc.setTextColor(f===null?107:f?18:229, f===null?99:f?161:25, f===null?150:f?80:75);
+      if(m.t!=="pct") doc.text(pdfSafe((dl.diff>=0?"+":"-")+brlFull(Math.abs(dl.diff))), cols[3]+26, y, {align:"right"});
+      doc.text(pdfSafe(dl.txt), cols[4]+26, y, {align:"right"}); }
+    y+=6;
+  });
+  y+=4;
+  doc.setTextColor(36,26,77); doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Receita e lucro líquido - 12 meses", M, y); y+=4;
+  const ch={x:M, y:y, w:W-2*M, h:42}; const win=D.slice(Math.max(0,i-11),i+1);
+  const mxv=Math.max(...win.map(r=>r.receita)); const bwc=ch.w/win.length*0.6;
+  doc.setDrawColor(236,233,247); doc.line(ch.x,ch.y+ch.h,ch.x+ch.w,ch.y+ch.h);
+  win.forEach((r,k)=>{ const cx=ch.x+ch.w/win.length*(k+0.5); const hh=r.receita/mxv*(ch.h-8);
+    doc.setFillColor(k===win.length-1?106:190, k===win.length-1?75:178, 255); doc.rect(cx-bwc/2, ch.y+ch.h-hh, bwc, hh, "F");
+    const lh=Math.max(0,r.lucroLiq)/mxv*(ch.h-8); doc.setFillColor(18,161,80); doc.rect(cx-bwc/2+bwc*0.25, ch.y+ch.h-lh, bwc*0.5, lh, "F");
+    doc.setFont("helvetica","normal"); doc.setFontSize(6.5); doc.setTextColor(107,99,150); doc.text(pdfSafe(mLabel(r.m)), cx, ch.y+ch.h+4, {align:"center"}); });
+  y+=ch.h+11;
+  doc.setTextColor(36,26,77); doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Resumo do CFO", M, y); y+=6;
+  (SUM||[]).forEach(s=>{ doc.setFont("helvetica","bold"); doc.setFontSize(9.5); const c=s.cls==="good"?[18,161,80]:s.cls==="bad"?[229,25,75]:[201,130,0]; doc.setTextColor(...c);
+    doc.text(pdfSafe(s.h+": "+s.t), M, y); y+=4.6; doc.setFont("helvetica","normal"); doc.setTextColor(80,72,120); doc.setFontSize(9);
+    const lines=doc.splitTextToSize(pdfSafe(s.b), W-2*M); doc.text(lines, M, y); y+=lines.length*4.2+2.5; });
+  if(y>240){ doc.addPage(); y=20; }
+  y+=2; doc.setTextColor(36,26,77); doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Insights do analista", M, y); y+=6;
+  INS.forEach(it=>{ if(y>275){ doc.addPage(); y=20; } doc.setFont("helvetica","bold"); doc.setFontSize(9.5); doc.setTextColor(36,26,77); doc.text(pdfSafe(it.t), M, y); y+=4.6;
+    doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(80,72,120); const lines=doc.splitTextToSize(pdfSafe(it.p), W-2*M); doc.text(lines, M, y); y+=lines.length*4.2+3; });
+  const aiTxt=document.getElementById("ai-out").textContent.trim();
+  if(aiTxt){ if(y>250){ doc.addPage(); y=20; } y+=2; doc.setTextColor(36,26,77); doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Parecer (Claude)", M, y); y+=6;
+    doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(80,72,120);
+    doc.splitTextToSize(pdfSafe(aiTxt), W-2*M).forEach(l=>{ if(y>285){ doc.addPage(); y=20; } doc.text(l, M, y); y+=4.2; }); }
+  const pages=doc.getNumberOfPages();
+  for(let pg=1;pg<=pages;pg++){ doc.setPage(pg); doc.setFontSize(7.5); doc.setTextColor(164,157,196); doc.text(pdfSafe(`Cockpit do CFO - ${mLabel(d.m)} - página ${pg} de ${pages}`), W-M, 292, {align:"right"}); }
+  return doc.output("arraybuffer");
+}
+
+const RT = (typeof window.claude!=="undefined" && window.claude && typeof window.claude.use==="function") ? window.claude : null;
+let DL=null, SAMPLE=null;
+const note=document.getElementById("export-note");
+function dlErr(e){
+  const c=e&&e.code;
+  if(c==="declined") return "Exportação cancelada.";
+  if(c==="rate_limited") return "Já há uma confirmação aberta. Tente de novo em instantes.";
+  if(c==="extension_not_enabled") return "Este formato não está disponível aqui.";
+  return "Não foi possível exportar nesta visualização.";
+}
+async function doSave(filename, makeData){
+  if(!DL) return;
+  let data; try { data=makeData(); } catch(err){ note.textContent = err.message==="jspdf" ? "O gerador de PDF não carregou. Recarregue a página." : "Não foi possível montar o arquivo."; return; }
+  note.textContent="Aguardando sua confirmação…";
+  try { await DL.save({filename, data}); note.textContent=`${filename} salvo.`; }
+  catch(e){ note.textContent=dlErr(e); if(e&&["unavailable","not_granted","capability_disabled","capability_removed"].includes(e.code)){ document.getElementById("btn-csv").hidden=true; document.getElementById("btn-pdf").hidden=true; } }
+}
+document.getElementById("btn-csv").addEventListener("click",()=>doSave(`cockpit-cfo-${D[state.idx].m}.csv`, buildCSV));
+document.getElementById("btn-pdf").addEventListener("click",()=>doSave(`cockpit-cfo-${D[state.idx].m}.pdf`, buildPDF));
+
+// ================== PARECER COM CLAUDE ==================
+let aiCtl=null;
+function aiPrompt(){
+  const i=state.idx, d=D[i];
+  const lines=VAR_ROWS.map(r=>{ const b=baseVal(i,r.k), dl=delta(r.k,d[r.k],b); return `${MET[r.k].l}: atual ${fmtMetFull(r.k,d[r.k])}; base ${fmtMetFull(r.k,b)}; variação ${dl?dl.txt:"n/d"}`; }).join("\n");
+  const segs=SEGS.map(s=>{ const x=d.seg[s.k]; return `${s.k}: receita ${brlFull(x.r)}, margem ${pctS((x.r-x.c)/x.r,0)}`; }).join("\n");
+  return `Você é o CFO de uma empresa com três segmentos (SaaS, Serviços, Hardware). Escreva um parecer executivo em português do Brasil sobre ${mFull(d.m)}, comparando com ${CMP_LBL[state.cmp]}.
+
+Regras: no máximo 180 palavras; 3 parágrafos curtos (desempenho, causas do desvio, próximos passos); cite números exatos da tabela; nenhum conselho genérico; sem títulos ou marcadores; texto simples sem markdown.
+
+DRE (valores em reais):
+${lines}
+
+Segmentos:
+${segs}
+
+Caixa: ${brlFull(d.caixa)}; queima média 3 meses ${brlFull(Math.max(0,d.burn))}; runway ${isFinite(d.runway)?num(d.runway,0)+" meses":"indefinido"}.
+
+Insights já calculados:
+${INS.map(x=>"- "+x.p).join("\n")}`;
+}
+function aiErr(c){
+  return ({not_granted:"Uso do Claude não autorizado nesta página.", sampling_disabled:"O Claude não está disponível para esta conta.", rate_limited:"Limite de uso atingido. Tente mais tarde.",
+    session_expired:"Sessão expirada. Entre de novo no Claude.", refused:"O Claude não respondeu a esse pedido.", empty_completion:"A resposta veio vazia. Tente de novo."})[c] || "Não foi possível gerar o parecer agora. Tente de novo.";
+}
+document.getElementById("ai-btn").addEventListener("click", async ()=>{
+  if(!SAMPLE) return;
+  const out=document.getElementById("ai-out"), st=document.getElementById("ai-status"), btn=document.getElementById("ai-btn"), stop=document.getElementById("ai-stop");
+  aiCtl=new AbortController(); btn.disabled=true; stop.hidden=false; out.textContent=""; st.textContent="Pensando…";
+  try{
+    const {truncated}=await SAMPLE(aiPrompt(), {signal:aiCtl.signal, onText:({text})=>{ out.textContent=text; st.textContent="Escrevendo…"; }});
+    st.textContent = truncated ? "Parecer cortado no limite de tamanho." : `Parecer de ${mLabel(D[state.idx].m)} vs ${CMP_LBL[state.cmp]}. Entra no PDF.`;
+  } catch(e){
+    out.textContent = e && e.text ? e.text : "";
+    if(e && e.code==="cancelled") st.textContent="Parado.";
+    else { st.textContent=aiErr(e&&e.code); if(e && ["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"].includes(e.code)) document.getElementById("ai-box").classList.remove("show"); }
+  } finally { btn.disabled=false; stop.hidden=true; }
+});
+document.getElementById("ai-stop").addEventListener("click",()=>aiCtl && aiCtl.abort());
+
+if(RT){
+  RT.use("downloads").then(dl=>{ DL=dl; if(dl){ document.getElementById("btn-csv").hidden=false; document.getElementById("btn-pdf").hidden=false; } }).catch(()=>{});
+  RT.use("sample").then(sm=>{ SAMPLE=sm; if(sm) document.getElementById("ai-box").classList.add("show"); }).catch(()=>{});
+}
+
+renderAll(true);
+</script>

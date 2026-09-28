@@ -1,0 +1,23 @@
+{
+  "skill_name": "dashboard-builder",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "monta um painel comercial mensal pra minha equipe de vendas: leads, oportunidades, taxa de conversão, ticket médio, receita nova e churn, com meta por mês e quebra por canal de aquisição (inbound, outbound, parcerias). usa dados de exemplo por enquanto",
+      "expected_output": "Painel HTML gerado pelo motor com paleta clara, 3 níveis de KPIs, churn com dir -1, conversão e churn como percent, quebra por canal, meta como base de comparação, check.mjs sem problemas",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "preciso de um dashboard pra acompanhar o projeto MAE por sprint: entregas concluídas vs planejadas, % do escopo, lead time em dias, bugs abertos, custo acumulado vs orçado e horas por frente (backend, frontend, infra). quero ver o que avançou, o que atrasou e o risco principal",
+      "expected_output": "Painel com periodType label (sprints), bugs e lead time com dir -1, quebra por frente, resumo executivo com atenção para risco, check.mjs sem problemas",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Construa um dashboard de fluxo de caixa para as finanças da empresa mostrando caixa inicial, entradas, despesas operacionais, dívidas, investimentos, impostos, outras saídas, fluxo líquido e caixa final, com projeção de 3 meses e alerta abaixo de R$ 150 mil",
+      "expected_output": "Caminho B a partir do template cashflow-sankey com mínimo de 150000, tema claro travado, check.mjs sem problemas",
+      "files": []
+    }
+  ]
+}

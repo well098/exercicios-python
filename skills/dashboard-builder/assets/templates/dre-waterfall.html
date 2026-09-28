@@ -1,0 +1,440 @@
+<title>DRE Executivo</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #eef0f4;
+    --surface: #ffffff;
+    --ink: #0f1729;
+    --ink-2: #475069;
+    --muted: #8b93a7;
+    --hair: #e2e5ec;
+    --hair-strong: #cfd3dd;
+    --accent: #4338ca;
+    --accent-soft: #ebe9fb;
+    --gain: #0d9c6e;
+    --gain-soft: #e2f5ee;
+    --loss: #d8455f;
+    --loss-soft: #fbe8ec;
+    --neutral-bar: #c7cbd6;
+    --shadow: 0 1px 2px rgba(15,23,41,0.04), 0 8px 24px rgba(15,23,41,0.05);
+  }
+  
+  
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--page); color: var(--ink); margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding-inline: 22px; padding-block: 26px;
+    font-variant-numeric: tabular-nums;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  .topbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 14px;
+    border-bottom: 2px solid var(--ink); padding-bottom: 14px; }
+  .topbar .eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .topbar h1 { font-size: 26px; margin: 4px 0 0; letter-spacing: -0.02em; }
+  .topbar .meta { font-size: 12.5px; color: var(--ink-2); margin-top: 4px; }
+  .controls { display: flex; gap: 8px; align-items: center; }
+  .controls select { font: inherit; font-size: 13px; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--hair-strong); border-radius: 7px; padding: 7px 10px; }
+  .seg { display: inline-flex; border: 1px solid var(--hair-strong); border-radius: 7px; overflow: hidden; }
+  .seg button { font: inherit; font-size: 12.5px; padding: 7px 12px; border: 0; background: var(--surface);
+    color: var(--ink-2); cursor: pointer; }
+  .seg button.on { background: var(--accent); color: #fff; }
+
+  .kpi-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+  @media (max-width: 780px) { .kpi-strip { grid-template-columns: 1fr 1fr; } }
+  .kpi { padding: 16px 18px; border-right: 1px solid var(--hair); position: relative; display: flex; flex-direction: column; gap: 6px; }
+  .kpi:last-child { border-right: 0; }
+  @media (max-width: 780px) { .kpi:nth-child(2) { border-right: 0; } .kpi:nth-child(1),.kpi:nth-child(2){ border-bottom: 1px solid var(--hair);} }
+  .kpi::before { content:""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); opacity: 0.85; }
+  .kpi.gain::before { background: var(--gain); } .kpi.loss::before { background: var(--loss); }
+  .kpi .k-label { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .kpi .k-value { font-size: 25px; letter-spacing: -0.015em; line-height: 1; }
+  .kpi .k-deltas { display: flex; gap: 12px; font-size: 11.5px; margin-top: 2px; }
+  .kpi .k-deltas .d { display: flex; flex-direction: column; }
+  .kpi .k-deltas .d .dv { font-weight: 600; }
+  .kpi .k-deltas .d .dl { color: var(--muted); font-size: 10px; letter-spacing: 0.03em; }
+  .up { color: var(--gain); } .down { color: var(--loss); }
+  .kpi .spark { margin-top: 2px; }
+
+  .grid-main { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .card { background: var(--surface); border: 1px solid var(--hair); border-radius: 14px; padding: 20px; box-shadow: var(--shadow); }
+  .card { min-width: 0; }
+  .card h2 { font-size: 15px; margin: 0 0 2px; letter-spacing: -0.01em; }
+  .card .csub { font-size: 12px; color: var(--muted); margin: 0 0 14px; }
+
+  .split { display: grid; grid-template-columns: 1.35fr 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
+
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wf-axis { fill: var(--muted); font-size: 10px; }
+  .wf-val { fill: var(--ink); font-size: 10.5px; font-weight: 600; }
+  .wf-connector { stroke: var(--hair-strong); stroke-width: 1; stroke-dasharray: 2 2; }
+  .grid-line { stroke: var(--hair); stroke-width: 1; }
+  .chart-wrap { position: relative; overflow-x: auto; }
+  .tooltip { position: absolute; pointer-events: none; background: var(--ink); color: var(--surface);
+    font-size: 11px; padding: 7px 9px; border-radius: 7px; opacity: 0; transition: opacity .1s; white-space: nowrap; z-index: 6; line-height: 1.5; }
+
+  table.dre { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.dre thead th { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted);
+    font-weight: 600; text-align: right; padding: 6px 8px; border-bottom: 2px solid var(--hair-strong); }
+  table.dre thead th:first-child { text-align: left; }
+  table.dre td { padding: 8px 8px; border-bottom: 1px solid var(--hair); text-align: right; white-space: nowrap; }
+  table.dre td:first-child { text-align: left; color: var(--ink-2); }
+  table.dre tr.total td { font-weight: 700; color: var(--ink); background: var(--accent-soft); }
+  table.dre tr.total td:first-child { color: var(--ink); }
+  table.dre tr.sub td:first-child { padding-left: 20px; color: var(--muted); }
+  .chip { display: inline-block; font-size: 10.5px; padding: 1px 6px; border-radius: 5px; font-weight: 600; }
+  .chip.up { background: var(--gain-soft); color: var(--gain); }
+  .chip.down { background: var(--loss-soft); color: var(--loss); }
+
+  .gauges { display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-around; margin-bottom: 18px; }
+  .gauge { text-align: center; }
+  .gauge .g-label { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .gauge .g-val { font-size: 20px; font-weight: 700; }
+  .gauge .g-target { font-size: 10.5px; color: var(--muted); }
+
+  .trend-legend { display: flex; gap: 14px; font-size: 11.5px; color: var(--ink-2); margin-bottom: 6px; }
+  .trend-legend .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+  footer.note { font-size: 11.5px; color: var(--muted); text-align: center; }
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <div class="eyebrow">Demonstração do Resultado</div>
+      <h1 id="title">DRE Mensal — SaaS</h1>
+      <div class="meta" id="meta">Período: — · comparativo destacado abaixo</div>
+    </div>
+    <div class="controls">
+      <select id="period"></select>
+      <div class="seg" id="cmp-seg">
+        <button data-cmp="mom" class="on">vs mês anterior</button>
+        <button data-cmp="bud">vs orçado</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-strip" id="kpi-strip"></div>
+
+  <div class="card">
+    <h2>Ponte de Resultado (Waterfall)</h2>
+    <p class="csub">Da receita ao lucro líquido — cada dedução e o resultado acumulado</p>
+    <div class="chart-wrap">
+      <svg id="waterfall" viewBox="0 0 940 340" style="width:100%;height:auto;display:block"></svg>
+      <div class="tooltip" id="wf-tt"></div>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="card">
+      <h2>Demonstrativo detalhado</h2>
+      <p class="csub" id="dre-sub">Valores em R$ — variação colorida por sinal</p>
+      <div style="overflow-x:auto"><table class="dre">
+        <thead>
+          <tr><th>Linha</th><th>Atual</th><th id="cmp-col-head">Anterior</th><th>Var.</th></tr>
+        </thead>
+        <tbody id="dre-body"></tbody>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h2>Margens & Tendência</h2>
+      <p class="csub">Margem bruta e líquida vs meta · lucro líquido 12 meses</p>
+      <div class="gauges" id="gauges"></div>
+      <div class="trend-legend">
+        <span><span class="dot" style="background:var(--accent)"></span>Lucro líquido</span>
+        <span><span class="dot" style="background:var(--gain)"></span>Margem líquida %</span>
+      </div>
+      <div class="chart-wrap">
+        <svg id="trend" viewBox="0 0 420 200" style="width:100%;height:auto;display:block"></svg>
+        <div class="tooltip" id="tr-tt"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="note">Dados de exemplo de uma operação SaaS. Substitua o array MONTHS e o objeto BUDGET no script pelos seus números.</footer>
+</div>
+
+<script>
+// ---------- Dados de exemplo (SaaS) — troque por seus números ----------
+// Cada mês: receita, cmv (infra+suporte), opex (vendas+mkt+G&A+P&D), impostos
+const RAW = [
+  {m:"2025-10", receita:412000, cmv:78000, opex:206000, impostos:31000},
+  {m:"2025-11", receita:438000, cmv:82000, opex:214000, impostos:34000},
+  {m:"2025-12", receita:471000, cmv:86000, opex:221000, impostos:39000},
+  {m:"2026-01", receita:459000, cmv:90000, opex:228000, impostos:34000},
+  {m:"2026-02", receita:483000, cmv:89000, opex:231000, impostos:38000},
+  {m:"2026-03", receita:512000, cmv:94000, opex:238000, impostos:43000},
+  {m:"2026-04", receita:534000, cmv:97000, opex:245000, impostos:46000},
+  {m:"2026-05", receita:558000, cmv:101000, opex:252000, impostos:49000},
+  {m:"2026-06", receita:571000, cmv:104000, opex:258000, impostos:50000},
+  {m:"2026-07", receita:596000, cmv:107000, opex:264000, impostos:54000},
+  {m:"2026-08", receita:618000, cmv:110000, opex:271000, impostos:57000},
+  {m:"2026-09", receita:647000, cmv:113000, opex:279000, impostos:62000},
+];
+// Orçado do mês corrente (último)
+const BUDGET = {receita:630000, cmv:118000, opex:286000, impostos:58000};
+const TARGET_GROSS = 0.80; // meta margem bruta
+const TARGET_NET = 0.30;   // meta margem líquida
+
+const MONTHS_PT = {"01":"Jan","02":"Fev","03":"Mar","04":"Abr","05":"Mai","06":"Jun","07":"Jul","08":"Ago","09":"Set","10":"Out","11":"Nov","12":"Dez"};
+function mLabel(k){ const [y,m]=k.split("-"); return (MONTHS_PT[m]||m)+"/"+y.slice(2); }
+function cvar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function brl(v){ const neg=v<0; return (neg?"-R$ ":"R$ ")+Math.abs(v).toLocaleString("pt-BR",{maximumFractionDigits:0}); }
+function brlk(v){ const a=Math.abs(v); const s=v<0?"-":""; if(a>=1e6) return s+"R$ "+(a/1e6).toFixed(2)+"M"; if(a>=1e3) return s+"R$ "+(a/1e3).toFixed(0)+"k"; return s+"R$ "+a.toFixed(0); }
+function pct(v){ return (v*100).toFixed(1)+"%"; }
+
+function derive(d){
+  const lucroBruto = d.receita - d.cmv;
+  const lucroOp = lucroBruto - d.opex;
+  const lucroLiq = lucroOp - d.impostos;
+  return {...d, lucroBruto, lucroOp, lucroLiq,
+    margemBruta: lucroBruto/d.receita, margemLiq: lucroLiq/d.receita, margemOp: lucroOp/d.receita};
+}
+const DATA = RAW.map(derive);
+const BUD = derive({...BUDGET, m:"orc"});
+
+const periodSel = document.getElementById("period");
+DATA.forEach((d,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=mLabel(d.m); periodSel.appendChild(o); });
+periodSel.value = DATA.length-1;
+
+let cmpMode = "mom";
+document.querySelectorAll("#cmp-seg button").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    document.querySelectorAll("#cmp-seg button").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on"); cmpMode = b.dataset.cmp; renderAll();
+  });
+});
+periodSel.addEventListener("change", renderAll);
+
+function deltaChip(cur, base, invertGood){
+  if(base===undefined || base===0) return `<span class="chip">—</span>`;
+  const diff = cur-base; const p = diff/Math.abs(base);
+  const good = invertGood ? diff<0 : diff>0;
+  const cls = diff===0 ? "" : (good?"up":"down");
+  const arrow = diff>0?"▲":diff<0?"▼":"—";
+  return `<span class="chip ${cls}">${arrow} ${Math.abs(p*100).toFixed(1)}%</span>`;
+}
+
+function renderKPIs(cur, base){
+  const strip = document.getElementById("kpi-strip");
+  const cfg = [
+    {key:"receita", label:"Receita", invert:false},
+    {key:"lucroBruto", label:"Lucro bruto", invert:false, sub:"margem"},
+    {key:"lucroOp", label:"Lucro operacional", invert:false},
+    {key:"lucroLiq", label:"Lucro líquido", invert:false, sub:"margem"},
+  ];
+  strip.innerHTML = cfg.map(c=>{
+    const v = cur[c.key];
+    const cls = v>=0 ? "gain" : "loss";
+    const momBase = base.mom ? base.mom[c.key] : undefined;
+    const budBase = BUD[c.key];
+    const marg = c.key==="lucroBruto" ? cur.margemBruta : c.key==="lucroLiq" ? cur.margemLiq : null;
+    return `<div class="kpi ${cls}">
+      <div class="k-label">${c.label}</div>
+      <div class="k-value">${brlk(v)}</div>
+      <div class="k-deltas">
+        <div class="d"><span class="dv">${deltaChip(v, momBase, c.invert)}</span><span class="dl">MoM</span></div>
+        <div class="d"><span class="dv">${deltaChip(v, budBase, c.invert)}</span><span class="dl">vs orçado</span></div>
+        ${marg!==null?`<div class="d"><span class="dv" style="color:var(--ink)">${pct(marg)}</span><span class="dl">margem</span></div>`:""}
+      </div>
+      <div class="spark">${sparkline(c.key)}</div>
+    </div>`;
+  }).join("");
+}
+
+function sparkline(key){
+  const W=120,H=26,p=2;
+  const vals=DATA.map(d=>d[key]);
+  const mn=Math.min(...vals),mx=Math.max(...vals),r=mx-mn||1;
+  const x=i=>p+(i/(vals.length-1))*(W-2*p);
+  const y=v=>H-p-((v-mn)/r)*(H-2*p);
+  const pts=vals.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
+  const last=vals.length-1;
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block">
+    <polyline points="${pts}" fill="none" stroke="${cvar('--accent')}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <circle cx="${x(last)}" cy="${y(vals[last])}" r="2.2" fill="${cvar('--accent')}"/>
+  </svg>`;
+}
+
+function renderWaterfall(cur){
+  const svg=document.getElementById("waterfall");
+  const W=940,H=340,padL=64,padR=20,padT=24,padB=54;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const steps=[
+    {label:"Receita", type:"total", value:cur.receita},
+    {label:"(–) CMV", type:"dec", value:cur.cmv},
+    {label:"Lucro Bruto", type:"total", value:cur.lucroBruto},
+    {label:"(–) Desp. Op.", type:"dec", value:cur.opex},
+    {label:"Lucro Op.", type:"total", value:cur.lucroOp},
+    {label:"(–) Impostos", type:"dec", value:cur.impostos},
+    {label:"Lucro Líquido", type:"total", value:cur.lucroLiq},
+  ];
+  let run=0; const bars=[];
+  steps.forEach(s=>{
+    if(s.type==="total"){ bars.push({...s, bottom:0, top:s.value}); run=s.value; }
+    else if(s.type==="dec"){ const before=run, after=run-s.value; bars.push({...s, bottom:after, top:before}); run=after; }
+    else { const before=run, after=run+s.value; bars.push({...s, bottom:before, top:after}); run=after; }
+  });
+  const maxV=Math.max(...bars.map(b=>b.top), cur.receita);
+  const minV=Math.min(0, ...bars.map(b=>b.bottom));
+  const range=maxV-minV||1;
+  const n=steps.length;
+  const slot=plotW/n;
+  const bw=Math.min(78, slot*0.6);
+  const y=v=>padT+plotH-((v-minV)/range)*plotH;
+
+  let s="";
+  const gsteps=4;
+  for(let i=0;i<=gsteps;i++){ const gy=padT+(plotH/gsteps)*i; const gv=maxV-(range)*(i/gsteps);
+    s+=`<line class="grid-line" x1="${padL}" x2="${W-padR}" y1="${gy}" y2="${gy}"/>`;
+    s+=`<text class="wf-axis" x="${padL-8}" y="${gy+3}" text-anchor="end">${brlk(gv)}</text>`; }
+
+  bars.forEach((b,i)=>{
+    const cx=padL+slot*i+slot/2;
+    const x=cx-bw/2;
+    const yt=y(b.top), yb=y(b.bottom);
+    let fill;
+    if(b.type==="total"){ fill = b.value>=0 ? cvar('--gain') : cvar('--loss'); if(i===0) fill=cvar('--accent'); }
+    else if(b.type==="dec"){ fill=cvar('--loss'); }
+    else fill=cvar('--gain');
+    // totais destacados: receita accent; resultado emerald; deduções rose
+    s+=`<rect class="wf-bar" data-i="${i}" x="${x}" y="${yt}" width="${bw}" height="${Math.max(1,yb-yt)}" rx="3" fill="${fill}" opacity="${b.type==='total'?0.95:0.82}"/>`;
+    // valor no topo
+    const labelVal = b.type==="dec" ? "–"+brlk(b.value).replace('-','') : brlk(b.value);
+    s+=`<text class="wf-val" x="${cx}" y="${yt-6}" text-anchor="middle">${labelVal}</text>`;
+    // rótulo do eixo
+    s+=`<text class="wf-axis" x="${cx}" y="${H-32}" text-anchor="middle">${b.label}</text>`;
+    // conector horizontal até a próxima barra, no nível do topo acumulado
+    if(i<bars.length-1){
+      const cyEnd = (b.type==="total") ? y(b.value) : y(b.bottom);
+      s+=`<line class="wf-connector" x1="${cx+bw/2}" x2="${padL+slot*(i+1)+slot/2-bw/2}" y1="${cyEnd}" y2="${cyEnd}"/>`;
+    }
+  });
+  svg.innerHTML=s;
+
+  const tt=document.getElementById("wf-tt");
+  svg.querySelectorAll(".wf-bar").forEach(el=>{
+    el.addEventListener("mouseenter",()=>{
+      const b=bars[+el.dataset.i];
+      const pctReceita = cur.receita? (b.value/cur.receita*100).toFixed(1)+"% da receita" : "";
+      tt.innerHTML=`<b>${b.label.replace(/[()–]/g,'').trim()}</b><br>${brl(b.value)}<br><span style="opacity:.75">${pctReceita}</span>`;
+      tt.style.opacity=1;
+      const r=svg.getBoundingClientRect(), wr=svg.parentElement.getBoundingClientRect();
+      const bx=+el.getAttribute("x")+ +el.getAttribute("width")/2;
+      const by=+el.getAttribute("y");
+      tt.style.left=(r.left-wr.left+bx*(r.width/W))+"px";
+      tt.style.top=(r.top-wr.top+by*(r.height/H)-58)+"px";
+    });
+    el.addEventListener("mouseleave",()=>tt.style.opacity=0);
+  });
+}
+
+function renderTable(cur, base){
+  const cmpLabel = cmpMode==="mom" ? "Anterior" : "Orçado";
+  document.getElementById("cmp-col-head").textContent = cmpLabel;
+  const rows=[
+    {l:"Receita líquida", k:"receita", total:true, invert:false},
+    {l:"(–) CMV", k:"cmv", sub:true, invert:true},
+    {l:"= Lucro bruto", k:"lucroBruto", total:true, invert:false, marg:"margemBruta"},
+    {l:"(–) Despesas operacionais", k:"opex", sub:true, invert:true},
+    {l:"= Lucro operacional", k:"lucroOp", total:true, invert:false, marg:"margemOp"},
+    {l:"(–) Impostos", k:"impostos", sub:true, invert:true},
+    {l:"= Lucro líquido", k:"lucroLiq", total:true, invert:false, marg:"margemLiq"},
+  ];
+  const cmpObj = cmpMode==="mom" ? (base.mom||{}) : BUD;
+  document.getElementById("dre-body").innerHTML = rows.map(r=>{
+    const v=cur[r.k], b=cmpObj[r.k];
+    const cls = r.total ? "total" : (r.sub?"sub":"");
+    const margTxt = r.marg ? ` <span style="color:var(--muted);font-weight:400">(${pct(cur[r.marg])})</span>` : "";
+    return `<tr class="${cls}">
+      <td>${r.l}${margTxt}</td>
+      <td>${brl(v)}</td>
+      <td>${b!==undefined?brl(b):"—"}</td>
+      <td>${deltaChip(v,b,r.invert)}</td>
+    </tr>`;
+  }).join("");
+}
+
+function renderGauges(cur){
+  const gs=[
+    {label:"Margem bruta", val:cur.margemBruta, target:TARGET_GROSS, color:cvar('--accent')},
+    {label:"Margem líquida", val:cur.margemLiq, target:TARGET_NET, color:cvar('--gain')},
+  ];
+  document.getElementById("gauges").innerHTML = gs.map(g=>{
+    const R=42, C=Math.PI*R, frac=Math.max(0,Math.min(1,g.val/ (g.target>0?g.target:1)));
+    const filled=C*Math.min(1,frac);
+    const meets = g.val>=g.target;
+    return `<div class="gauge">
+      <div class="g-label">${g.label}</div>
+      <svg viewBox="0 0 110 66" width="120" height="72">
+        <path d="M13 60 A42 42 0 0 1 97 60" fill="none" stroke="var(--hair)" stroke-width="9" stroke-linecap="round"/>
+        <path d="M13 60 A42 42 0 0 1 97 60" fill="none" stroke="${g.color}" stroke-width="9" stroke-linecap="round"
+          stroke-dasharray="${filled} ${C}" opacity="0.95"/>
+      </svg>
+      <div class="g-val" style="color:${g.color}">${pct(g.val)}</div>
+      <div class="g-target">meta ${pct(g.target)} · <span class="${meets?'up':'down'}">${meets?'atingida':'abaixo'}</span></div>
+    </div>`;
+  }).join("");
+}
+
+function renderTrend(){
+  const svg=document.getElementById("trend");
+  const W=420,H=200,padL=42,padR=36,padT=14,padB=26;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const profit=DATA.map(d=>d.lucroLiq);
+  const margin=DATA.map(d=>d.margemLiq);
+  const pmn=Math.min(0,...profit),pmx=Math.max(...profit),pr=pmx-pmn||1;
+  const mmn=Math.min(...margin),mmx=Math.max(...margin),mr=mmx-mmn||1;
+  const x=i=>padL+(i/(DATA.length-1))*plotW;
+  const yP=v=>padT+plotH-((v-pmn)/pr)*plotH;
+  const yM=v=>padT+plotH-((v-mmn)/mr)*plotH;
+
+  let s="";
+  for(let i=0;i<=4;i++){ const gy=padT+(plotH/4)*i; s+=`<line class="grid-line" x1="${padL}" x2="${W-padR}" y1="${gy}" y2="${gy}"/>`; }
+  // barras de lucro
+  const bw=plotW/DATA.length*0.5;
+  DATA.forEach((d,i)=>{ const yt=yP(d.lucroLiq), yb=yP(0);
+    s+=`<rect class="tp" data-i="${i}" x="${x(i)-bw/2}" y="${Math.min(yt,yb)}" width="${bw}" height="${Math.abs(yb-yt)}" rx="2" fill="${cvar('--accent')}" opacity="0.28"/>`; });
+  // linha de margem
+  const mpts=margin.map((v,i)=>`${x(i)},${yM(v)}`).join(" ");
+  s+=`<polyline points="${mpts}" fill="none" stroke="${cvar('--gain')}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  margin.forEach((v,i)=>{ s+=`<circle class="tp" data-i="${i}" cx="${x(i)}" cy="${yM(v)}" r="3" fill="${cvar('--gain')}" stroke="var(--surface)" stroke-width="1.5"/>`; });
+  // rótulos eixo x (a cada 2)
+  DATA.forEach((d,i)=>{ if(i%2===0||i===DATA.length-1) s+=`<text class="wf-axis" x="${x(i)}" y="${H-8}" text-anchor="middle">${mLabel(d.m)}</text>`; });
+  svg.innerHTML=s;
+
+  const tt=document.getElementById("tr-tt");
+  svg.querySelectorAll(".tp").forEach(el=>{
+    el.addEventListener("mouseenter",()=>{
+      const d=DATA[+el.dataset.i];
+      tt.innerHTML=`<b>${mLabel(d.m)}</b><br>Lucro: ${brlk(d.lucroLiq)}<br>Margem: ${pct(d.margemLiq)}`;
+      tt.style.opacity=1;
+      const r=svg.getBoundingClientRect(), wr=svg.parentElement.getBoundingClientRect();
+      const bx=+(el.getAttribute("cx")||(+el.getAttribute("x")+ +el.getAttribute("width")/2));
+      const by=+(el.getAttribute("cy")||el.getAttribute("y"));
+      tt.style.left=(r.left-wr.left+bx*(r.width/W))+"px";
+      tt.style.top=(r.top-wr.top+by*(r.height/H)-48)+"px";
+    });
+    el.addEventListener("mouseleave",()=>tt.style.opacity=0);
+  });
+}
+
+function renderAll(){
+  const i=+periodSel.value;
+  const cur=DATA[i];
+  const base={ mom: i>0?DATA[i-1]:undefined };
+  document.getElementById("meta").textContent =
+    `Período: ${mLabel(cur.m)} · comparando ${cmpMode==="mom"?"com o mês anterior":"com o orçado"}`;
+  renderKPIs(cur, base);
+  renderWaterfall(cur);
+  renderTable(cur, base);
+  renderGauges(cur);
+  renderTrend();
+}
+renderAll();
+</script>

@@ -37,6 +37,10 @@ Para outro domínio, troque `FSEGS` (segmentos e quais entidades compõem cada u
 
 O template traz um seletor de tema no menu com 5 opções: **bege** (padrão), branco, preto, azul e vermelho. Cada tema é um bloco `:root[data-theme="…"]` que redefine os tokens, inclusive os gradientes (`--hero`, `--fhero`, `--falt`, `--hero-glow`). A escolha fica salva em `localStorage` (`mae-theme`). Texto sobre fundo colorido continua `#fff`; todo o resto usa tokens, para que nenhum tema quebre o contraste. O preto é opcional: o padrão continua claro.
 
+## Marca
+
+A marca do MAE está em `assets/brand/mae-logo.svg`, em vetor. O símbolo são duas fitas em Λ formando o M, com gradiente ciano `#14e0d2` → azul `#2f8bff` → violeta `#8a4bff`. O nome é M, Λ (A sem travessão) e E, em traço na cor do texto do tema (`currentColor`). No template, `LOGO_SYM` e `LOGO_WORD` montam o menu (no celular aparece só o símbolo), o favicon é o símbolo em data URI e o PDF abre com uma faixa escura e o símbolo desenhado com linhas. Os gradientes dos temas (`--hero`, `--fhero`, `--falt`) seguem as cores do símbolo.
+
 ## Demonstração × dados reais
 
 Os dados de exemplo ficam num objeto `DEMO` isolado. A página lê `window.MAE_DATA` quando o backend injeta os dados do tenant e só cai no `DEMO` sem ele (`IS_DEMO`). Em modo demo, uma faixa em todas as telas e um selo no menu dizem "Demonstração · dados fictícios". Nunca misture as duas origens, nem deixe um número de exemplo aparecer numa conta real.

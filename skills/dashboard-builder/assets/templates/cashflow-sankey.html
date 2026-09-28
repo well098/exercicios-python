@@ -1,0 +1,488 @@
+<title>Fluxo de Caixa</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #eaf3f1;
+    --surface: #ffffff;
+    --surface-2: #f4faf8;
+    --ink: #0c211e;
+    --ink-2: #45645e;
+    --muted: #8aa8a1;
+    --hair: #dcebe7;
+    --hair-strong: #c6ded8;
+    --accent: #0e9f8f;
+    --accent-2: #14b8a6;
+    --inflow: #0aa06a;
+    --inflow-soft: #dff5ec;
+    --out-opex: #f2683c;
+    --out-div: #e0435c;
+    --out-inv: #7c6ff0;
+    --out-tax: #e4a70a;
+    --out-other: #4a9bd6;
+    --final: #0e9f8f;
+    --warn: #e4a70a;
+    --danger: #e0435c;
+    --good: #0aa06a;
+    --shadow: 0 1px 2px rgba(12,33,30,0.05), 0 10px 30px rgba(12,33,30,0.07);
+    --shadow-lg: 0 4px 12px rgba(12,33,30,0.08), 0 20px 50px rgba(12,33,30,0.10);
+  }
+  
+  
+
+  * { box-sizing: border-box; }
+  body {
+    background:
+      radial-gradient(1200px 500px at 15% -8%, rgba(20,184,166,0.12), transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, rgba(124,111,240,0.08), transparent 55%),
+      var(--page);
+    color: var(--ink); margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding-inline: 22px; padding-block: 26px;
+    font-variant-numeric: tabular-nums;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  .topbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .mark { width: 40px; height: 40px; border-radius: 12px; flex-shrink:0;
+    background: linear-gradient(135deg, var(--accent-2), var(--accent)); box-shadow: var(--shadow);
+    display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 20px; }
+  .brand h1 { font-size: 23px; margin: 0; letter-spacing: -0.02em; }
+  .brand .sub { font-size: 12.5px; color: var(--ink-2); margin-top: 1px; }
+  .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .field { display: flex; flex-direction: column; gap: 3px; }
+  .field label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .field select, .field input { font: inherit; font-size: 13px; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--hair-strong); border-radius: 9px; padding: 7px 10px; }
+  .field input { width: 130px; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px) { .kpi-row { grid-template-columns: 1fr; } }
+  .kpi { background: var(--surface); border-radius: 16px; padding: 16px 18px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 7px; position: relative; overflow: hidden;
+    opacity: 0; transform: translateY(10px); }
+  .kpi.in { animation: rise .5s cubic-bezier(.2,.7,.3,1) forwards; }
+  .kpi .glow { position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--accent); }
+  .kpi.inflow .glow { background: var(--inflow); }
+  .kpi.outflow .glow { background: var(--out-opex); }
+  .kpi.final .glow { background: linear-gradient(90deg, var(--accent-2), var(--accent)); }
+  .kpi .k-label { font-size: 11.5px; color: var(--ink-2); font-weight: 500; }
+  .kpi .k-value { font-size: 24px; letter-spacing: -0.015em; line-height: 1.05; }
+  .kpi .k-note { font-size: 11px; color: var(--muted); }
+  .kpi .k-note .up { color: var(--good); font-weight: 600; }
+  .kpi .k-note .down { color: var(--danger); font-weight: 600; }
+
+  .card { background: var(--surface); border-radius: 18px; padding: 22px; box-shadow: var(--shadow);
+    opacity: 0; transform: translateY(12px); }
+  .card.in { animation: rise .55s cubic-bezier(.2,.7,.3,1) forwards; }
+  .card h2 { font-size: 16px; margin: 0 0 2px; letter-spacing: -0.01em; }
+  .card .csub { font-size: 12.5px; color: var(--muted); margin: 0 0 16px; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
+
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .ax { fill: var(--muted); font-size: 10.5px; }
+  .node-label { fill: var(--ink); font-size: 11px; font-weight: 600; }
+  .node-val { fill: var(--ink-2); font-size: 10px; }
+  .grid-line { stroke: var(--hair); stroke-width: 1; }
+  .chart-wrap { position: relative; overflow-x: auto; }
+  .tooltip { position: absolute; pointer-events: none; background: var(--ink); color: var(--surface);
+    font-size: 11.5px; padding: 8px 10px; border-radius: 8px; opacity: 0; transition: opacity .12s;
+    white-space: nowrap; z-index: 8; line-height: 1.55; box-shadow: var(--shadow-lg); }
+
+  .sankey-link { opacity: 0; transition: opacity .7s ease, filter .15s ease; }
+  .sankey-link.in { opacity: .5; }
+  .sankey-link:hover { opacity: .82; }
+  .sankey-node { opacity: 0; transition: opacity .5s ease; }
+  .sankey-node.in { opacity: 1; }
+
+  .flag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+    padding: 6px 12px; border-radius: 999px; background: var(--danger); color: #fff; margin-bottom: 12px; }
+  .flag.ok { background: var(--good); }
+
+  .drain-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .drain-row .rank { width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center;
+    font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .drain-row .name { width: 128px; font-size: 12.5px; color: var(--ink-2); flex-shrink: 0; }
+  .drain-track { flex: 1; height: 20px; background: var(--surface-2); border-radius: 7px; overflow: hidden; }
+  .drain-fill { height: 100%; border-radius: 7px; width: 0; transition: width 1s cubic-bezier(.2,.7,.3,1); }
+  .drain-row .amt { width: 96px; text-align: right; font-size: 12.5px; font-weight: 600; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .kpi, .card { opacity: 1 !important; transform: none !important; animation: none !important; }
+    .sankey-link { opacity: .5 !important; transition: none; }
+    .sankey-node { opacity: 1 !important; transition: none; }
+    .drain-fill { transition: none; }
+  }
+  footer.note { font-size: 11.5px; color: var(--muted); text-align: center; }
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark">≋</div>
+      <div>
+        <h1>Fluxo de Caixa</h1>
+        <div class="sub" id="brand-sub">Finanças da empresa · visão mensal com projeção de 3 meses</div>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="field">
+        <label>Mês de referência</label>
+        <select id="period"></select>
+      </div>
+      <div class="field">
+        <label>Caixa mínimo (R$)</label>
+        <input id="min-cash" type="number" value="100000" step="10000">
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-row" id="kpi-row"></div>
+
+  <div class="card" id="card-sankey">
+    <h2>Para onde o dinheiro foi</h2>
+    <p class="csub">Do caixa disponível (inicial + entradas) até o caixa final — largura proporcional ao valor</p>
+    <div class="chart-wrap">
+      <svg id="sankey" viewBox="0 0 940 380" style="width:100%;height:auto;display:block"></svg>
+      <div class="tooltip" id="sk-tt"></div>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="card" id="card-proj">
+      <h2>Saldo de caixa & projeção</h2>
+      <p class="csub">Histórico e projeção de 3 meses — linha traçada indica projeção</p>
+      <div id="flag-slot"></div>
+      <div class="chart-wrap">
+        <svg id="proj" viewBox="0 0 460 240" style="width:100%;height:auto;display:block"></svg>
+        <div class="tooltip" id="pj-tt"></div>
+      </div>
+    </div>
+
+    <div class="card" id="card-drain">
+      <h2>Maiores ralos de caixa</h2>
+      <p class="csub">Saídas do mês de referência, do maior para o menor</p>
+      <div id="drains"></div>
+    </div>
+  </div>
+
+  <footer class="note">Dados de exemplo. Substitua o array MONTHS no script pelos seus lançamentos mensais.</footer>
+</div>
+
+<script>
+// ---------- Dados de exemplo (empresa) — troque por seus números ----------
+// Cada mês: caixaInicial e saídas por categoria; entradas = receitas do mês
+const MONTHS = [
+  {m:"2026-01", caixaInicial:145000, entradas:512000, opex:288000, dividas:82000, investimentos:60000, impostos:64000, outras:33000},
+  {m:"2026-02", caixaInicial:130000, entradas:498000, opex:291000, dividas:82000, investimentos:45000, impostos:61000, outras:29000},
+  {m:"2026-03", caixaInicial:120000, entradas:556000, opex:301000, dividas:82000, investimentos:70000, impostos:69000, outras:31000},
+  {m:"2026-04", caixaInicial:123000, entradas:571000, opex:305000, dividas:82000, investimentos:55000, impostos:72000, outras:35000},
+  {m:"2026-05", caixaInicial:145000, entradas:588000, opex:312000, dividas:82000, investimentos:90000, impostos:74000, outras:38000},
+  {m:"2026-06", caixaInicial:137000, entradas:604000, opex:318000, dividas:82000, investimentos:65000, impostos:77000, outras:36000},
+  {m:"2026-07", caixaInicial:163000, entradas:619000, opex:322000, dividas:82000, investimentos:110000, impostos:79000, outras:41000},
+  {m:"2026-08", caixaInicial:148000, entradas:641000, opex:329000, dividas:82000, investimentos:75000, impostos:83000, outras:39000},
+  {m:"2026-09", caixaInicial:182000, entradas:620000, opex:310000, dividas:95000, investimentos:120000, impostos:78000, outras:42000},
+];
+const OUT_KEYS = [
+  {k:"opex", label:"Desp. operacionais", color:"--out-opex"},
+  {k:"dividas", label:"Dívidas", color:"--out-div"},
+  {k:"investimentos", label:"Investimentos", color:"--out-inv"},
+  {k:"impostos", label:"Impostos", color:"--out-tax"},
+  {k:"outras", label:"Outras saídas", color:"--out-other"},
+];
+const MONTHS_PT={"01":"Jan","02":"Fev","03":"Mar","04":"Abr","05":"Mai","06":"Jun","07":"Jul","08":"Ago","09":"Set","10":"Out","11":"Nov","12":"Dez"};
+function mLabel(k){ const [y,m]=k.split("-"); return (MONTHS_PT[m]||m)+"/"+y.slice(2); }
+function cvar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function brl(v){ const n=v<0; return (n?"-R$ ":"R$ ")+Math.abs(v).toLocaleString("pt-BR",{maximumFractionDigits:0}); }
+function brlk(v){ const a=Math.abs(v),s=v<0?"-":""; if(a>=1e6) return s+"R$ "+(a/1e6).toFixed(2)+"M"; if(a>=1e3) return s+"R$ "+(a/1e3).toFixed(0)+"k"; return s+"R$ "+a.toFixed(0); }
+const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function derive(d){
+  const saidasTotais = d.opex+d.dividas+d.investimentos+d.impostos+d.outras;
+  const disponivel = d.caixaInicial + d.entradas;
+  const fluxoLiquido = d.entradas - saidasTotais;
+  const caixaFinal = disponivel - saidasTotais;
+  return {...d, saidasTotais, disponivel, fluxoLiquido, caixaFinal};
+}
+const DATA = MONTHS.map(derive);
+
+const periodSel=document.getElementById("period");
+DATA.forEach((d,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=mLabel(d.m); periodSel.appendChild(o); });
+periodSel.value=DATA.length-1;
+const minInput=document.getElementById("min-cash");
+
+// contagem crescente
+function countUp(el, target, fmt, dur=900){
+  if(REDUCE){ el.textContent=fmt(target); return; }
+  const start=performance.now();
+  function step(now){
+    const t=Math.min(1,(now-start)/dur);
+    const e=1-Math.pow(1-t,3);
+    el.textContent=fmt(target*e);
+    if(t<1) requestAnimationFrame(step); else el.textContent=fmt(target);
+  }
+  requestAnimationFrame(step);
+}
+
+function renderKPIs(cur, prev){
+  const row=document.getElementById("kpi-row");
+  const noteMoM=(v,p)=>{ if(p===undefined) return ""; const diff=v-p, pc=p!==0?diff/Math.abs(p)*100:0;
+    const cls=diff>=0?"up":"down"; const ar=diff>=0?"▲":"▼"; return `<span class="${cls}">${ar} ${Math.abs(pc).toFixed(1)}%</span> vs mês ant.`; };
+  const cfg=[
+    {cls:"", label:"Caixa inicial", val:cur.caixaInicial, note:""},
+    {cls:"inflow", label:"Entradas", val:cur.entradas, note:noteMoM(cur.entradas, prev&&prev.entradas)},
+    {cls:"outflow", label:"Saídas totais", val:cur.saidasTotais, note:noteMoM(cur.saidasTotais, prev&&prev.saidasTotais)},
+    {cls: cur.fluxoLiquido>=0?"inflow":"outflow", label:"Fluxo líquido", val:cur.fluxoLiquido, note:cur.fluxoLiquido>=0?"gerou caixa":"queimou caixa"},
+    {cls:"final", label:"Caixa final", val:cur.caixaFinal, note:noteMoM(cur.caixaFinal, prev&&prev.caixaFinal)},
+  ];
+  row.innerHTML=cfg.map(c=>`
+    <div class="kpi ${c.cls}">
+      <div class="glow"></div>
+      <div class="k-label">${c.label}</div>
+      <div class="k-value" data-val="${c.val}">R$ 0</div>
+      <div class="k-note">${c.note||"&nbsp;"}</div>
+    </div>`).join("");
+  const kpis=[...row.querySelectorAll(".kpi")];
+  kpis.forEach((el,i)=>{ if(!REDUCE) el.style.animationDelay=(i*70)+"ms"; el.classList.add("in"); });
+  row.querySelectorAll(".k-value").forEach((el,i)=>{
+    const v=+el.dataset.val;
+    setTimeout(()=>countUp(el, v, brlk), REDUCE?0:200+i*70);
+  });
+}
+
+function renderSankey(cur){
+  const svg=document.getElementById("sankey");
+  const W=940,H=380,padT=24,padB=20,padL=8,padR=8;
+  const plotH=H-padT-padB;
+  const total=cur.disponivel;
+  const S=plotH/total;
+  const colX=[padL+8, W*0.45, W-padR-8];
+  const nodeW=16;
+
+  // Col 0: fontes
+  const sources=[
+    {label:"Caixa inicial", val:cur.caixaInicial, color:"--accent"},
+    {label:"Entradas", val:cur.entradas, color:"--inflow"},
+  ];
+  // Col 2: destinos (saídas + caixa final)
+  const sinks=[
+    ...OUT_KEYS.map(o=>({label:o.label, val:cur[o.k], color:o.color})),
+    {label:"Caixa final", val:cur.caixaFinal, color:"--final"},
+  ];
+
+  // posições col0
+  let y=padT; sources.forEach(n=>{ n.y0=y; n.y1=y+n.val*S; y=n.y1; });
+  // posições col2
+  y=padT; sinks.forEach(n=>{ n.y0=y; n.y1=y+n.val*S; y=n.y1; });
+  // hub: entrada empilhada na ordem das fontes; saída na ordem dos destinos
+  const hub={x:colX[1], y0:padT, y1:padT+total*S};
+  let hy=padT; sources.forEach(n=>{ n.hubIn0=hy; n.hubIn1=hy+n.val*S; hy=n.hubIn1; });
+  let ho=padT; sinks.forEach(n=>{ n.hubOut0=ho; n.hubOut1=ho+n.val*S; ho=n.hubOut1; });
+
+  function bandPath(x0,x1,s0,s1,t0,t1){
+    const mx=(x0+x1)/2;
+    return `M${x0},${s0} C${mx},${s0} ${mx},${t0} ${x1},${t0} L${x1},${t1} C${mx},${t1} ${mx},${s1} ${x0},${s1} Z`;
+  }
+  let links="", nodes="";
+  // links fontes -> hub
+  sources.forEach((n,i)=>{
+    const x0=colX[0]+nodeW, x1=hub.x;
+    links+=`<path class="sankey-link" data-t="src" data-i="${i}" d="${bandPath(x0,x1,n.y0,n.y1,n.hubIn0,n.hubIn1)}" fill="${cvar(n.color)}"/>`;
+  });
+  // links hub -> destinos
+  sinks.forEach((n,i)=>{
+    const x0=hub.x+nodeW, x1=colX[2];
+    links+=`<path class="sankey-link" data-t="snk" data-i="${i}" d="${bandPath(x0,x1,n.hubOut0,n.hubOut1,n.y0,n.y1)}" fill="${cvar(n.color)}"/>`;
+  });
+  // nós
+  function nodeRect(x,n,anchorRight){
+    const h=Math.max(2,n.y1-n.y0);
+    let r=`<rect class="sankey-node" x="${x}" y="${n.y0}" width="${nodeW}" height="${h}" rx="4" fill="${cvar(n.color)}"/>`;
+    const lx = anchorRight ? x-8 : x+nodeW+8;
+    const anc = anchorRight ? "end" : "start";
+    const midY=(n.y0+n.y1)/2;
+    r+=`<text class="node-label sankey-node" x="${lx}" y="${midY-1}" text-anchor="${anc}">${n.label}</text>`;
+    r+=`<text class="node-val sankey-node" x="${lx}" y="${midY+12}" text-anchor="${anc}">${brlk(n.val)}</text>`;
+    return r;
+  }
+  sources.forEach(n=>{ nodes+=nodeRect(colX[0], n, false); });
+  nodes+=`<rect class="sankey-node" x="${hub.x}" y="${hub.y0}" width="${nodeW}" height="${hub.y1-hub.y0}" rx="4" fill="${cvar('--accent-2')}"/>`;
+  nodes+=`<text class="node-label sankey-node" x="${hub.x+nodeW/2}" y="${padT-8}" text-anchor="middle">Caixa disponível ${brlk(total)}</text>`;
+  sinks.forEach(n=>{ nodes+=nodeRect(colX[2]-nodeW, n, true); });
+
+  svg.innerHTML=links+nodes;
+
+  // animação de entrada (staggered)
+  const linkEls=[...svg.querySelectorAll(".sankey-link")];
+  const nodeEls=[...svg.querySelectorAll(".sankey-node")];
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    nodeEls.forEach(el=>el.classList.add("in"));
+    linkEls.forEach((el,i)=>{ if(REDUCE){el.classList.add("in");return;} setTimeout(()=>el.classList.add("in"), 150+i*80); });
+  }));
+
+  // tooltip
+  const tt=document.getElementById("sk-tt");
+  linkEls.forEach(el=>{
+    const t=el.dataset.t, i=+el.dataset.i;
+    const n = t==="src"? sources[i] : sinks[i];
+    el.style.cursor="pointer";
+    el.addEventListener("mousemove",(e)=>{
+      const share=(n.val/total*100).toFixed(1);
+      tt.innerHTML=`<b>${n.label}</b><br>${brl(n.val)}<br><span style="opacity:.75">${share}% do caixa disponível</span>`;
+      tt.style.opacity=1;
+      const wr=svg.parentElement.getBoundingClientRect();
+      tt.style.left=(e.clientX-wr.left+12)+"px"; tt.style.top=(e.clientY-wr.top-10)+"px";
+    });
+    el.addEventListener("mouseleave",()=>tt.style.opacity=0);
+  });
+}
+
+function renderProjection(curIdx){
+  const svg=document.getElementById("proj");
+  const W=460,H=240,padL=46,padR=14,padT=16,padB=28;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const minCash=+minInput.value||0;
+
+  // histórico: caixaFinal até o mês de referência
+  const hist=DATA.slice(0,curIdx+1).map(d=>({m:d.m, v:d.caixaFinal, proj:false}));
+  // projeção 3 meses: aplica fluxo líquido médio dos últimos 3 meses, com um investimento pontual no 2º mês projetado
+  const last3=DATA.slice(Math.max(0,curIdx-2),curIdx+1);
+  const avgFlow=last3.reduce((s,d)=>s+d.fluxoLiquido,0)/last3.length;
+  let base=hist[hist.length-1].v;
+  const shocks=[0, -180000, 0]; // 2º mês projetado tem um desembolso grande
+  const proj=[];
+  const lastKey=DATA[curIdx].m;
+  let [yy,mm]=lastKey.split("-").map(Number);
+  for(let i=0;i<3;i++){
+    mm++; if(mm>12){mm=1;yy++;}
+    base=base+avgFlow*0.6+shocks[i];
+    proj.push({m:`${yy}-${String(mm).padStart(2,"0")}`, v:Math.round(base), proj:true});
+  }
+  const all=[...hist, ...proj];
+  const vals=all.map(p=>p.v);
+  const mn=Math.min(minCash, ...vals, 0), mx=Math.max(minCash, ...vals);
+  const range=mx-mn||1;
+  const x=i=>padL+(i/(all.length-1))*plotW;
+  const y=v=>padT+plotH-((v-mn)/range)*plotH;
+
+  let s="";
+  for(let i=0;i<=4;i++){ const gy=padT+(plotH/4)*i, gv=mx-range*(i/4);
+    s+=`<line class="grid-line" x1="${padL}" x2="${W-padR}" y1="${gy}" y2="${gy}"/>`;
+    s+=`<text class="ax" x="${padL-8}" y="${gy+3}" text-anchor="end">${brlk(gv)}</text>`; }
+  // linha de caixa mínimo
+  const my=y(minCash);
+  s+=`<line x1="${padL}" x2="${W-padR}" y1="${my}" y2="${my}" stroke="${cvar('--danger')}" stroke-width="1.4" stroke-dasharray="5 4"/>`;
+  s+=`<text class="ax" x="${W-padR}" y="${my-5}" text-anchor="end" fill="${cvar('--danger')}">mín ${brlk(minCash)}</text>`;
+
+  // área histórica
+  const histIdx=hist.length-1;
+  function line(points){ return points.map((p,i)=>`${x(p.gi)},${y(p.v)}`).join(" "); }
+  const withIdx=all.map((p,i)=>({...p,gi:i}));
+  const histPts=withIdx.slice(0,histIdx+1);
+  const projPts=withIdx.slice(histIdx); // inclui ponto de junção
+
+  // área sob histórico
+  const areaD=`M${x(0)},${y(mn)} `+histPts.map(p=>`L${x(p.gi)},${y(p.v)}`).join(" ")+` L${x(histIdx)},${y(mn)} Z`;
+  s+=`<defs><linearGradient id="cashgrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${cvar('--accent')}" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="${cvar('--accent')}" stop-opacity="0"/></linearGradient></defs>`;
+  s+=`<path d="${areaD}" fill="url(#cashgrad)"/>`;
+
+  // linha histórica (com animação de traço)
+  const histLine=`<polyline id="hist-line" points="${line(histPts)}" fill="none" stroke="${cvar('--accent')}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const projLine=`<polyline id="proj-line" points="${line(projPts)}" fill="none" stroke="${cvar('--accent')}" stroke-width="2.4" stroke-dasharray="6 5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>`;
+  s+=histLine+projLine;
+
+  // pontos + alerta abaixo do mínimo
+  withIdx.forEach(p=>{
+    const below=p.v<minCash;
+    const fill= below ? cvar('--danger') : (p.proj?cvar('--surface'):cvar('--accent'));
+    const stroke= p.proj? cvar('--accent') : cvar('--surface');
+    s+=`<circle class="pj-pt" data-i="${p.gi}" cx="${x(p.gi)}" cy="${y(p.v)}" r="${below?5:3.6}" fill="${fill}" stroke="${stroke}" stroke-width="1.6"/>`;
+    if(below) s+=`<text class="ax" x="${x(p.gi)}" y="${y(p.v)-9}" text-anchor="middle" fill="${cvar('--danger')}" font-weight="700">!</text>`;
+  });
+  // rótulos x
+  withIdx.forEach(p=>{ if(p.gi%2===0||p.gi===all.length-1) s+=`<text class="ax" x="${x(p.gi)}" y="${H-8}" text-anchor="middle" ${p.proj?`fill="${cvar('--muted')}"`:""}>${mLabel(p.m)}</text>`; });
+
+  svg.innerHTML=s;
+
+  // animação de traço nas linhas
+  if(!REDUCE){
+    ["hist-line","proj-line"].forEach((id,k)=>{
+      const el=svg.querySelector("#"+id); if(!el) return;
+      const len=el.getTotalLength();
+      el.style.strokeDasharray = id==="proj-line" ? `${len}` : `${len}`;
+      el.style.strokeDashoffset = len;
+      el.style.transition="none";
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        el.style.transition=`stroke-dashoffset 1.1s ease ${k*0.9}s`;
+        el.style.strokeDashoffset="0";
+        if(id==="proj-line") setTimeout(()=>{ el.style.strokeDasharray="6 5"; }, 900+1100);
+      }));
+    });
+  }
+
+  // flag
+  const breach=proj.find(p=>p.v<minCash);
+  const slot=document.getElementById("flag-slot");
+  if(breach){
+    slot.innerHTML=`<div class="flag">⚠ Projeção abaixo do caixa mínimo em ${mLabel(breach.m)}: ${brl(breach.v)}</div>`;
+  } else {
+    slot.innerHTML=`<div class="flag ok">✓ Caixa projetado acima do mínimo nos próximos 3 meses</div>`;
+  }
+
+  // tooltip
+  const tt=document.getElementById("pj-tt");
+  svg.querySelectorAll(".pj-pt").forEach(el=>{
+    el.addEventListener("mouseenter",()=>{
+      const p=withIdx[+el.dataset.i];
+      const status=p.v<minCash?`<span style="color:${cvar('--danger')}">abaixo do mínimo</span>`:(p.proj?"projetado":"realizado");
+      tt.innerHTML=`<b>${mLabel(p.m)}</b><br>${brl(p.v)}<br><span style="opacity:.8">${status}</span>`;
+      tt.style.opacity=1;
+      const r=svg.getBoundingClientRect(), wr=svg.parentElement.getBoundingClientRect();
+      tt.style.left=(r.left-wr.left+(+el.getAttribute("cx"))*(r.width/W))+"px";
+      tt.style.top=(r.top-wr.top+(+el.getAttribute("cy"))*(r.height/H)-52)+"px";
+    });
+    el.addEventListener("mouseleave",()=>tt.style.opacity=0);
+  });
+}
+
+function renderDrains(cur){
+  const drains=OUT_KEYS.map(o=>({label:o.label, val:cur[o.k], color:o.color})).sort((a,b)=>b.val-a.val);
+  const max=drains[0].val||1;
+  const el=document.getElementById("drains");
+  el.innerHTML=drains.map((d,i)=>`
+    <div class="drain-row">
+      <span class="rank" style="background:${cvar(d.color)}">${i+1}</span>
+      <span class="name">${d.label}</span>
+      <span class="drain-track"><span class="drain-fill" data-w="${(d.val/max*100).toFixed(1)}" style="background:${cvar(d.color)}"></span></span>
+      <span class="amt">${brlk(d.val)}</span>
+    </div>`).join("");
+  const fills=[...el.querySelectorAll(".drain-fill")];
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    fills.forEach((f,i)=>{ setTimeout(()=>{ f.style.width=f.dataset.w+"%"; }, REDUCE?0:120+i*90); });
+  }));
+}
+
+function renderAll(){
+  const i=+periodSel.value;
+  const cur=DATA[i], prev=i>0?DATA[i-1]:undefined;
+  document.getElementById("brand-sub").textContent=`Finanças da empresa · ${mLabel(cur.m)} · projeção de 3 meses`;
+  renderKPIs(cur, prev);
+  renderSankey(cur);
+  renderProjection(i);
+  renderDrains(cur);
+  ["card-sankey","card-proj","card-drain"].forEach((id,k)=>{
+    const c=document.getElementById(id); c.classList.remove("in");
+    if(!REDUCE) c.style.animationDelay=(120+k*90)+"ms";
+    void c.offsetWidth; c.classList.add("in");
+  });
+}
+periodSel.addEventListener("change", renderAll);
+minInput.addEventListener("input", ()=>renderProjection(+periodSel.value));
+renderAll();
+</script>

@@ -1,0 +1,631 @@
+<title>Patrimônio Líquido</title>
+<style>
+  /* ===== PALETA: esmeralda & ouro sobre branco-menta (tema claro travado) ===== */
+  :root {
+    color-scheme: light;
+    --bg: #eef5f1;
+    --bg-2: #e4efe9;
+    --surface: #ffffff;
+    --surface-2: #f5faf7;
+    --ink: #13261e;
+    --ink-2: #557064;
+    --muted: #93aa9f;
+    --hair: #e1ece6;
+    --hair-2: #cfe0d7;
+
+    --emerald: #0f8a5f;
+    --emerald-2: #16b37b;
+    --gold: #c9971a;
+    --navy: #22407a;
+    --sky: #2f9bd6;
+    --plum: #8a5cc7;
+
+    --coral: #ef6a55;
+    --rose: #d9435e;
+    --amber: #f0a02a;
+    --clay: #b86b4b;
+
+    --good: #0f8a5f; --good-soft: #e1f5ec;
+    --bad: #d9435e; --bad-soft: #fde8ec;
+    --warn: #c98200; --warn-soft: #fff3d9;
+
+    --grad-hero: linear-gradient(135deg, #0b7a54 0%, #10a06d 55%, #3cc596 100%);
+    --grad-gold: linear-gradient(90deg, #e2b33a, #c9971a);
+
+    --shadow: 0 2px 8px rgba(19,60,42,0.06), 0 18px 44px rgba(19,60,42,0.09);
+    --shadow-sm: 0 1px 4px rgba(19,60,42,0.08);
+    --shadow-color: 0 14px 34px rgba(15,138,95,0.30);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(1000px 480px at 0% -10%, rgba(22,179,123,0.14), transparent 60%),
+      radial-gradient(800px 420px at 100% 0%, rgba(201,151,26,0.12), transparent 55%);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-variant-numeric: tabular-nums;
+    padding-inline: 22px; padding-block: 30px; min-height: 100%;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  .topbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; }
+  .eyebrow { font-size: 11.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
+    background: var(--grad-gold); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .topbar h1 { font-size: 28px; margin: 5px 0 0; letter-spacing: -0.025em; }
+  .topbar .sub { font-size: 13px; color: var(--ink-2); margin-top: 3px; }
+  .btn { font: inherit; font-size: 12.5px; font-weight: 700; border: 0; border-radius: 11px; padding: 10px 16px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px; transition: transform .12s, background .2s, box-shadow .2s; }
+  .btn:active { transform: scale(0.97); }
+  .btn.primary { background: var(--ink); color: #fff; box-shadow: var(--shadow-sm); }
+  .btn.primary:hover { background: var(--emerald); }
+  .btn.primary.on { background: var(--emerald); box-shadow: 0 6px 16px rgba(15,138,95,.35); }
+
+  .reveal { opacity: 0; transform: translateY(14px) scale(.985); }
+  .reveal.in { animation: pop .55s cubic-bezier(.2,.8,.25,1) forwards; }
+  @keyframes pop { to { opacity: 1; transform: none; } }
+
+  /* HERO */
+  .hero { display: grid; grid-template-columns: 1fr 1.25fr; gap: 16px; }
+  @media (max-width: 880px) { .hero { grid-template-columns: 1fr; } }
+  .pl-card { background: var(--grad-hero); color: #fff; border-radius: 24px; padding: 24px; box-shadow: var(--shadow-color);
+    position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; }
+  .pl-card::after { content:""; position: absolute; width: 260px; height: 260px; right: -80px; bottom: -110px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,.28), transparent 70%); pointer-events: none; }
+  .pl-card .lbl { font-size: 12px; font-weight: 600; opacity: .88; }
+  .pl-card .big { font-size: 48px; font-weight: 800; letter-spacing: -0.035em; line-height: 1; }
+  .pl-card .chg { font-size: 12.5px; font-weight: 700; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
+  .pl-card .chg .pill { background: rgba(255,255,255,.2); padding: 3px 10px; border-radius: 999px; }
+  .pl-card .mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: auto; padding-top: 16px; }
+  .pl-card .mini > div { background: rgba(255,255,255,.14); border-radius: 12px; padding: 9px 11px; }
+  .pl-card .mini .ml { font-size: 10.5px; opacity: .85; }
+  .pl-card .mini .mv { font-size: 15px; font-weight: 800; margin-top: 2px; }
+
+  .card { background: var(--surface); border-radius: 22px; padding: 20px; box-shadow: var(--shadow); min-width: 0; }
+  .card h2 { font-size: 15px; margin: 0 0 3px; letter-spacing: -0.01em; }
+  .card .csub { font-size: 12px; color: var(--muted); margin: 0 0 14px; }
+
+  /* balança */
+  .scale-bar { display: flex; height: 44px; border-radius: 13px; overflow: hidden; background: var(--surface-2); position: relative; }
+  .scale-seg { height: 100%; width: 0; transition: width 1.1s cubic-bezier(.2,.8,.25,1); position: relative; }
+  .scale-seg + .scale-seg { border-left: 2px solid var(--surface); }
+  .scale-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+  .scale-legend .sl { display: flex; flex-direction: column; gap: 2px; }
+  .scale-legend .sl .t { font-size: 11px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
+  .scale-legend .sl .v { font-size: 17px; font-weight: 800; letter-spacing: -0.01em; }
+  .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex-shrink: 0; }
+  .ratio-row { margin-top: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .ratio-chip { font-size: 12px; font-weight: 800; padding: 5px 12px; border-radius: 999px; }
+  .ratio-chip.good { background: var(--good-soft); color: var(--good); }
+  .ratio-chip.warn { background: var(--warn-soft); color: var(--warn); }
+  .ratio-chip.bad { background: var(--bad-soft); color: var(--bad); }
+  .ratio-note { font-size: 12px; color: var(--ink-2); }
+
+  /* KPI strip */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 880px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 440px) { .kpis { grid-template-columns: 1fr; } }
+  .kpi { background: var(--surface); border-radius: 18px; padding: 15px 17px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 4px; }
+  .kpi .kl { font-size: 11.5px; color: var(--ink-2); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .kpi .kv { font-size: 23px; font-weight: 800; letter-spacing: -0.02em; }
+  .kpi .kn { font-size: 11.5px; color: var(--muted); }
+  .kpi .meter { height: 6px; border-radius: 6px; background: var(--hair); overflow: hidden; margin-top: 6px; }
+  .kpi .meter span { display: block; height: 100%; width: 0; border-radius: 6px; transition: width 1s cubic-bezier(.2,.8,.25,1); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 880px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* donut */
+  .donut-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .donut-box { position: relative; width: 210px; height: 210px; flex-shrink: 0; margin: 0 auto; }
+  .donut-box svg { width: 210px; height: 210px; display: block; }
+  .donut-seg { transition: stroke-dasharray 1s cubic-bezier(.2,.8,.25,1), opacity .2s, stroke-width .2s; cursor: pointer; }
+  .donut-seg.dim { opacity: .22; }
+  .donut-seg.focus { stroke-width: 30; }
+  .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; padding: 40px; }
+  .donut-center .dc-l { font-size: 11px; color: var(--ink-2); font-weight: 600; }
+  .donut-center .dc-v { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-top: 2px; }
+  .donut-center .dc-p { font-size: 12px; font-weight: 700; color: var(--emerald); margin-top: 2px; }
+  .alloc-list { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 4px; }
+  .alloc-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 11px; cursor: pointer; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; width: 100%; transition: background .15s; }
+  .alloc-item:hover, .alloc-item.on { background: var(--surface-2); }
+  .alloc-item .an { flex: 1; font-size: 13px; color: var(--ink-2); }
+  .alloc-item .av { font-size: 13px; font-weight: 700; }
+  .alloc-item .ap { font-size: 11.5px; color: var(--muted); width: 44px; text-align: right; }
+
+  /* dívidas */
+  .debt { padding: 10px 0; border-bottom: 1px solid var(--hair); cursor: pointer; }
+  .debt:last-child { border-bottom: 0; }
+  .debt .dh { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+  .debt .dn { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 7px; }
+  .debt .dv { font-size: 13.5px; font-weight: 800; }
+  .debt .track { height: 10px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+  .debt .fill { height: 100%; width: 0; border-radius: 6px; transition: width 1s cubic-bezier(.2,.8,.25,1); }
+  .debt .detail { max-height: 0; overflow: hidden; transition: max-height .3s ease, margin .3s ease; font-size: 12px; color: var(--ink-2); }
+  .debt.open .detail { max-height: 80px; margin-top: 8px; }
+  .debt .detail b { color: var(--ink); }
+  .debt .chev { font-size: 11px; color: var(--muted); transition: transform .2s; display: inline-block; }
+  .debt.open .chev { transform: rotate(90deg); }
+
+  /* trend */
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .ax { fill: var(--muted); font-size: 10.5px; }
+  .grid-line { stroke: var(--hair); stroke-width: 1; }
+  .scrub-row { display: flex; align-items: center; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+  .scrub-row input[type=range] { flex: 1; min-width: 180px; -webkit-appearance: none; appearance: none; height: 6px; border-radius: 6px; background: var(--hair); cursor: pointer; }
+  .scrub-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); border: 3px solid var(--emerald); box-shadow: var(--shadow-sm); }
+  .scrub-row input[type=range]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--surface); border: 3px solid var(--emerald); }
+  .scrub-read { display: flex; gap: 16px; flex-wrap: wrap; }
+  .scrub-read .sr { display: flex; flex-direction: column; }
+  .scrub-read .sr .t { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .scrub-read .sr .v { font-size: 15px; font-weight: 800; }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--ink-2); flex-wrap: wrap; margin-bottom: 6px; }
+  .legend .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+
+  /* poupança */
+  .save-row { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .ring-box { position: relative; width: 150px; flex-shrink: 0; margin: 0 auto; }
+  .ring-box svg { display: block; }
+  .ring-box .rc { height: 150px; bottom: auto; }
+  .ring-cap { text-align: center; font-size: 12px; color: var(--ink-2); margin-top: 8px; }
+  .ring-cap b { color: var(--ink); }
+  .ring-box .rc { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring-box .rc .rv { font-size: 26px; font-weight: 800; color: var(--emerald); letter-spacing: -0.02em; }
+  .ring-box .rc .rl { font-size: 10.5px; color: var(--ink-2); text-align: center; }
+  .bars { flex: 1; min-width: 220px; }
+  .bar-col { cursor: default; }
+
+  /* painel de edição */
+  .editor { display: none; }
+  .editor.open { display: block; }
+  .ed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 760px) { .ed-grid { grid-template-columns: 1fr; } }
+  .ed-col h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); margin: 0 0 10px; }
+  .ed-field { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .ed-field label { flex: 1; font-size: 13px; color: var(--ink); display: flex; align-items: center; gap: 7px; }
+  .ed-field input { width: 150px; font: inherit; font-size: 13px; font-weight: 700; color: var(--ink); background: var(--surface-2);
+    border: 1px solid var(--hair-2); border-radius: 9px; padding: 7px 10px; text-align: right; }
+  .ed-field input:focus { outline: 2px solid var(--emerald); outline-offset: 1px; }
+
+  .tooltip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; font-size: 11.5px; padding: 8px 10px;
+    border-radius: 9px; opacity: 0; transition: opacity .12s; white-space: nowrap; z-index: 9; line-height: 1.55; box-shadow: var(--shadow); }
+  .chart-wrap { position: relative; overflow-x: auto; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1 !important; transform: none !important; animation: none !important; }
+    .scale-seg, .kpi .meter span, .debt .fill, .donut-seg { transition: none !important; }
+  }
+  footer.note { font-size: 11.5px; color: var(--muted); text-align: center; }
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <div class="eyebrow">Patrimônio pessoal</div>
+      <h1>Patrimônio Líquido</h1>
+      <div class="sub">Clique nas fatias, arraste a linha do tempo e edite os valores — tudo recalcula ao vivo.</div>
+    </div>
+    <button class="btn primary" id="edit-btn">✎ Editar valores</button>
+  </div>
+
+  <div class="card editor reveal" id="editor">
+    <h2>Seus números</h2>
+    <p class="csub">Digite os valores em reais. O painel inteiro atualiza enquanto você digita.</p>
+    <div class="ed-grid">
+      <div class="ed-col"><h3>Ativos</h3><div id="ed-assets"></div></div>
+      <div class="ed-col"><h3>Passivos</h3><div id="ed-liabs"></div></div>
+      <div class="ed-col"><h3>Fluxo mensal</h3><div id="ed-flow"></div></div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="pl-card reveal">
+      <div class="lbl">Patrimônio líquido</div>
+      <div class="big" id="pl-big">R$ 0</div>
+      <div class="chg" id="pl-chg"></div>
+      <div class="mini">
+        <div><div class="ml">Ativos</div><div class="mv" id="m-assets">—</div></div>
+        <div><div class="ml">Passivos</div><div class="mv" id="m-liabs">—</div></div>
+        <div><div class="ml">Poupança/mês</div><div class="mv" id="m-save">—</div></div>
+      </div>
+    </div>
+
+    <div class="card reveal">
+      <h2>Balança patrimonial</h2>
+      <p class="csub">Quanto dos seus ativos é realmente seu — e quanto está comprometido com dívidas</p>
+      <div class="scale-bar" id="scale-bar"></div>
+      <div class="scale-legend" id="scale-legend"></div>
+      <div class="ratio-row" id="ratio-row"></div>
+    </div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid-2">
+    <div class="card reveal">
+      <h2>Alocação de ativos</h2>
+      <p class="csub">Clique numa fatia ou item para ver o detalhe</p>
+      <div class="donut-row">
+        <div class="donut-box">
+          <svg viewBox="0 0 210 210" id="donut"></svg>
+          <div class="donut-center" id="donut-center"></div>
+        </div>
+        <div class="alloc-list" id="alloc-list"></div>
+      </div>
+    </div>
+
+    <div class="card reveal">
+      <h2>Detalhamento das dívidas</h2>
+      <p class="csub">Clique numa dívida para ver juros e custo mensal estimado</p>
+      <div id="debts"></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <h2>Evolução do patrimônio — 24 meses</h2>
+    <p class="csub">Arraste o controle para percorrer a linha do tempo</p>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--emerald)"></span>Patrimônio líquido</span>
+      <span><span class="dot" style="background:var(--navy)"></span>Ativos</span>
+      <span><span class="dot" style="background:var(--coral)"></span>Passivos</span>
+    </div>
+    <div class="chart-wrap">
+      <svg id="trend" viewBox="0 0 1000 280" style="width:100%;height:auto;display:block"></svg>
+    </div>
+    <div class="scrub-row">
+      <input type="range" id="scrub" min="0" max="23" step="1" value="23" aria-label="Mês na linha do tempo">
+      <div class="scrub-read" id="scrub-read"></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <h2>Progresso da poupança</h2>
+    <p class="csub">Reserva de emergência (6× despesas) e quanto sobrou por mês no último ano</p>
+    <div class="save-row">
+      <div class="ring-box">
+        <svg viewBox="0 0 150 150" width="150" height="150">
+          <circle cx="75" cy="75" r="62" fill="none" stroke="var(--hair)" stroke-width="13"/>
+          <circle id="save-ring" cx="75" cy="75" r="62" fill="none" stroke="url(#rg)" stroke-width="13" stroke-linecap="round"
+            transform="rotate(-90 75 75)" stroke-dasharray="0 999"/>
+          <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#16b37b"/><stop offset="100%" stop-color="#c9971a"/></linearGradient></defs>
+        </svg>
+        <div class="rc"><div class="rv" id="save-pct">0%</div><div class="rl">da reserva</div></div>
+        <div class="ring-cap" id="save-lbl"></div>
+      </div>
+      <div class="bars chart-wrap">
+        <svg id="save-bars" viewBox="0 0 1000 240" style="width:100%;height:auto;display:block"></svg>
+        <div class="tooltip" id="save-tt"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="note">Dados de exemplo. Clique em “Editar valores” para usar seus próprios números.</footer>
+</div>
+
+<script>
+// ===== Dados de exemplo (R$) =====
+const ASSETS = [
+  {k:"Dinheiro",      v:48000,  color:"--sky"},
+  {k:"Investimentos", v:312000, color:"--emerald"},
+  {k:"Imóveis",       v:680000, color:"--navy"},
+  {k:"Previdência",   v:95000,  color:"--gold"},
+  {k:"Outros",        v:42000,  color:"--plum"},
+];
+const LIABS = [
+  {k:"Financiamento imobiliário", v:398000, rate:9.8,  unit:"a.a.", color:"--clay"},
+  {k:"Cartões de crédito",        v:8400,   rate:12.5, unit:"a.m.", color:"--rose"},
+  {k:"Empréstimos",               v:36000,  rate:1.9,  unit:"a.m.", color:"--coral"},
+  {k:"Outras dívidas",            v:12000,  rate:1.2,  unit:"a.m.", color:"--amber"},
+];
+const FLOW = { renda: 18500, despesas: 12900 };
+const SAVINGS_12M = [4100, 3800, 5200, 4600, 2900, 5400, 5900, 4800, 6100, 5300, 5700, 5600];
+
+const MONTHS_PT=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function cvar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function brl(v){ const a=Math.abs(v), s=v<0?"-":""; if(a>=1e6) return s+"R$ "+(a/1e6).toFixed(2).replace(".",",")+"M"; if(a>=1e3) return s+"R$ "+(a/1e3).toFixed(1).replace(".",",")+"k"; return s+"R$ "+a.toFixed(0); }
+function brlFull(v){ return (v<0?"-R$ ":"R$ ")+Math.abs(Math.round(v)).toLocaleString("pt-BR"); }
+function pct(v,d=1){ return v.toFixed(d).replace(".",",")+"%"; }
+function monthLabel(offsetFromNow){ const d=new Date(2026,8,1); d.setMonth(d.getMonth()+offsetFromNow); return MONTHS_PT[d.getMonth()]+"/"+String(d.getFullYear()).slice(2); }
+
+// ===== contagem animada de-para =====
+const lastVals={}, handles={};
+function animNum(el, key, target, fmt, dur=800){
+  if(handles[key]) cancelAnimationFrame(handles[key]);
+  const from = lastVals[key]!==undefined ? lastVals[key] : 0;
+  lastVals[key]=target;
+  if(REDUCE){ el.textContent=fmt(target); return; }
+  const t0=performance.now();
+  (function step(now){ const t=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-t,3);
+    el.textContent=fmt(from+(target-from)*e);
+    if(t<1) handles[key]=requestAnimationFrame(step); else handles[key]=null; })(performance.now());
+}
+
+function totals(){
+  const a=ASSETS.reduce((s,x)=>s+x.v,0), l=LIABS.reduce((s,x)=>s+x.v,0);
+  const save=FLOW.renda-FLOW.despesas;
+  return {a, l, pl:a-l, ratio: a>0? l/a : 0, save, saveRate: FLOW.renda>0? save/FLOW.renda : 0};
+}
+
+// histórico sintético de 24 meses que termina exatamente no valor atual
+function history(){
+  const {a,l}=totals(); const N=24, out=[];
+  for(let i=0;i<N;i++){
+    const f=i/(N-1);
+    const wig = i===N-1 ? 0 : Math.sin(i*1.35)*0.009 + Math.cos(i*0.7)*0.005;
+    const assets = a*(0.855 + 0.145*f + wig);
+    const liabs  = l*(1.16 - 0.16*f);
+    out.push({i, off:i-(N-1), assets, liabs, pl:assets-liabs});
+  }
+  return out;
+}
+
+// ===== HERO + balança =====
+function renderHero(){
+  const t=totals(), h=history();
+  animNum(document.getElementById("pl-big"),"pl",t.pl,brlFull);
+  animNum(document.getElementById("m-assets"),"ma",t.a,brl);
+  animNum(document.getElementById("m-liabs"),"ml",t.l,brl);
+  animNum(document.getElementById("m-save"),"ms",t.save,brl);
+  const y12=h[h.length-13].pl, dy=t.pl-y12, dyp=y12? dy/Math.abs(y12)*100 : 0;
+  const m1=h[h.length-2].pl, dm=t.pl-m1;
+  document.getElementById("pl-chg").innerHTML =
+    `<span class="pill">${dy>=0?"▲":"▼"} ${brl(Math.abs(dy))} em 12 meses (${dy>=0?"+":"-"}${pct(Math.abs(dyp))})</span>
+     <span class="pill">${dm>=0?"▲":"▼"} ${brl(Math.abs(dm))} no mês</span>`;
+
+  const total=t.a||1;
+  const segs=[
+    {label:"Patrimônio líquido", v:Math.max(0,t.pl), color:cvar('--emerald')},
+    {label:"Passivos", v:t.l, color:cvar('--coral')},
+  ];
+  const bar=document.getElementById("scale-bar");
+  bar.innerHTML=segs.map(s=>`<div class="scale-seg" data-w="${(s.v/total*100).toFixed(2)}" style="background:${s.color}" title="${s.label}: ${brlFull(s.v)}"></div>`).join("");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    bar.querySelectorAll(".scale-seg").forEach(el=>el.style.width=el.dataset.w+"%");
+  }));
+  document.getElementById("scale-legend").innerHTML=`
+    <div class="sl"><span class="t"><span class="sw" style="background:var(--navy)"></span>Ativos totais</span><span class="v">${brl(t.a)}</span></div>
+    <div class="sl"><span class="t"><span class="sw" style="background:var(--coral)"></span>Passivos</span><span class="v" style="color:var(--coral)">${brl(t.l)}</span></div>
+    <div class="sl"><span class="t"><span class="sw" style="background:var(--emerald)"></span>Seu (PL)</span><span class="v" style="color:var(--emerald)">${brl(t.pl)}</span></div>`;
+  const r=t.ratio*100;
+  const cls = r<30?"good": r<50?"warn":"bad";
+  const txt = r<30?"endividamento saudável": r<50?"endividamento moderado — acompanhe":"endividamento alto — priorize quitar dívidas";
+  document.getElementById("ratio-row").innerHTML=
+    `<span class="ratio-chip ${cls}">Índice de endividamento ${pct(r)}</span><span class="ratio-note">${txt} · cada R$ 100 em ativos carrega R$ ${r.toFixed(0)} de dívida</span>`;
+}
+
+// ===== KPIs =====
+function renderKPIs(){
+  const t=totals();
+  const box=document.getElementById("kpis");
+  if(!box.dataset.built){
+    box.innerHTML=`
+      <div class="kpi reveal"><div class="kl"><span class="sw" style="background:var(--navy)"></span>Renda mensal</div><div class="kv" id="k-renda">—</div><div class="kn">entradas recorrentes</div></div>
+      <div class="kpi reveal"><div class="kl"><span class="sw" style="background:var(--coral)"></span>Despesas mensais</div><div class="kv" id="k-desp">—</div><div class="kn" id="k-desp-n"></div></div>
+      <div class="kpi reveal"><div class="kl"><span class="sw" style="background:var(--emerald)"></span>Taxa de poupança</div><div class="kv" id="k-rate" style="color:var(--emerald)">—</div><div class="meter"><span id="k-rate-m" style="background:var(--grad-hero)"></span></div></div>
+      <div class="kpi reveal"><div class="kl"><span class="sw" style="background:var(--gold)"></span>Índice de endividamento</div><div class="kv" id="k-ratio">—</div><div class="meter"><span id="k-ratio-m"></span></div></div>`;
+    box.dataset.built="1";
+  }
+  animNum(document.getElementById("k-renda"),"kr",FLOW.renda,brlFull);
+  animNum(document.getElementById("k-desp"),"kd",FLOW.despesas,brlFull);
+  document.getElementById("k-desp-n").textContent = FLOW.renda? `${pct(FLOW.despesas/FLOW.renda*100,0)} da renda` : "";
+  animNum(document.getElementById("k-rate"),"krt",t.saveRate*100,v=>pct(v));
+  animNum(document.getElementById("k-ratio"),"kra",t.ratio*100,v=>pct(v));
+  const rEl=document.getElementById("k-ratio"); const r=t.ratio*100;
+  rEl.style.color = r<30?cvar('--good'): r<50?cvar('--warn'):cvar('--bad');
+  const rm=document.getElementById("k-ratio-m"); rm.style.background = r<30?cvar('--good'): r<50?cvar('--amber'):cvar('--bad');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.getElementById("k-rate-m").style.width=Math.max(0,Math.min(100,t.saveRate*100/0.5))+"%"; // escala: 50% = cheio
+    rm.style.width=Math.min(100,r)+"%";
+  }));
+}
+
+// ===== Donut =====
+let focusIdx=null;
+function renderDonut(){
+  const svg=document.getElementById("donut");
+  const t=totals(); const total=t.a||1;
+  const R=80, C=2*Math.PI*R, gap=3;
+  let acc=0, s=`<circle cx="105" cy="105" r="${R}" fill="none" stroke="var(--hair)" stroke-width="24"/>`;
+  ASSETS.forEach((it,i)=>{
+    const frac=it.v/total, len=Math.max(0,frac*C-gap);
+    s+=`<circle class="donut-seg ${focusIdx!==null&&focusIdx!==i?'dim':''} ${focusIdx===i?'focus':''}" data-i="${i}" cx="105" cy="105" r="${R}" fill="none"
+        stroke="${cvar(it.color)}" stroke-width="24" transform="rotate(-90 105 105)"
+        stroke-dasharray="0 ${C}" data-len="${len.toFixed(2)}" data-c="${C.toFixed(2)}" stroke-dashoffset="${(-acc).toFixed(2)}"><title>${it.k}: ${brlFull(it.v)}</title></circle>`;
+    acc+=frac*C;
+  });
+  svg.innerHTML=s;
+  const segs=[...svg.querySelectorAll(".donut-seg")];
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    segs.forEach((el,i)=>{ const go=()=>el.setAttribute("stroke-dasharray", `${el.dataset.len} ${el.dataset.c}`);
+      if(REDUCE) go(); else setTimeout(go, i*110); });
+  }));
+  segs.forEach(el=>el.addEventListener("click",()=>setFocus(+el.dataset.i)));
+
+  document.getElementById("alloc-list").innerHTML=ASSETS.map((it,i)=>`
+    <button class="alloc-item ${focusIdx===i?'on':''}" data-i="${i}">
+      <span class="sw" style="background:var(${it.color})"></span>
+      <span class="an">${it.k}</span><span class="av">${brl(it.v)}</span><span class="ap">${pct(it.v/total*100,0)}</span>
+    </button>`).join("");
+  document.querySelectorAll(".alloc-item").forEach(b=>b.addEventListener("click",()=>setFocus(+b.dataset.i)));
+  renderDonutCenter();
+}
+function renderDonutCenter(){
+  const t=totals(); const c=document.getElementById("donut-center");
+  if(focusIdx===null){ c.innerHTML=`<div class="dc-l">Ativos totais</div><div class="dc-v">${brl(t.a)}</div><div class="dc-p">${ASSETS.length} classes</div>`; return; }
+  const it=ASSETS[focusIdx];
+  c.innerHTML=`<div class="dc-l">${it.k}</div><div class="dc-v">${brl(it.v)}</div><div class="dc-p" style="color:var(${it.color})">${pct(it.v/(t.a||1)*100)} dos ativos</div>`;
+}
+function setFocus(i){
+  focusIdx = focusIdx===i? null : i;
+  document.querySelectorAll(".donut-seg").forEach(el=>{ const j=+el.dataset.i;
+    el.classList.toggle("dim", focusIdx!==null && focusIdx!==j); el.classList.toggle("focus", focusIdx===j); });
+  document.querySelectorAll(".alloc-item").forEach(b=>b.classList.toggle("on", +b.dataset.i===focusIdx));
+  renderDonutCenter();
+}
+
+// ===== Dívidas =====
+const openDebts=new Set();
+function renderDebts(){
+  const max=Math.max(...LIABS.map(d=>d.v),1);
+  const box=document.getElementById("debts");
+  box.innerHTML=LIABS.map((d,i)=>{
+    const monthlyRate = d.unit==="a.a." ? Math.pow(1+d.rate/100,1/12)-1 : d.rate/100;
+    const interest = d.v*monthlyRate;
+    const share = d.v/(totals().l||1)*100;
+    return `<div class="debt ${openDebts.has(i)?'open':''}" data-i="${i}" role="button" tabindex="0">
+      <div class="dh"><span class="dn"><span class="chev">▶</span><span class="sw" style="background:var(${d.color})"></span>${d.k}</span><span class="dv">${brl(d.v)}</span></div>
+      <div class="track"><div class="fill" data-w="${(d.v/max*100).toFixed(1)}" style="background:var(${d.color})"></div></div>
+      <div class="detail">Juros de <b>${pct(d.rate)} ${d.unit}</b> → custo estimado de <b>${brlFull(interest)}/mês</b> · ${pct(share)} de todas as dívidas${d.unit==="a.m." && d.rate>=5?' · <b style="color:var(--bad)">prioridade de quitação</b>':''}</div>
+    </div>`;
+  }).join("");
+  const fills=[...box.querySelectorAll(".fill")];
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    fills.forEach((f,i)=>{ if(REDUCE) f.style.width=f.dataset.w+"%"; else setTimeout(()=>f.style.width=f.dataset.w+"%", i*100); });
+  }));
+  box.querySelectorAll(".debt").forEach(el=>{
+    const toggle=()=>{ const i=+el.dataset.i; openDebts.has(i)?openDebts.delete(i):openDebts.add(i); el.classList.toggle("open"); };
+    el.addEventListener("click",toggle);
+    el.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } });
+  });
+}
+
+// ===== Tendência + scrubber =====
+let TREND={};
+function renderTrend(animate){
+  const svg=document.getElementById("trend");
+  const h=history();
+  const W=1000,H=280,padL=62,padR=18,padT=16,padB=30, plotW=W-padL-padR, plotH=H-padT-padB;
+  const vals=h.flatMap(p=>[p.assets,p.liabs,p.pl]);
+  const mx=Math.max(...vals)*1.04, mn=0;
+  const x=i=>padL+(i/(h.length-1))*plotW;
+  const y=v=>padT+plotH-((v-mn)/(mx-mn))*plotH;
+  TREND={h,x,y,W,H,padT,plotH};
+  let s="";
+  for(let i=0;i<=4;i++){ const gy=padT+(plotH/4)*i, gv=mx-(mx-mn)*(i/4);
+    s+=`<line class="grid-line" x1="${padL}" x2="${W-padR}" y1="${gy}" y2="${gy}"/><text class="ax" x="${padL-8}" y="${gy+3}" text-anchor="end">${brl(gv)}</text>`; }
+  h.forEach(p=>{ if(p.i%3===0||p.i===h.length-1) s+=`<text class="ax" x="${x(p.i)}" y="${H-8}" text-anchor="middle">${monthLabel(p.off)}</text>`; });
+  const area=`M${x(0)},${y(0)} `+h.map(p=>`L${x(p.i)},${y(p.pl)}`).join(" ")+` L${x(h.length-1)},${y(0)} Z`;
+  s+=`<defs><linearGradient id="plg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${cvar('--emerald')}" stop-opacity="0.28"/><stop offset="100%" stop-color="${cvar('--emerald')}" stop-opacity="0"/></linearGradient></defs>`;
+  s+=`<path d="${area}" fill="url(#plg)"/>`;
+  const line=(key,col,w,id)=>`<polyline class="tl" id="${id}" points="${h.map(p=>`${x(p.i)},${y(p[key])}`).join(" ")}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  s+=line("assets",cvar('--navy'),2,"t-a");
+  s+=line("liabs",cvar('--coral'),2,"t-l");
+  s+=line("pl",cvar('--emerald'),3.2,"t-p");
+  s+=`<line id="scrub-line" x1="0" x2="0" y1="${padT}" y2="${padT+plotH}" stroke="${cvar('--ink-2')}" stroke-width="1" stroke-dasharray="3 3"/>`;
+  s+=`<circle id="scrub-a" r="4.5" fill="${cvar('--navy')}" stroke="#fff" stroke-width="2"/>`;
+  s+=`<circle id="scrub-l" r="4.5" fill="${cvar('--coral')}" stroke="#fff" stroke-width="2"/>`;
+  s+=`<circle id="scrub-p" r="6.5" fill="${cvar('--emerald')}" stroke="#fff" stroke-width="2.5"/>`;
+  h.forEach(p=>{ s+=`<rect class="hit" data-i="${p.i}" x="${x(p.i)-plotW/(h.length-1)/2}" y="${padT}" width="${plotW/(h.length-1)}" height="${plotH}" fill="transparent"/>`; });
+  svg.innerHTML=s;
+  if(animate && !REDUCE){
+    svg.querySelectorAll(".tl").forEach((el,k)=>{ const len=el.getTotalLength();
+      el.style.strokeDasharray=len; el.style.strokeDashoffset=len;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.style.transition=`stroke-dashoffset 1.3s ease ${0.1+k*0.15}s`; el.style.strokeDashoffset="0"; })); });
+  }
+  svg.querySelectorAll(".hit").forEach(r=>{
+    r.addEventListener("mousemove",()=>{ const sc=document.getElementById("scrub"); sc.value=r.dataset.i; updateScrub(); });
+    r.addEventListener("click",()=>{ const sc=document.getElementById("scrub"); sc.value=r.dataset.i; updateScrub(); });
+  });
+  updateScrub();
+}
+function updateScrub(){
+  const {h,x,y}=TREND; const i=+document.getElementById("scrub").value; const p=h[i];
+  const ln=document.getElementById("scrub-line"); ln.setAttribute("x1",x(i)); ln.setAttribute("x2",x(i));
+  [["scrub-a","assets"],["scrub-l","liabs"],["scrub-p","pl"]].forEach(([id,k])=>{ const c=document.getElementById(id); c.setAttribute("cx",x(i)); c.setAttribute("cy",y(p[k])); });
+  const first=h[0].pl, dv=p.pl-first, dvp=first? dv/Math.abs(first)*100:0;
+  document.getElementById("scrub-read").innerHTML=`
+    <div class="sr"><span class="t">Mês</span><span class="v">${monthLabel(p.off)}</span></div>
+    <div class="sr"><span class="t">Patrimônio</span><span class="v" style="color:var(--emerald)">${brl(p.pl)}</span></div>
+    <div class="sr"><span class="t">Ativos</span><span class="v" style="color:var(--navy)">${brl(p.assets)}</span></div>
+    <div class="sr"><span class="t">Passivos</span><span class="v" style="color:var(--coral)">${brl(p.liabs)}</span></div>
+    <div class="sr"><span class="t">Desde ${monthLabel(h[0].off)}</span><span class="v" style="color:${dv>=0?'var(--good)':'var(--bad)'}">${dv>=0?'+':'-'}${brl(Math.abs(dv))} (${dv>=0?'+':'-'}${pct(Math.abs(dvp))})</span></div>`;
+}
+
+// ===== Poupança =====
+function renderSavings(){
+  const reserveGoal = FLOW.despesas*6;
+  const cash = ASSETS.find(a=>a.k==="Dinheiro").v;
+  const prog = reserveGoal? Math.min(1, cash/reserveGoal) : 0;
+  const ring=document.getElementById("save-ring"); const C=2*Math.PI*62;
+  const go=()=>{ ring.style.transition=REDUCE?"none":"stroke-dasharray 1.2s cubic-bezier(.2,.8,.25,1)"; ring.setAttribute("stroke-dasharray", `${(C*prog).toFixed(1)} ${C.toFixed(1)}`); };
+  requestAnimationFrame(()=>requestAnimationFrame(go));
+  animNum(document.getElementById("save-pct"),"sp",prog*100,v=>v.toFixed(0)+"%");
+  document.getElementById("save-lbl").innerHTML = `<b>${brl(cash)}</b> de ${brl(reserveGoal)}`;
+
+  const svg=document.getElementById("save-bars");
+  const vals=[...SAVINGS_12M.slice(0,11), FLOW.renda-FLOW.despesas];
+  const W=1000,H=240,padL=60,padR=12,padT=22,padB=28, plotW=W-padL-padR, plotH=H-padT-padB;
+  const mx=Math.max(...vals.map(v=>Math.abs(v)),1)*1.15;
+  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const bw=plotW/vals.length*0.62;
+  const y=v=>padT+plotH-(Math.max(0,v)/mx)*plotH;
+  let s="";
+  for(let i=0;i<=3;i++){ const gy=padT+(plotH/3)*i, gv=mx*(1-i/3); s+=`<line class="grid-line" x1="${padL}" x2="${W-padR}" y1="${gy}" y2="${gy}"/><text class="ax" x="${padL-6}" y="${gy+3}" text-anchor="end">${brl(gv)}</text>`; }
+  vals.forEach((v,i)=>{
+    const cx=padL+plotW/vals.length*(i+0.5), top=y(v), hgt=padT+plotH-top;
+    const last=i===vals.length-1;
+    s+=`<rect class="sbar" data-i="${i}" data-v="${v}" x="${(cx-bw/2).toFixed(1)}" y="${(padT+plotH).toFixed(1)}" width="${bw.toFixed(1)}" height="0" rx="4"
+        fill="${last?cvar('--gold'):cvar('--emerald')}" opacity="${last?1:0.8}" data-top="${top.toFixed(1)}" data-h="${hgt.toFixed(1)}"/>`;
+    if(i%2===1||last) s+=`<text class="ax" x="${cx}" y="${H-8}" text-anchor="middle">${monthLabel(i-11)}</text>`;
+  });
+  s+=`<line x1="${padL}" x2="${W-padR}" y1="${y(avg)}" y2="${y(avg)}" stroke="${cvar('--navy')}" stroke-width="1.3" stroke-dasharray="5 4"/>`;
+  s+=`<text class="ax" x="${padL+4}" y="${y(avg)-6}" text-anchor="start" fill="${cvar('--navy')}" font-weight="700">média ${brl(avg)}</text>`;
+  svg.innerHTML=s;
+  const bars=[...svg.querySelectorAll(".sbar")];
+  bars.forEach((b,i)=>{
+    const grow=()=>{ b.style.transition=REDUCE?"none":"y .7s cubic-bezier(.2,.8,.25,1), height .7s cubic-bezier(.2,.8,.25,1)"; b.setAttribute("y",b.dataset.top); b.setAttribute("height",b.dataset.h); };
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(REDUCE) grow(); else setTimeout(grow, 200+i*55); }));
+  });
+  const tt=document.getElementById("save-tt");
+  bars.forEach(b=>{
+    b.addEventListener("mouseenter",()=>{
+      const v=+b.dataset.v, i=+b.dataset.i;
+      tt.innerHTML=`<b>${monthLabel(i-11)}</b><br>Poupou ${brlFull(v)}<br><span style="opacity:.8">${v>=avg?'acima':'abaixo'} da média (${v>=avg?'+':'-'}${brl(Math.abs(v-avg))})</span>`;
+      tt.style.opacity=1;
+      const r=svg.getBoundingClientRect(), wr=svg.parentElement.getBoundingClientRect();
+      tt.style.left=(r.left-wr.left+(+b.getAttribute("x"))*(r.width/W))+"px";
+      tt.style.top=(r.top-wr.top+(+b.dataset.top)*(r.height/H)-62)+"px";
+    });
+    b.addEventListener("mouseleave",()=>tt.style.opacity=0);
+  });
+}
+
+// ===== Editor =====
+function buildEditor(){
+  const field=(arr,i,prefix)=>`<div class="ed-field"><label for="${prefix}-${i}"><span class="sw" style="background:var(${arr[i].color})"></span>${arr[i].k}</label>
+    <input id="${prefix}-${i}" type="number" min="0" step="1000" value="${arr[i].v}"></div>`;
+  document.getElementById("ed-assets").innerHTML=ASSETS.map((_,i)=>field(ASSETS,i,"ea")).join("");
+  document.getElementById("ed-liabs").innerHTML=LIABS.map((_,i)=>field(LIABS,i,"el")).join("");
+  document.getElementById("ed-flow").innerHTML=`
+    <div class="ed-field"><label for="ef-renda"><span class="sw" style="background:var(--navy)"></span>Renda mensal</label><input id="ef-renda" type="number" min="0" step="100" value="${FLOW.renda}"></div>
+    <div class="ed-field"><label for="ef-desp"><span class="sw" style="background:var(--coral)"></span>Despesas mensais</label><input id="ef-desp" type="number" min="0" step="100" value="${FLOW.despesas}"></div>`;
+  let timer=null;
+  const onChange=()=>{ clearTimeout(timer); timer=setTimeout(()=>{
+    ASSETS.forEach((a,i)=>a.v=Math.max(0,+document.getElementById("ea-"+i).value||0));
+    LIABS.forEach((l,i)=>l.v=Math.max(0,+document.getElementById("el-"+i).value||0));
+    FLOW.renda=Math.max(0,+document.getElementById("ef-renda").value||0);
+    FLOW.despesas=Math.max(0,+document.getElementById("ef-desp").value||0);
+    renderAll(false);
+  }, 180); };
+  document.querySelectorAll("#editor input").forEach(inp=>inp.addEventListener("input",onChange));
+}
+document.getElementById("edit-btn").addEventListener("click",()=>{
+  const ed=document.getElementById("editor"), b=document.getElementById("edit-btn");
+  const open=!ed.classList.contains("open");
+  ed.classList.toggle("open",open); b.classList.toggle("on",open);
+  b.textContent = open? "✓ Fechar edição" : "✎ Editar valores";
+  if(open){ ed.classList.remove("in"); void ed.offsetWidth; ed.classList.add("in"); ed.scrollIntoView({behavior:"smooth",block:"start"}); }
+});
+document.getElementById("scrub").addEventListener("input",updateScrub);
+
+function renderAll(first){
+  renderHero(); renderKPIs(); renderDonut(); renderDebts(); renderTrend(first); renderSavings();
+}
+buildEditor();
+renderAll(true);
+[...document.querySelectorAll(".reveal")].filter(el=>el.id!=="editor").forEach((el,i)=>{
+  if(!REDUCE) el.style.animationDelay=(i*80)+"ms"; el.classList.add("in");
+});
+</script>

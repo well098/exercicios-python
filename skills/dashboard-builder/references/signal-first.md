@@ -11,9 +11,9 @@ O número vira **evidência**, não manchete.
 
 1. **Saudação e escopo da análise**: "Bom dia, João. O MAE leu 1.284 mensagens, 6 meses de vendas…"
 2. **Cobertura dos dados**: cada fonte com status (tempo real, sincronizado há X, desatualizado, não conectado). Sem isso, "nada a relatar" pode ser falta de dado.
-3. **Sinal principal (herói)**: título do sinal, os porquês com números, impacto estimado (com contagem animada), o que fazer, confiança, botões [Ver X] e [Ver evidências].
-4. **Atenção agora**: fila de sinais ordenada por impacto, com barra de severidade, fontes e confiança. Clique abre as evidências.
-5. **Hoje na empresa**: uma linha por área, resumida pelo que merece olhar ("3 em atenção · 12 ativos"), clicável para a área. Abaixo, um insight de concentração ou mix que um total esconderia.
+3. **Sinal principal (herói)** na ordem *observação → evidência → impacto → próxima ação*: título, frase de risco ("isso pode representar até R$ X/mês em faturamento em risco"), evidências com números e chips do tipo de evidência (histórico, conversas, comparação temporal), impacto com contagem animada, próxima ação, confiança e botões [Ver X] [Ver evidências] [Ver recomendação].
+4. **Atenção agora**: fila de sinais ordenada por impacto. Cada linha responde *o que aconteceu, por quê, quanto está em jogo e o que fazer* (`fazer` no sinal), com fontes e confiança. Clique abre as evidências, que terminam no "o que fazer" e nas recomendações ligadas, aprováveis ali mesmo.
+5. **Hoje na empresa**: uma linha por área, resumida pelo que merece olhar ("3 em atenção · 12 ativos"), com a **fonte** de cada linha, clicável para a área. Abaixo, um insight de concentração ou mix que um total esconderia. Um link "De onde vêm esses dados?" leva a Dados & integrações.
 6. **Aguardando aprovação**: cartões de recomendação com Aprovar e Rejeitar.
 7. **Ciclo recente**: ações e resultados.
 8. **Atalho para perguntas**: sugestões clicáveis.
@@ -36,6 +36,28 @@ Para outro domínio, troque `FSEGS` (segmentos e quais entidades compõem cada u
 ## Temas
 
 O template traz um seletor de tema no menu com 5 opções: **bege** (padrão), branco, preto, azul e vermelho. Cada tema é um bloco `:root[data-theme="…"]` que redefine os tokens, inclusive os gradientes (`--hero`, `--fhero`, `--falt`, `--hero-glow`). A escolha fica salva em `localStorage` (`mae-theme`). Texto sobre fundo colorido continua `#fff`; todo o resto usa tokens, para que nenhum tema quebre o contraste. O preto é opcional: o padrão continua claro.
+
+## Demonstração × dados reais
+
+Os dados de exemplo ficam num objeto `DEMO` isolado. A página lê `window.MAE_DATA` quando o backend injeta os dados do tenant e só cai no `DEMO` sem ele (`IS_DEMO`). Em modo demo, uma faixa em todas as telas e um selo no menu dizem "Demonstração · dados fictícios". Nunca misture as duas origens, nem deixe um número de exemplo aparecer numa conta real.
+
+## Transparência: Dados & integrações
+
+A tela responde "de onde o MAE tirou isso?":
+- **O MAE conhece**: contagem de clientes, fornecedores, produtos, contratos, conversas e registros, com a conta dos registros explicada. "Se não está aqui, o MAE não usa."
+- Abas **Fontes** (status e última sincronização por fonte e por conjunto de dados), **Importações** (arquivo, linhas, rejeições), **Mapeamento** (coluna → entidade, automático/confirmado/revisar) e **Histórico** (eventos de sincronização).
+- Cartão do **modo** (demo × real) e a cadeia do produto: fontes → motor de dados → entidades → memória → padrões → insights → recomendações → você aprova → ação → resultado → aprendizado.
+
+## Company DNA
+
+"O que o MAE aprendeu sobre a minha empresa?", em três grupos: modelo comercial, padrões operacionais e preferências. Regras:
+- Cada traço é **calculado** dos dados e diz a base: "Identificado com base em 72 pedidos". Clique abre as ocorrências.
+- Sem padrão, diga que não há ("Sem sazonalidade confirmada ainda: nenhum mês ficou acima da tendência nos 2 anos"). Com poucas ocorrências, marque "amostra pequena".
+- Inclua o que vem do humano: taxa de sucesso por tipo de ação e o motivo de rejeição mais comum.
+
+## Perfil de entidade ligado ao ciclo
+
+O perfil (cliente, fornecedor, produto) abre com os números do sinal (compras ↓32%, conversas que citaram preço, menções a concorrente, impacto), depois "O que o MAE percebeu" e o bloco **do sinal ao resultado**: etapas Insight → Recomendação → Aprovação → Ação → Resultado marcadas pelo estado, o insight com [Ver evidências] e o cartão da recomendação com Aprovar/Rejeitar/Executar/Resultado. A gaveta se redesenha depois de cada ação (`refreshDrawer`). O Financeiro mostra a mesma ideia como cadeia clicável: faturamento → clientes → conversas → padrão → recomendação → humano → resultado.
 
 ## Regras
 

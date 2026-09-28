@@ -453,13 +453,14 @@ const MONTHS = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov
 const MONTHS_FULL = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
 const CUR = { BRL: "R$ ", USD: "$ ", EUR: "€ " }[CONFIG.currency || "BRL"] || "";
 const M = CONFIG.metrics;
-const LAG = CONFIG.yearLag || 12;
+const LAG = CONFIG.yearLag || (CONFIG.periodType === "month" ? 12 : Infinity);
+const DV = (x, kind, row, member) => CONFIG.derive ? (CONFIG.derive({ ...x }, { kind, row, member }) || x) : { ...x };
 const R = CONFIG.rows.map(r => {
-  const v = CONFIG.derive ? CONFIG.derive({ ...r.v }) : { ...r.v };
-  const b = r.b ? (CONFIG.derive ? CONFIG.derive({ ...r.b }) : { ...r.b }) : {};
+  const v = DV(r.v, "v", r);
+  const b = r.b ? DV(r.b, "b", r) : {};
   const dim = {}, bdim = {};
-  Object.entries(r.dim || {}).forEach(([k, x]) => dim[k] = CONFIG.derive ? CONFIG.derive({ ...x }) : { ...x });
-  Object.entries(r.bdim || {}).forEach(([k, x]) => bdim[k] = CONFIG.derive ? CONFIG.derive({ ...x }) : { ...x });
+  Object.entries(r.dim || {}).forEach(([k, x]) => dim[k] = DV(x, "dim", r, k));
+  Object.entries(r.bdim || {}).forEach(([k, x]) => bdim[k] = DV(x, "bdim", r, k));
   return { p: r.p, v, b, dim, bdim };
 });
 const HAS_BUDGET = R.some(r => Object.keys(r.b).length > 0);
@@ -476,7 +477,8 @@ function fmt(unit, v, full, dec){
     case "percent":  return num(v * 100, dec ?? 1) + "%";
     case "minutes":  return a >= 60 ? s + Math.floor(a / 60) + "h " + String(Math.round(a % 60)).padStart(2, "0") + "m" : s + num(a, a < 10 ? 1 : 0) + " min";
     case "score":    return num(v, dec ?? 1);
-    case "number":   return s + (full ? Math.round(a).toLocaleString("pt-BR") : compact(a));
+    case "days":     return num(v, dec ?? (a < 100 ? 1 : 0)) + (a === 1 ? " dia" : " dias");
+    case "number":   return dec != null && a < 1e4 ? s + num(a, dec) : s + (full ? Math.round(a).toLocaleString("pt-BR") : compact(a));
     default:         return String(v);
   }
 }
@@ -507,9 +509,9 @@ function baseVal(i, key, cmp = state.cmp){
 function delta(key, cur, base){
   if (base == null || !isFinite(base) || cur == null || !isFinite(cur)) return null;
   const m = M[key], diff = cur - base;
-  const fav = diff * m.dir > 0 ? true : diff * m.dir < 0 ? false : null;
+  const fav = !m.dir ? null : diff * m.dir > 0 ? true : diff * m.dir < 0 ? false : null;
   if (m.unit === "percent") return { diff, fav, isPct: true, txt: signed(diff * 100, m.decimals ?? 1) + " p.p." };
-  if (m.unit === "score" || m.absDelta) return { diff, fav, abs: true, txt: signed(diff, m.decimals ?? 1) + (m.unit === "score" ? " pts" : "") };
+  if (m.unit === "score" || m.unit === "days" || m.absDelta) return { diff, fav, abs: true, txt: (diff >= 0 ? "+" : "−") + (m.unit === "score" ? num(Math.abs(diff), m.decimals ?? 1) + " pts" : fmt(m.unit, Math.abs(diff), false, m.decimals)) };
   if (base === 0 || Math.sign(base) !== Math.sign(cur) || Math.abs(base) < Math.abs(cur) * 0.25)
     return { diff, fav, txt: (diff >= 0 ? "+" : "−") + fmt(m.unit, Math.abs(diff)) };
   const p = diff / Math.abs(base);
@@ -645,7 +647,7 @@ function renderBridge(){
   s += `<line x1="${padL}" x2="${W - padR}" y1="${y(0)}" y2="${y(0)}" stroke="${cvar("--hair-2")}" stroke-width="1.4"/>`;
   bars.forEach((bb, k) => {
     const cx = padL + slot * (k + 0.5), top = Math.min(y(bb.y0), y(bb.y1)), hh = Math.max(2, Math.abs(y(bb.y1) - y(bb.y0)));
-    const col = bb.total ? cvar("--accent") : bb.v * M[B.target].dir >= 0 ? cvar("--good") : cvar("--bad");
+    const col = bb.total ? cvar("--accent") : !M[B.target].dir ? cvar("--c2") : bb.v * M[B.target].dir >= 0 ? cvar("--good") : cvar("--bad");
     s += `<rect class="bb" data-k="${k}" x="${(cx - bw / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" rx="4" fill="${col}" style="transform-origin:${cx}px ${y(bb.y0)}px;${REDUCE ? "" : `animation:grow .6s cubic-bezier(.2,.8,.25,1) ${k * 90}ms both`}"/>`;
     s += `<text class="ax" x="${cx}" y="${(top - 6).toFixed(1)}" text-anchor="middle" style="fill:${bb.total ? cvar("--ink") : col};font-weight:700">${bb.total ? fmt(unit, bb.v) : (bb.v >= 0 ? "+" : "−") + fmt(unit, Math.abs(bb.v))}</text>`;
     s += `<text class="ax" x="${cx}" y="${H - 12}" text-anchor="middle">${bb.l}</text>`;
@@ -764,9 +766,10 @@ function renderBreakdown(){
 // -------- insights genéricos + resumo --------
 let INS = [], SUM = null;
 function buildInsights(){
-  const i = state.idx, row = R[i], out = [], hero = CONFIG.trend.series[0], mh = M[hero];
+  const i = state.idx, row = R[i], out = [], hero = CONFIG.insightMetric || CONFIG.trend.series[0], mh = M[hero];
+  const on = r => !(CONFIG.autoInsights && CONFIG.autoInsights[r] === false);
   // 1. ritmo do indicador principal
-  if (i >= 6) {
+  if (on("pace") && i >= 6) {
     const a = R.slice(i - 6, i + 1).map(r => r.v[hero]); const g = a.slice(1).map((v, k) => (v - a[k]) / Math.abs(a[k] || 1));
     const recent = (g[3] + g[4] + g[5]) / 3, prior = (g[0] + g[1] + g[2]) / 3, good = (recent > prior) === (mh.dir > 0);
     out.push({ cls: good ? "good" : "warn", t: `Ritmo de ${mh.label.toLowerCase()}`,
@@ -775,7 +778,7 @@ function buildInsights(){
   }
   // 2. maior desvio contra a base
   const cands = CONFIG.table.map(t => typeof t === "string" ? t : t.key).map(k => { const b = baseVal(i, k), dl = delta(k, row.v[k], b); return dl ? { k, dl, score: dl.pct !== undefined ? Math.abs(dl.pct) : dl.isPct ? Math.abs(dl.diff) * 3 : dl.abs ? Math.abs(dl.diff / (b || 1)) : Math.abs(dl.diff) / Math.abs(row.v[hero] || 1) } : null; }).filter(Boolean).sort((a, b) => b.score - a.score);
-  if (cands.length) { const L = cands[0];
+  if (on("deviation") && cands.length) { const L = cands[0];
     out.push({ cls: L.dl.fav ? "good" : "bad", t: `Maior desvio vs ${CMP_LBL[state.cmp]}`,
       h: `<b>${M[L.k].label}</b> variou <b>${L.dl.txt}</b> (${fm(L.k, baseVal(i, L.k))} → ${fm(L.k, row.v[L.k])}), ${L.dl.fav ? "a favor" : "contra"} o resultado.`,
       p: `${M[L.k].label} variou ${L.dl.txt} (${fm(L.k, baseVal(i, L.k))} -> ${fm(L.k, row.v[L.k])}).` }); }
@@ -784,21 +787,21 @@ function buildInsights(){
   Object.keys(M).forEach(k => { const w = R.slice(Math.max(0, i - 11), i + 1).map(r => r.v[k]).filter(v => v != null && isFinite(v)); if (w.length < 6) return;
     const mean = w.reduce((a, b) => a + b, 0) / w.length, sd = Math.sqrt(w.reduce((a, b) => a + (b - mean) ** 2, 0) / w.length); if (!sd) return;
     const z = (row.v[k] - mean) / sd; if (Math.abs(z) >= 1.8 && (!best || Math.abs(z) > Math.abs(best.z))) best = { k, z, mean }; });
-  if (best) { const fav = (best.z > 0) === (M[best.k].dir > 0);
-    out.push({ cls: fav ? "good" : "bad", t: "Fora do padrão", h: `<b>${M[best.k].label}</b> em ${fm(best.k, row.v[best.k])} contra média de ${fm(best.k, best.mean)} nos últimos 12 períodos (<b>${num(Math.abs(best.z), 1)} desvios-padrão</b> ${best.z > 0 ? "acima" : "abaixo"}).`,
+  if (on("anomaly") && best) { const fav = !M[best.k].dir ? null : (best.z > 0) === (M[best.k].dir > 0);
+    out.push({ cls: fav === null ? "warn" : fav ? "good" : "bad", t: "Fora do padrão", h: `<b>${M[best.k].label}</b> em ${fm(best.k, row.v[best.k])} contra média de ${fm(best.k, best.mean)} nos últimos 12 períodos (<b>${num(Math.abs(best.z), 1)} desvios-padrão</b> ${best.z > 0 ? "acima" : "abaixo"}).`,
       p: `${M[best.k].label} em ${fm(best.k, row.v[best.k])} contra média de ${fm(best.k, best.mean)} (${num(Math.abs(best.z), 1)} desvios-padrão).` }); }
   // 4. quem puxa a variação na dimensão
   const BD = CONFIG.breakdown;
-  if (BD) { const j = state.cmp === "yoy" ? i - LAG : i - 1;
+  if (on("mover") && BD) { const j = state.cmp === "yoy" ? i - LAG : i - 1;
     if (j >= 0) { const tot = row.v[BD.metric] - R[j].v[BD.metric]; const cs = BD.members.map(m => ({ k: m.k, v: (row.dim[m.k] || {})[BD.metric] - ((R[j].dim[m.k] || {})[BD.metric] || 0) })).sort((a, b) => Math.abs(b.v) - Math.abs(a.v)); const top = cs[0];
       if (top && tot) out.push({ cls: (top.v > 0) === (M[BD.metric].dir > 0) ? "good" : "bad", t: "Quem mais moveu o total", h: `<b>${top.k}</b> variou <b>${(top.v >= 0 ? "+" : "−") + fm(BD.metric, Math.abs(top.v))}</b> dos <b>${(tot >= 0 ? "+" : "−") + fm(BD.metric, Math.abs(tot))}</b> de variação total contra ${state.cmp === "yoy" ? "o ano anterior" : "o período anterior"}.`,
         p: `${top.k} variou ${fm(BD.metric, top.v)} de ${fm(BD.metric, tot)} de variação total.` }); } }
   // 5. melhor e pior período do indicador principal (12 períodos)
-  const w12 = R.slice(Math.max(0, i - 11), i + 1); const bestR = w12.reduce((a, r) => r.v[hero] * mh.dir > a.v[hero] * mh.dir ? r : a, w12[0]), worstR = w12.reduce((a, r) => r.v[hero] * mh.dir < a.v[hero] * mh.dir ? r : a, w12[0]);
+  if (on("bestWorst")) { const w12 = R.slice(Math.max(0, i - 11), i + 1); const bestR = w12.reduce((a, r) => r.v[hero] * mh.dir > a.v[hero] * mh.dir ? r : a, w12[0]), worstR = w12.reduce((a, r) => r.v[hero] * mh.dir < a.v[hero] * mh.dir ? r : a, w12[0]);
   out.push({ cls: "good", t: "Melhor e pior período", h: `Melhor: <b>${pLabel(R.indexOf(bestR))}</b> com ${fm(hero, bestR.v[hero])}. Pior: <b>${pLabel(R.indexOf(worstR))}</b> com ${fm(hero, worstR.v[hero])} (últimos 12 períodos).`,
-    p: `Melhor período: ${pLabel(R.indexOf(bestR))} (${fm(hero, bestR.v[hero])}); pior: ${pLabel(R.indexOf(worstR))} (${fm(hero, worstR.v[hero])}).` });
+    p: `Melhor período: ${pLabel(R.indexOf(bestR))} (${fm(hero, bestR.v[hero])}); pior: ${pLabel(R.indexOf(worstR))} (${fm(hero, worstR.v[hero])}).` }); }
   // 6. projeção
-  if (HZ) { const pr = project(hero); if (pr.length) { const last = R[R.length - 1].v[hero], end = pr[pr.length - 1], ch = (end.v - last) / Math.abs(last || 1), good = (ch > 0) === (mh.dir > 0);
+  if (on("projection") && HZ) { const pr = project(hero); if (pr.length) { const last = R[R.length - 1].v[hero], end = pr[pr.length - 1], ch = (end.v - last) / Math.abs(last || 1), good = (ch > 0) === (mh.dir > 0);
     out.push({ cls: good ? "good" : "warn", t: `Projeção em ${HZ} períodos`, h: `${mh.label} tende a <b>${fm(hero, end.v)}</b> em ${pLabel(R.length - 1 + HZ)} (<b>${signed(ch * 100, 1)}%</b>), faixa de ${fm(hero, end.lo)} a ${fm(hero, end.hi)}.`,
       p: `${mh.label} projetado em ${fm(hero, end.v)} (${signed(ch * 100, 1)}%), faixa ${fm(hero, end.lo)} a ${fm(hero, end.hi)}.` }); } }
   if (CONFIG.insights) CONFIG.insights(ctx(i)).forEach(x => out.push({ p: (x.h || "").replace(/<[^>]+>/g, ""), ...x }));
@@ -806,14 +809,16 @@ function buildInsights(){
 }
 function buildSummary(){
   const i = state.idx, row = R[i], keys = CONFIG.summaryKeys || [...T1, ...T2].map(t => t.key);
-  const moves = keys.map(k => { const b = baseVal(i, k), dl = delta(k, row.v[k], b); if (!dl) return null;
+  const moves = keys.filter(k => M[k].dir).map(k => { const b = baseVal(i, k), dl = delta(k, row.v[k], b); if (!dl) return null;
     const rel = dl.isPct ? dl.diff * 10 : dl.pct !== undefined ? dl.pct : dl.abs ? dl.diff / Math.abs(b || 1) : dl.diff / Math.abs(row.v[CONFIG.trend.series[0]] || 1); return { k, dl, score: rel * M[k].dir }; }).filter(Boolean);
   if (!moves.length) return null;
   const best = [...moves].sort((a, b) => b.score - a.score)[0], worst = [...moves].sort((a, b) => a.score - b.score)[0];
   let att = CONFIG.attention ? CONFIG.attention(ctx(i)) : null;
   if (!att) { const anom = INS.find(x => x.t === "Fora do padrão"); att = anom ? { t: "Indicador fora do padrão", b: anom.p } : { t: "Sem alerta crítico", b: "Nenhum indicador fora do padrão ou abaixo da meta neste período." }; }
   return [
-    { cls: "good", h: "▲ O que melhorou", t: `${M[best.k].label} ${best.dl.txt}`, b: `Maior movimento favorável contra ${CMP_LBL[state.cmp]}: ${fm(best.k, baseVal(i, best.k))} → ${fm(best.k, row.v[best.k])}.` },
+    best.score > 0
+      ? { cls: "good", h: "▲ O que melhorou", t: `${M[best.k].label} ${best.dl.txt}`, b: `Maior movimento favorável contra ${CMP_LBL[state.cmp]}: ${fm(best.k, baseVal(i, best.k))} → ${fm(best.k, row.v[best.k])}.` }
+      : { cls: "", h: "▲ O que melhorou", t: "Nenhum indicador melhorou", b: `O movimento menos desfavorável foi ${M[best.k].label} (${best.dl.txt}): ${fm(best.k, baseVal(i, best.k))} → ${fm(best.k, row.v[best.k])}.` },
     { cls: "bad", h: "▼ O que piorou", t: `${M[worst.k].label} ${worst.dl.txt}`, b: worst.score < 0 ? `Maior movimento desfavorável: ${fm(worst.k, baseVal(i, worst.k))} → ${fm(worst.k, row.v[worst.k])}.` : `Nenhum indicador piorou; este foi o avanço mais fraco.` },
     { cls: "warn", h: "● Exige atenção", t: att.t, b: att.b },
   ];

@@ -72,13 +72,18 @@ problems.unshift(...errs); // erros de JS do carregamento e dos cliques
 
 fs.mkdirSync(shotDir, { recursive: true });
 const base = isURL ? "painel" : path.basename(file, ".html");
-await page.screenshot({ path: path.join(shotDir, `${base}-desktop.png`), fullPage: true });
+// print em estado limpo: recarrega (sem gaveta aberta nem filtro trocado) e solta barras fixas
+const shot = await open({ width: 1280, height: 900 });
+await shot.page.addStyleTag({ content: ".filters{position:static!important} #progress{display:none!important}" });
+await shot.page.waitForTimeout(300);
+await shot.page.screenshot({ path: path.join(shotDir, `${base}-desktop.png`), fullPage: true });
 
 const mob = await open({ width: 390, height: 844 });
 const overflow = await mob.page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 if (overflow > 1) problems.push(`rolagem horizontal de ${overflow}px no celular (390px)`);
 if (mob.errs.length) problems.push(...mob.errs.map(e => "celular " + e));
 await mob.page.screenshot({ path: path.join(shotDir, `${base}-mobile.png`), fullPage: false });
+if (shot.errs.length) problems.push(...shot.errs);
 await browser.close();
 
 console.log(`título: ${info.title}`);

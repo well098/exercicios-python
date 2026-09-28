@@ -1,6 +1,7 @@
 ---
 name: dashboard-builder
-description: Constrói dashboards e painéis interativos de nível analista sênior para qualquer domínio (finanças, operações, produto, vendas, marketing, RH, SaaS, projetos como o MAE) como página HTML única e publicável, com KPIs hierarquizados, comparação com período anterior, ano anterior e meta, análise de variação, drill-down, projeção, insights calculados, exportação CSV/PDF e animações. Use esta skill sempre que o usuário pedir um dashboard, painel, cockpit, relatório interativo, visão de KPIs, métricas, indicadores, analytics ou "tela para acompanhar" números, ou quando colar um prompt de dashboard, mesmo que não diga "dashboard" (ex.: "quero ver receita x despesa por mês", "monta uma visão do funil", "acompanhar SLA do suporte"). Também para auditar ou elevar um dashboard existente.
+description: >-
+  Constrói dashboards e painéis interativos de nível analista sênior para qualquer domínio (finanças, operações, produto, vendas, marketing, RH, SaaS, projetos como o MAE) como página HTML única e publicável, com KPIs hierarquizados, comparação com período anterior, ano anterior e meta, análise de variação, drill-down, projeção, insights calculados, exportação CSV/PDF e animações. Use esta skill sempre que o usuário pedir um dashboard, painel, cockpit, relatório interativo, visão de KPIs, métricas, indicadores, analytics ou "tela para acompanhar" números, ou quando colar um prompt de dashboard, mesmo que não diga "dashboard" (ex.: "quero ver receita x despesa por mês", "monta uma visão do funil", "acompanhar SLA do suporte"). Também para auditar ou elevar um dashboard existente.
 ---
 
 # Dashboard Builder
@@ -34,7 +35,7 @@ Pergunte só o que bloqueia de verdade. Placeholders do tipo `[TIPO DE NEGÓCIO]
   ```bash
   python scripts/new_dashboard.py minha.config.js painel.html
   ```
-  O contrato completo está em `references/engine-config.md`. Exemplo financeiro no próprio motor (`assets/engine/dashboard-engine.html`) e exemplo de operações em `assets/examples/ops.config.js`.
+  O contrato completo está em `references/engine-config.md`. Exemplos prontos: finanças no próprio motor (`assets/engine/dashboard-engine.html`), operações e suporte em `assets/examples/ops.config.js` (mensal, metas, minutos, NPS) e projeto por sprint em `assets/examples/project-sprints.config.js` (períodos rotulados, dias, métrica neutra, CPI/EAC).
 - **Caminho B: padrão sob medida.** Quando a visualização central não é uma série temporal: fluxo de dinheiro (Sankey), orçado × realizado por item (bullet), simulador com sliders e cenários, patrimônio editável, varredura de anomalias. Parta do template mais próximo em `assets/templates/` (índice em `references/patterns.md`) e adapte, mantendo as regras desta skill.
 - **Combinação**: gere pelo motor e acrescente uma seção sob medida copiando o padrão do template.
 
@@ -55,9 +56,9 @@ Pergunte só o que bloqueia de verdade. Placeholders do tipo `[TIPO DE NEGÓCIO]
 ### 5. Verificar antes de entregar (sempre)
 
 ```bash
-node scripts/check.mjs painel.html --click "<seletor de um cartão>" --click "<seletor de um filtro>"
+node scripts/check.mjs painel.html --click ".tile[data-metric=receita]" --click ".segrow" --click "#f-cmp button[data-c=bud]"
 ```
-O script checa erros de JS, se o script rodou, fundo claro com host em tema escuro, elementos presos invisíveis, rolagem horizontal a 390px e cliques. Depois **olhe uma vez** os prints gerados (desktop e celular), procurando `NaN`, `—` onde deveria haver número, rótulos sobrepostos, valores com ordem de grandeza errada ("R$ 182M" em vez de "R$ 182k") e barras vazias. Corrija e publique. Cada item do checklist veio de um bug real (`references/pitfalls.md`).
+(Seletores do motor em `references/engine-config.md`; em templates, use os `id`/classes do próprio arquivo.) O script checa erros de JS, se o script rodou, fundo claro com host em tema escuro, elementos presos invisíveis, rolagem horizontal a 390px e cliques. Depois **olhe uma vez** os prints gerados (desktop e celular), procurando `NaN`, `—` onde deveria haver número, rótulos sobrepostos, valores com ordem de grandeza errada ("R$ 182M" em vez de "R$ 182k") e barras vazias. Corrija e publique. Cada item do checklist veio de um bug real (`references/pitfalls.md`).
 
 Em ambientes sem Playwright: `npm i playwright` (ou aponte `PW_CHROMIUM` para um Chromium já instalado).
 

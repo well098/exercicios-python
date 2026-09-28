@@ -27,12 +27,12 @@ Com esse texto, a skill preenche um `CONFIG` diretamente. Se faltar "sobe bom ou
 > Painel da operação da plataforma: usuários ativos, cadastros, tickets, tickets por mil usuários, tempo de resposta (min), SLA, NPS, uptime, custo de infra e de suporte. Metas para SLA, tempo, NPS e uptime. Quebra por canal (chat, e-mail, telefone).
 
 **Vendas / funil**
-> Painel comercial mensal: leads, oportunidades, taxa de conversão (%), ticket médio, receita nova (MRR), ciclo de venda (dias → `number`), churn (%, sobe ruim). Meta por mês. Quebra por vendedor ou canal de aquisição. Ponte do MRR: novo + expansão − churn − contração.
+> Painel comercial mensal: leads, oportunidades, taxa de conversão (%), ticket médio, receita nova (MRR), ciclo de venda (`days`), churn (%, sobe ruim). Meta por mês. Quebra por vendedor ou canal de aquisição. Ponte do MRR: novo + expansão − churn − contração.
 
 **Produto / SaaS**
 > Painel de produto semanal (`periodType: "label"`, `yearLag: 52`): DAU, WAU, retenção D30 (%), ativação (%), tempo até valor (min), erros por mil sessões (sobe ruim). Quebra por plano.
 
-**Projeto / governança (ex.: MAE)**
+**Projeto / governança (ex.: MAE)** (molde pronto em `assets/examples/project-sprints.config.js`, com números inventados)
 > Painel de acompanhamento do **[projeto]**: entregas concluídas × planejadas, % do escopo, lead time (dias), bugs abertos (sobe ruim), custo acumulado × orçado, horas por frente. Quebra por frente/equipe. Metas por sprint (`periodType: "label"`). Resumo executivo com o que avançou, o que atrasou e o risco principal.
 
 Para um painel **dentro** do frontend do projeto (não como Artifact), veja `porting.md`.

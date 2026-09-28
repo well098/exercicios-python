@@ -2,6 +2,8 @@
 
 O motor (`assets/engine/dashboard-engine.html`) lê um único objeto `CONFIG` e monta tudo: 3 níveis de KPIs, índices, tabela de variação com formatação condicional, ponte (waterfall), tendência com projeção e scrubber, quebra por dimensão com drill-down, insights calculados, resumo executivo, auditoria, exportação CSV/PDF e parecer com Claude.
 
+Exemplos completos: `assets/examples/ops.config.js` (mensal com metas) e `assets/examples/project-sprints.config.js` (sprints rotulados, métricas acumuladas, índices de projeto).
+
 Gere um painel novo com `python scripts/new_dashboard.py minha.config.js saida.html`. O arquivo precisa declarar `const CONFIG = ...;`. Um IIFE (`const CONFIG = (() => { ...; return {...}; })();`) é o jeito mais limpo de gerar dados de exemplo ou transformar dados reais antes de devolver o objeto.
 
 ## Campos
@@ -13,10 +15,10 @@ Gere um painel novo com `python scripts/new_dashboard.py minha.config.js saida.h
 | `palette` | não | string ou objeto | `violeta`, `esmeralda`, `creme`, `cimento`, `menta`, `eletrico`, ou um objeto de tokens (ver design-system.md). Padrão: violeta. |
 | `currency` | não | `"BRL"`, `"USD"`, `"EUR"` | Prefixo das métricas `currency`. |
 | `periodType` | não | `"month"` ou `"label"` | `month` espera `p` no formato `AAAA-MM` e mostra "Set/26"; `label` mostra `p` como está (semanas, sprints, trimestres). |
-| `yearLag` | não | número | Períodos por ano para a comparação "ano anterior" (12 meses, 52 semanas, 4 trimestres). O botão some se não houver histórico suficiente. |
+| `yearLag` | não | número | Períodos por ano para a comparação "ano anterior" (12 meses, 52 semanas, 4 trimestres). Padrão: 12 se `periodType` for `month`; **desligado** para `label` (sprints etc.) a menos que você defina. O botão some sem histórico suficiente. |
 | `budgetLabel` | não | string | Como chamar a referência: "Orçado", "Meta", "Plano", "Forecast". O botão some se não houver `b` em nenhuma linha. |
 | `metrics` | sim | objeto | Dicionário de métricas (abaixo). |
-| `derive` | não | função `(x) => x` | Calcula métricas derivadas. Roda em cada `v`, em cada `b` e em cada membro da dimensão. Proteja contra campos ausentes. |
+| `derive` | não | função `(x, ctx) => x` | Calcula métricas derivadas. Roda em cada `v`, em cada `b` e em cada membro da dimensão. `ctx = {kind: "v"\|"b"\|"dim"\|"bdim", row, member}` dá acesso à linha bruta, então dá para calcular realizado ÷ planejado (`row.v.x / row.b.x`). Proteja contra campos ausentes. |
 | `rows` | sim | array | Uma linha por período, em ordem cronológica (abaixo). |
 | `tiers` | sim | objeto | `labels` (3 textos), `t1` (1 a 3 métricas; o 1º vira o herói), `t2` (até 4). Itens podem ser `"chave"` ou `{key, title, style}`, com `style` em `hero`, `alt` (gradiente secundário) ou `plain`. |
 | `tileFoot` | não | `(key, c) => html` | Linha extra dentro de um cartão (ex.: "margem 10% · orçado R$ 69k"). |
@@ -27,7 +29,9 @@ Gere um painel novo com `python scripts/new_dashboard.py minha.config.js saida.h
 | `breakdown` | não | objeto | `{title, dimension, metric, secondary, secondaryLabel, members:[{k, color}]}`. `color` é um token (`--c1` a `--c5`). |
 | `attention` | não | `(c) => {t, b} \| null` | Regra do cartão "Exige atenção" do resumo. Sem ela, o motor usa a maior anomalia. |
 | `insights` | não | `(c) => [{cls, t, h}]` | Insights extras do domínio (`h` aceita `<b>`). Somam-se aos 6 automáticos. |
-| `summaryKeys` | não | array | Métricas avaliadas em "melhorou/piorou". Padrão: níveis 1 e 2. |
+| `summaryKeys` | não | array | Métricas avaliadas em "melhorou/piorou". Padrão: níveis 1 e 2 (métricas neutras ficam de fora). |
+| `insightMetric` | não | chave | Métrica usada nos insights de ritmo, melhor/pior período e projeção. Padrão: `trend.series[0]`. Use uma métrica de fluxo, não um acumulado. |
+| `autoInsights` | não | objeto | Desliga insights automáticos: `{pace, deviation, anomaly, mover, bestWorst, projection}` com `false`. Ex.: `{bestWorst: false}` para métricas acumuladas. |
 | `drillNote` | não | `(key, c) => html` | Texto extra no painel lateral de uma métrica. |
 | `audit` | não | objeto | `{questions, gaps, improvements, changes}` (listas de strings). Mostra a seção "Auditoria". |
 | `aiContext` | não | string | Complemento do prompt do parecer: "…responsável por **{aiContext}**". |
@@ -43,9 +47,9 @@ metrics: {
   caixa:    { label: "Caixa", unit: "currency", dir: 1, noBudget: true },
 }
 ```
-- `unit`: `currency`, `number`, `percent` (fração 0 a 1), `minutes`, `score`.
-- `dir`: `1` se subir é bom, `-1` se subir é ruim. Define cor, "melhorou/piorou" e a ponte.
-- `decimals`: casas para `percent` e `score` (uptime 99,95% pede 2).
+- `unit`: `currency`, `number`, `percent` (fração 0 a 1), `minutes`, `days`, `score`.
+- `dir`: `1` se subir é bom, `-1` se subir é ruim, `0` se é neutro (horas por frente, volume por canal). Define cor, "melhorou/piorou" e a ponte; neutras ficam cinza e fora do resumo.
+- `decimals`: casas para `percent`, `score`, `days` e `number` (uptime 99,95% pede 2; bugs e entregas pedem 0; lead time 12,4 pede 1).
 - `noBudget`: a métrica não tem meta (esconde a comparação com a meta nela).
 - `absDelta`: força a variação em valor absoluto em vez de %. `score` já é absoluto ("+8,0 pts").
 
@@ -63,6 +67,19 @@ Métricas que dependem de períodos anteriores (média móvel, runway, acumulado
 ### Objeto `c` recebido pelas funções
 
 `c.i` (índice), `c.row`, `c.rows`, `c.prevRow`, `c.yoyRow` (ou `null`), `c.base(key)` (valor da base de comparação escolhida), `c.cmp` e `c.cmpLabel`, e os formatadores `c.fmt(unit, v, full, decimals)`, `c.num(v, casas)`, `c.signed(v, casas)` e `c.label(j)`.
+
+## Seletores para `check.mjs --click`
+
+| Elemento | Seletor |
+|---|---|
+| Cartão de uma métrica (nível 1 ou 2) | `.tile[data-metric=CHAVE]` |
+| Linha da tabela de variação | `#var-table tr[data-metric=CHAVE]` |
+| Membro da quebra | `.segrow[data-seg="NOME"]` |
+| Base de comparação | `#f-cmp button[data-c=prev]`, `…[data-c=yoy]`, `…[data-c=bud]` |
+| Série da legenda | `#trend-legend button[data-s=CHAVE]` |
+| Fechar painel lateral | `#dr-close` |
+
+Exemplo: `node scripts/check.mjs painel.html --click ".tile[data-metric=receita]" --click ".segrow" --click "#f-cmp button[data-c=bud]"`. Os prints saem de uma página recarregada, então os cliques não afetam a imagem.
 
 ## Dados reais
 

@@ -4,6 +4,7 @@ Todos os templates em `assets/templates/` são páginas completas, testadas e co
 
 | Template | Visualização central | Use quando | Interações |
 |---|---|---|---|
+| `signal-command-center.html` ★ | Sinal principal + fila "Atenção agora" + recomendações com aprovação | Produto que diz o que olhar agora (MAE, copiloto de operação); várias entidades cruzadas (clientes, fornecedores, produtos, conversas) | Menu com 13 telas, evidências, perfis "O que o MAE percebeu", aprovar/rejeitar/executar/resultado, aprendizado, perguntas com fontes |
 | `cfo-pro-analyst.html` ★ | KPIs em 3 níveis, tabela de variação, ponte, projeção, segmentos | Visão executiva de qualquer operação com histórico e meta (o motor é a versão genérica dele) | Filtro período/base, drill em tudo, scrubber, legenda, CSV/PDF, parecer Claude |
 | `networth-editable.html` ★ | Balança ativos × passivos, donut, scrubber, anel de progresso | Composição de um todo + evolução + meta de progresso (patrimônio, carteira, alocação de verba, estoque) | Editar valores ao vivo, clicar fatia, abrir item (juros), arrastar linha do tempo |
 | `runway-scenarios.html` | Projeção com 3 cenários, sliders de premissas | Simulador "e se": runway, capacidade, metas de venda, precificação | Sliders, cenários clicáveis, legenda focável, restaurar |
@@ -31,6 +32,7 @@ Todos os templates em `assets/templates/` são páginas completas, testadas e co
 
 ## Qual escolher
 
+0. O usuário quer que o sistema aponte o que merece atenção e proponha ações, não que mostre totais? → **signal-command-center** (signal-first.md).
 1. É uma série temporal de métricas com meta? → **motor**.
 2. O usuário quer mexer em premissas e ver o efeito? → **runway-scenarios**.
 3. É composição de um todo que o usuário atualiza à mão? → **networth-editable**.

@@ -1,0 +1,835 @@
+<title>MAE Centro de Comando</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f3f5fa; --surface: #ffffff; --surface-2: #f7f8fc; --surface-3: #eef1f8;
+    --ink: #0f1a33; --ink-2: #56607e; --muted: #98a0b8; --hair: #e7eaf2; --hair-2: #d8ddea;
+    --accent: #3b4dff; --accent-soft: #eceefe; --mae: #0aa896; --mae-soft: #e1f6f3;
+    --crit: #e5484d; --crit-soft: #fdecec; --warn: #d9860a; --warn-soft: #fff3de;
+    --info: #2f7ef7; --info-soft: #e7f0fe; --good: #149b5f; --good-soft: #e3f5ec;
+    --hero: linear-gradient(135deg, #16215a 0%, #2d3fd6 58%, #0aa896 120%);
+    --shadow: 0 1px 3px rgba(15,26,51,.06), 0 12px 32px rgba(15,26,51,.08);
+    --shadow-sm: 0 1px 3px rgba(15,26,51,.07);
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background-color: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; font-variant-numeric: tabular-nums; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .app { display: grid; grid-template-columns: 250px 1fr; min-height: 100%; }
+  @media (max-width: 900px) { .app { grid-template-columns: 1fr; } }
+
+  /* ---------- menu lateral ---------- */
+  .side { background: var(--surface); border-right: 1px solid var(--hair); padding: 20px 14px; position: sticky; top: 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 6px; }
+  .brand .logo { width: 38px; height: 38px; border-radius: 12px; background: var(--hero); color: #fff; font-weight: 900; display: grid; place-items: center; letter-spacing: -.04em; font-size: 15px; flex-shrink: 0; }
+  .brand .nm { font-weight: 800; font-size: 16px; letter-spacing: -.02em; }
+  .brand .tg { font-size: 11px; color: var(--muted); }
+  .nav-group { display: flex; flex-direction: column; gap: 2px; }
+  .nav-group .gl { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 8px 10px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; border: 0; background: transparent; cursor: pointer; text-align: left; color: var(--ink-2); font-weight: 600; font-size: 13.5px; width: 100%; }
+  .nav-item:hover { background: var(--surface-2); color: var(--ink); }
+  .nav-item.on { background: var(--accent-soft); color: var(--accent); }
+  .nav-item .ic { width: 18px; text-align: center; flex-shrink: 0; }
+  .nav-item .badge { margin-left: auto; background: var(--crit); color: #fff; font-size: 10.5px; font-weight: 800; border-radius: 999px; padding: 1px 7px; }
+  .nav-item .badge.soft { background: var(--accent); }
+  .nav-item[disabled] { opacity: .45; cursor: default; }
+  .nav-item[disabled]:hover { background: transparent; color: var(--ink-2); }
+  .nav-item .soon { margin-left: auto; font-size: 10px; font-weight: 700; color: var(--muted); }
+  .nav-item.ask { background: var(--mae-soft); color: var(--mae); margin: 4px 0; }
+  .nav-item.ask.on { background: var(--mae); color: #fff; }
+  .side-foot { margin-top: auto; font-size: 11px; color: var(--muted); padding: 8px 10px; line-height: 1.5; }
+  .side-foot button { border: 0; background: transparent; color: var(--accent); cursor: pointer; padding: 0; font-weight: 700; font-size: 11px; }
+  @media (max-width: 900px) {
+    .side { position: sticky; top: 0; height: auto; flex-direction: row; align-items: center; overflow-x: auto; padding: 10px 12px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); gap: 6px; border-right: 0; border-bottom: 1px solid var(--hair); z-index: 30; }
+    .brand { padding: 0 6px 0 0; } .brand .tg, .brand .nm { display: none; }
+    .nav-group { flex-direction: row; gap: 4px; } .nav-group .gl, .side-foot { display: none; }
+    .nav-item { white-space: nowrap; width: auto; padding: 8px 10px; }
+    .nav-item[disabled] { display: none; }
+  }
+
+  /* ---------- área principal ---------- */
+  .main { padding-inline: 28px; padding-block: 26px 40px; min-width: 0; }
+  @media (max-width: 600px) { .main { padding-inline: 16px; } }
+  .view { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+  .head h1 { font-size: 26px; margin: 0; letter-spacing: -.025em; }
+  .head p { margin: 5px 0 0; color: var(--ink-2); font-size: 14px; max-width: 70ch; }
+  .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--mae); margin-bottom: 6px; }
+
+  .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; min-width: 0; }
+  .card h2 { font-size: 15.5px; margin: 0; letter-spacing: -.01em; }
+  .card .cs { font-size: 12.5px; color: var(--muted); margin: 3px 0 14px; }
+  .row2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; align-items: start; }
+  @media (max-width: 960px) { .row2 { grid-template-columns: 1fr; } }
+
+  .reveal { opacity: 0; transform: translateY(12px); }
+  .reveal.in { animation: pop .5s cubic-bezier(.2,.8,.25,1) forwards; }
+  @keyframes pop { to { opacity: 1; transform: none; } }
+
+  /* cobertura */
+  .coverage { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .src { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; background: var(--surface); border: 1px solid var(--hair); border-radius: 999px; padding: 5px 11px; color: var(--ink-2); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .dot.live { background: var(--good); box-shadow: 0 0 0 0 rgba(20,155,95,.5); animation: live 2s infinite; }
+  @keyframes live { 70% { box-shadow: 0 0 0 7px rgba(20,155,95,0); } 100% { box-shadow: 0 0 0 0 rgba(20,155,95,0); } }
+  .dot.ok { background: var(--good); } .dot.stale { background: var(--warn); } .dot.off { background: var(--hair-2); }
+
+  /* sinal principal */
+  .hero { background: var(--hero); color: #fff; border-radius: 22px; padding: 24px; box-shadow: 0 18px 40px rgba(29,43,140,.28); display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; position: relative; overflow: hidden; }
+  .hero::after { content: ""; position: absolute; right: -80px; top: -80px; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.14), transparent 70%); pointer-events: none; }
+  @media (max-width: 860px) { .hero { grid-template-columns: 1fr; } }
+  .hero .lbl { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; opacity: .8; display: flex; align-items: center; gap: 8px; }
+  .hero .ttl { font-size: 24px; font-weight: 800; letter-spacing: -.02em; margin: 8px 0 12px; line-height: 1.2; text-wrap: balance; }
+  .hero .why { display: flex; flex-direction: column; gap: 7px; font-size: 13.5px; }
+  .hero .why div { display: flex; gap: 9px; align-items: flex-start; opacity: .95; }
+  .hero .why .b { width: 18px; height: 18px; border-radius: 6px; background: rgba(255,255,255,.18); display: grid; place-items: center; font-size: 10px; flex-shrink: 0; margin-top: 1px; }
+  .hero .side-box { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .hero .imp-l { font-size: 11.5px; opacity: .8; }
+  .hero .imp-v { font-size: 30px; font-weight: 800; letter-spacing: -.03em; }
+  .hero .todo { font-size: 13.5px; line-height: 1.45; }
+  .hero .conf { font-size: 11.5px; opacity: .85; }
+  .hero .acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .btn { border: 0; border-radius: 11px; padding: 9px 14px; font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: transform .1s, background .15s, opacity .15s; }
+  .btn:active { transform: scale(.97); }
+  .btn.w { background: #fff; color: var(--ink); } .btn.wg { background: rgba(255,255,255,.14); color: #fff; }
+  .btn.p { background: var(--accent); color: #fff; } .btn.p:hover { background: #2f40e6; }
+  .btn.g { background: var(--good); color: #fff; } .btn.r { background: var(--surface-3); color: var(--ink); }
+  .btn.ghost { background: transparent; color: var(--accent); padding: 6px 8px; }
+  .btn.sm { padding: 7px 11px; font-size: 12.5px; }
+  .btn[disabled] { opacity: .5; cursor: default; }
+
+  /* fila de sinais */
+  .sig { display: grid; grid-template-columns: 4px 1fr auto; gap: 12px; align-items: center; padding: 12px 10px; border-radius: 12px; cursor: pointer; border: 0; background: transparent; width: 100%; text-align: left; }
+  .sig:hover { background: var(--surface-2); }
+  .sig .bar { width: 4px; height: 100%; min-height: 36px; border-radius: 4px; }
+  .sig .st { font-weight: 700; font-size: 13.5px; }
+  .sig .sd { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+  .sig .src-tag { font-size: 10.5px; color: var(--muted); margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .sig .go { font-size: 12px; color: var(--accent); font-weight: 700; white-space: nowrap; }
+  .sev-crit { background: var(--crit); } .sev-warn { background: var(--warn); } .sev-info { background: var(--info); } .sev-good { background: var(--good); }
+  .tag { font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--surface-3); color: var(--ink-2); white-space: nowrap; }
+  .tag.crit { background: var(--crit-soft); color: var(--crit); } .tag.warn { background: var(--warn-soft); color: var(--warn); } .tag.info { background: var(--info-soft); color: var(--info); } .tag.good { background: var(--good-soft); color: var(--good); } .tag.mae { background: var(--mae-soft); color: var(--mae); }
+
+  /* hoje na empresa */
+  table.today { width: 100%; border-collapse: collapse; }
+  table.today td { padding: 11px 8px; border-bottom: 1px solid var(--hair); font-size: 13.5px; }
+  table.today tr { cursor: pointer; } table.today tr:hover td { background: var(--surface-2); }
+  table.today tr:last-child td { border-bottom: 0; }
+  table.today td:first-child { font-weight: 600; white-space: nowrap; } table.today td:last-child { text-align: right; color: var(--accent); font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .up { color: var(--good); font-weight: 800; } .down { color: var(--crit); font-weight: 800; }
+
+  /* recomendações */
+  .recs { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+  @media (max-width: 420px) { .recs { grid-template-columns: 1fr; } }
+  .rec { background: var(--surface); border: 1px solid var(--hair); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; transition: opacity .35s, transform .35s; }
+  .rec.leaving { opacity: 0; transform: translateX(24px) scale(.97); }
+  .rec .rh { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .rec .rt { font-weight: 800; font-size: 14.5px; letter-spacing: -.01em; line-height: 1.3; }
+  .rec ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 12.5px; line-height: 1.6; }
+  .rec .meta { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
+  .rec .meta b { color: var(--ink); }
+  .rec .draft { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; font-size: 12.5px; color: var(--ink-2); line-height: 1.5; border-left: 3px solid var(--mae); }
+  .rec .acts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: auto; }
+  .reject-box { display: flex; flex-direction: column; gap: 8px; background: var(--surface-2); border-radius: 12px; padding: 10px; }
+  .reject-box select { background: var(--surface); border: 1px solid var(--hair-2); border-radius: 9px; padding: 7px 9px; }
+
+  /* ciclo */
+  .cycle { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--ink-2); }
+  .cycle span { padding: 4px 10px; border-radius: 999px; background: var(--surface-3); font-weight: 700; }
+  .cycle span.hl { background: var(--mae-soft); color: var(--mae); }
+  .timeline { display: flex; flex-direction: column; gap: 10px; }
+  .tl { display: grid; grid-template-columns: 26px 1fr; gap: 10px; font-size: 13px; }
+  .tl .ti { width: 26px; height: 26px; border-radius: 9px; display: grid; place-items: center; font-size: 12px; color: #fff; }
+  .tl .tt { font-weight: 700; } .tl .td { color: var(--ink-2); font-size: 12px; margin-top: 2px; }
+
+  /* tabelas de lista */
+  .tbl-wrap { overflow-x: auto; }
+  table.list { width: 100%; border-collapse: collapse; min-width: 640px; }
+  table.list th { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); text-align: left; padding: 8px; border-bottom: 2px solid var(--hair-2); }
+  table.list td { padding: 11px 8px; border-bottom: 1px solid var(--hair); font-size: 13px; vertical-align: middle; }
+  table.list th.n, table.list td.n { text-align: right; }
+  table.list tbody tr { cursor: pointer; } table.list tbody tr:hover td { background: var(--surface-2); }
+  .search { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .search input { flex: 1; min-width: 200px; background: var(--surface); border: 1px solid var(--hair-2); border-radius: 12px; padding: 11px 14px; font-size: 14px; }
+  .chips { display: inline-flex; gap: 4px; background: var(--surface); border-radius: 11px; padding: 3px; box-shadow: var(--shadow-sm); }
+  .chips button { border: 0; background: transparent; padding: 7px 11px; border-radius: 8px; font-weight: 700; font-size: 12.5px; color: var(--ink-2); cursor: pointer; }
+  .chips button.on { background: var(--accent); color: #fff; }
+
+  /* gaveta */
+  .backdrop { position: fixed; inset: 0; background: rgba(15,26,51,.3); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 50; }
+  .backdrop.open { opacity: 1; pointer-events: auto; }
+  .drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(620px, 100%); background: var(--surface); z-index: 51; box-shadow: -20px 0 50px rgba(15,26,51,.18); transform: translateX(104%); transition: transform .3s cubic-bezier(.2,.8,.25,1); display: flex; flex-direction: column; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .drawer.open { transform: none; }
+  .drawer .dh { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; padding: 20px 22px 14px; border-bottom: 1px solid var(--hair); }
+  .drawer .dh h3 { margin: 0; font-size: 19px; letter-spacing: -.02em; } .drawer .dh p { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; }
+  .drawer .x { border: 0; background: var(--surface-3); width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 15px; flex-shrink: 0; }
+  .drawer .db { overflow-y: auto; padding: 18px 22px 30px; display: flex; flex-direction: column; gap: 16px; }
+  .sec-t { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .perceived { background: var(--mae-soft); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 7px; font-size: 13.5px; }
+  .perceived .pt { font-weight: 800; color: var(--mae); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+  .perceived div { display: flex; gap: 8px; } .perceived div::before { content: "•"; color: var(--mae); font-weight: 900; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  @media (max-width: 520px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--surface-2); border-radius: 12px; padding: 11px; } .kpi .kl { font-size: 11px; color: var(--ink-2); } .kpi .kv { font-size: 17px; font-weight: 800; margin-top: 3px; }
+  .conv { border: 1px solid var(--hair); border-radius: 12px; padding: 11px 13px; display: flex; flex-direction: column; gap: 6px; }
+  .conv .ch { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: var(--muted); flex-wrap: wrap; }
+  .conv .cm { font-size: 13.5px; line-height: 1.5; } .conv .ct { display: flex; gap: 5px; flex-wrap: wrap; }
+  .ev { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--hair); }
+  .ev:last-child { border-bottom: 0; }
+  .ev .ei { width: 30px; height: 30px; border-radius: 9px; background: var(--surface-3); display: grid; place-items: center; font-size: 13px; }
+  .ev .et { font-weight: 700; font-size: 13px; } .ev .ed { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; line-height: 1.5; }
+  .note { font-size: 12.5px; color: var(--ink-2); background: var(--surface-2); border-radius: 12px; padding: 11px 13px; line-height: 1.55; }
+  .note b { color: var(--ink); }
+
+  /* pergunte */
+  .ask-box { display: flex; gap: 10px; }
+  .ask-box input { flex: 1; min-width: 0; background: var(--surface); border: 2px solid var(--mae); border-radius: 14px; padding: 13px 16px; font-size: 15px; }
+  .sugs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sug { border: 1px solid var(--hair-2); background: var(--surface); border-radius: 999px; padding: 7px 13px; font-size: 12.5px; cursor: pointer; color: var(--ink-2); text-align: left; }
+  .sug:hover { border-color: var(--mae); color: var(--mae); }
+  .answer { display: flex; flex-direction: column; gap: 12px; }
+  .answer .q { font-weight: 800; font-size: 15px; }
+  .answer .a { font-size: 14px; line-height: 1.6; }
+  .answer .srcs { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--ink-2); }
+
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .ax { fill: var(--muted); font-size: 10.5px; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; transition: all .25s; z-index: 60; box-shadow: var(--shadow); max-width: calc(100% - 32px); }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .empty { color: var(--muted); font-size: 13px; padding: 16px 4px; }
+  .demo-flag { font-size: 11px; color: var(--warn); background: var(--warn-soft); border-radius: 8px; padding: 3px 8px; font-weight: 700; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1 !important; transform: none !important; animation: none !important; } .drawer, .rec, .toast { transition: none; } .dot.live { animation: none; } }
+</style>
+
+<div class="app">
+  <aside class="side" id="side"></aside>
+  <main class="main"><div class="view" id="view"></div></main>
+</div>
+<div class="backdrop" id="backdrop"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-hidden="true" aria-label="Detalhe">
+  <div class="dh"><div><h3 id="dr-t"></h3><p id="dr-s"></p></div><button class="x" id="dr-x" aria-label="Fechar">✕</button></div>
+  <div class="db" id="dr-b"></div>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ================= DADOS DE EXEMPLO (empresa fictícia) ================= */
+const EMPRESA = "Aurora Distribuidora", USUARIO = "João";
+const HOJE = new Date(2026, 8, 28);
+const MESES = ["Abr", "Mai", "Jun", "Jul", "Ago", "Set"];
+const d = (dia, mes = 9) => new Date(2026, mes - 1, dia);
+
+const CLIENTES = [
+  { id: "c1", nome: "Mercado Bom Preço", seg: "Supermercado", fone: "(11) 98812-4410", rec: [58, 61, 60, 63, 44, 38], ult: d(19), prods: ["p1", "p2", "p5", "p6"], contratoAno: 2027,
+    conv: [{ dt: d(12), txt: "O preço do azeite subiu de novo, assim fica difícil repassar.", tags: ["preço"], prod: "p1" },
+           { dt: d(20), txt: "A Distribuidora Norte está fazendo um preço melhor no óleo e no azeite.", tags: ["preço", "concorrente"], prod: "p1" },
+           { dt: d(24), txt: "Vou segurar o pedido desse mês até ver as condições.", tags: ["negociação"] }] },
+  { id: "c2", nome: "Rede Sabor & Cia", seg: "Restaurantes", fone: "(11) 97730-1188", rec: [42, 44, 43, 45, 33, 29], ult: d(16), prods: ["p1", "p3", "p4"], contratoAno: 2027,
+    conv: [{ dt: d(15), txt: "Os preços estão acima do que pagávamos no começo do ano.", tags: ["preço"], prod: "p1" },
+           { dt: d(22), txt: "Recebemos proposta de outro fornecedor para laticínios.", tags: ["concorrente"] }] },
+  { id: "c3", nome: "Restaurante Oliva", seg: "Restaurante", fone: "(11) 96641-0932", rec: [21, 22, 20, 23, 17, 15], ult: d(21), prods: ["p1", "p3", "p6"], contratoAno: 2027,
+    conv: [{ dt: d(18), txt: "Atrasou de novo a entrega de terça.", tags: ["reclamação"], tema: "atraso" },
+           { dt: d(22), txt: "Mais um atraso hoje, precisamos resolver isso.", tags: ["reclamação"], tema: "atraso" },
+           { dt: d(23), txt: "O azeite de vocês está bem mais caro que o do mercado.", tags: ["preço"], prod: "p1" }] },
+  { id: "c4", nome: "Padaria Trigo Nobre", seg: "Padaria", fone: "(11) 95520-7765", rec: [18, 19, 20, 21, 23, 26], ult: d(26), prods: ["p4", "p8"], contratoAno: 2027,
+    conv: [{ dt: d(23), txt: "Vocês trabalham com farinha integral? Queria um orçamento para outubro.", tags: ["oportunidade"], valor: 6000 }] },
+  { id: "c5", nome: "Hotel Vista Mar", seg: "Hotelaria", fone: "(13) 99102-3345", rec: [35, 36, 38, 40, 44, 49], ult: d(25), prods: ["p3", "p5", "p7", "p8"], contrato: d(15, 10),
+    conv: [{ dt: d(10), txt: "Gostamos muito do novo café, a equipe elogiou.", tags: ["elogio"] }] },
+  { id: "c6", nome: "Empório Central", seg: "Empório", fone: "(11) 94418-2201", rec: [26, 25, 27, 26, 28, 31], ult: d(25), prods: ["p1", "p2", "p5"], contratoAno: 2027,
+    conv: [{ dt: d(25), txt: "A entrega chegou com 2 caixas faltando.", tags: ["reclamação"], tema: "falta" }] },
+  { id: "c7", nome: "Cantina Bella", seg: "Restaurante", fone: "(11) 93307-5519", rec: [12, 12, 13, 12, 13, 14], ult: d(22), prods: ["p3", "p4"], contrato: d(8, 10), conv: [] },
+  { id: "c8", nome: "Mercado Família", seg: "Supermercado", fone: "(11) 92215-8804", rec: [30, 31, 33, 34, 38, 43], ult: d(27), prods: ["p2", "p5", "p6", "p8"], contratoAno: 2027,
+    conv: [{ dt: d(17), txt: "Pode aumentar o pedido de leite e arroz, está saindo bem.", tags: ["pedido"] }] },
+  { id: "c9", nome: "Lanchonete Ponto Certo", seg: "Lanchonete", fone: "(11) 91193-6672", rec: [8, 9, 8, 9, 9, 10], ult: d(26), prods: ["p3", "p8"], contratoAno: 2027,
+    conv: [{ dt: d(26), txt: "Pedido atrasou de novo, cliente meu ficou sem pão de queijo.", tags: ["reclamação"], tema: "atraso" }] },
+  { id: "c10", nome: "Buffet Estrela", seg: "Eventos", fone: "(11) 98076-4430", rec: [15, 14, 16, 15, 19, 24], ult: d(24), prods: ["p3", "p8"], contratoAno: 2027,
+    conv: [{ dt: d(21), txt: "Temos 3 eventos grandes em outubro, vocês conseguem um volume maior de laticínios?", tags: ["oportunidade"], valor: 18000 }] },
+  { id: "c11", nome: "Café Aroma", seg: "Cafeteria", fone: "(11) 97654-2238", rec: [9, 10, 9, 10, 10, 10], ult: d(20), prods: ["p7", "p8"], contrato: d(20, 10),
+    conv: [{ dt: d(24), txt: "O leite chegou com atraso pela terceira vez no mês.", tags: ["reclamação"], tema: "atraso" }] },
+  { id: "c12", nome: "Mini Mercado Esquina", seg: "Mercado", fone: "(11) 96543-1120", rec: [6, 6, 7, 6, 6, 6], ult: d(18), prods: ["p2", "p5"], contratoAno: 2027, conv: [] },
+].map(c => ({ ...c, rec: c.rec.map(v => v * 1000) }));
+
+const FORNECEDORES = [
+  { id: "f1", nome: "Laticínios Serra", cat: "Laticínios", preco: [100, 100, 104, 104, 108, 108, 108, 113], part: 0.58, atrasos: 1, compras: 52000 },
+  { id: "f2", nome: "Grãos do Vale", cat: "Grãos", preco: [100, 100, 100, 102, 102, 102, 102, 102], part: 0.47, atrasos: 0, compras: 41000 },
+  { id: "f3", nome: "Azeites Mediterrâneo", cat: "Óleos e azeites", preco: [100, 100, 100, 100, 100, 106, 106, 111], part: 0.71, atrasos: 0, compras: 33000 },
+  { id: "f4", nome: "Transportadora Via Rápida", cat: "Logística", preco: [100, 100, 100, 100, 100, 100, 100, 100], part: 1, atrasos: 6, compras: 14000 },
+  { id: "f5", nome: "Café Serra Azul", cat: "Café", preco: [100, 100, 100, 100, 103, 103, 103, 103], part: 0.64, atrasos: 0, compras: 12000 },
+  { id: "f6", nome: "Embalagens Pack", cat: "Embalagens", preco: [100, 100, 100, 100, 100, 100, 100, 100], part: 0.55, atrasos: 0, compras: 6000 },
+];
+const PRODUTOS = [
+  { id: "p1", nome: "Azeite Premium 500ml", cat: "Óleos e azeites", qtd: [820, 800, 815, 790, 700, 660], forn: "f3" },
+  { id: "p2", nome: "Óleo de Soja 900ml", cat: "Óleos e azeites", qtd: [1500, 1480, 1520, 1490, 1460, 1440], forn: "f3" },
+  { id: "p3", nome: "Queijo Mussarela kg", cat: "Laticínios", qtd: [640, 650, 660, 690, 720, 760], forn: "f1" },
+  { id: "p4", nome: "Farinha de Trigo 5kg", cat: "Grãos", qtd: [410, 420, 430, 440, 460, 490], forn: "f2" },
+  { id: "p5", nome: "Arroz Tipo 1 5kg", cat: "Grãos", qtd: [900, 910, 905, 920, 930, 940], forn: "f2" },
+  { id: "p6", nome: "Feijão Carioca 1kg", cat: "Grãos", qtd: [700, 690, 700, 680, 590, 560], forn: "f2" },
+  { id: "p7", nome: "Café Torrado 500g", cat: "Café", qtd: [380, 390, 385, 400, 405, 410], forn: "f5" },
+  { id: "p8", nome: "Leite UHT 1L", cat: "Laticínios", qtd: [2400, 2450, 2500, 2560, 2650, 2760], forn: "f1" },
+];
+const FONTES = [
+  { nome: "WhatsApp Business", tipo: "Conversas", status: "live", sinc: "tempo real", vol: "1.284 mensagens em 30 dias" },
+  { nome: "Planilha de vendas", tipo: "Excel", status: "ok", sinc: "há 2 horas", vol: "6 meses · 12 clientes · 8 produtos" },
+  { nome: "Cadastro de clientes", tipo: "CSV", status: "ok", sinc: "há 1 dia", vol: "12 clientes · 5 contratos" },
+  { nome: "Compras e fornecedores", tipo: "CSV", status: "stale", sinc: "há 4 dias", vol: "6 fornecedores · 8 meses de preços" },
+  { nome: "ERP", tipo: "Integração", status: "off", sinc: "não conectado", vol: "estoque e notas fiscais ficam fora da análise" },
+];
+// histórico de ciclos anteriores (para o Aprendizado)
+const HIST = [
+  { tipo: "contato", titulo: "Contato com Empório Central (queda de compras)", res: "sucesso", det: "voltou a comprar em 12 dias" },
+  { tipo: "contato", titulo: "Contato com Cantina Bella (queda de compras)", res: "sucesso", det: "pedido retomado com desconto de 3%" },
+  { tipo: "contato", titulo: "Contato com Mini Mercado Esquina", res: "sem resposta", det: "sem retorno em 15 dias" },
+  { tipo: "contato", titulo: "Contato com Café Aroma (preço)", res: "sucesso", det: "manteve volume" },
+  { tipo: "contato", titulo: "Contato com Lanchonete Ponto Certo", res: "recusou", det: "migrou parte das compras" },
+  { tipo: "renovacao", titulo: "Renovação antecipada · Mercado Família", res: "sucesso", det: "renovado por 12 meses" },
+  { tipo: "renovacao", titulo: "Renovação antecipada · Buffet Estrela", res: "sucesso", det: "renovado com volume maior" },
+  { tipo: "renovacao", titulo: "Renovação · Padaria Trigo Nobre", res: "sucesso", det: "renovado" },
+  { tipo: "cotacao", titulo: "Cotação alternativa · embalagens", res: "sucesso", det: "economia de 7%" },
+  { tipo: "cotacao", titulo: "Cotação alternativa · café", res: "recusou", det: "fornecedor atual cobriu a oferta" },
+  { tipo: "proposta", titulo: "Proposta de volume · Hotel Vista Mar", res: "sucesso", det: "+R$ 4 mil/mês" },
+  { tipo: "proposta", titulo: "Proposta de linha nova · Empório Central", res: "sem resposta", det: "sem retorno" },
+  { tipo: "preco", titulo: "Revisão de preço · óleo de soja", res: "sucesso", det: "volume estabilizou" },
+];
+const TIPO_LBL = { contato: "Contato com cliente", renovacao: "Renovação de contrato", cotacao: "Cotação de fornecedor", proposta: "Proposta comercial", preco: "Revisão de preço" };
+
+/* ================= utilidades ================= */
+const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const num = (v, dd = 0) => Number(v).toFixed(dd).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+const brl = v => { const a = Math.abs(v), s = v < 0 ? "−" : ""; if (a >= 1e6) return s + "R$ " + (a / 1e6).toFixed(2).replace(".", ",") + "M"; if (a >= 1e3) return s + "R$ " + (a / 1e3).toFixed(1).replace(".", ",") + " mil"; return s + "R$ " + num(a); };
+const brlFull = v => (v < 0 ? "−R$ " : "R$ ") + num(Math.abs(Math.round(v)));
+const pct = (v, dd = 1) => (v >= 0 ? "+" : "−") + Math.abs(v * 100).toFixed(dd).replace(".", ",") + "%";
+const dia = dt => String(dt.getDate()).padStart(2, "0") + "/" + String(dt.getMonth() + 1).padStart(2, "0");
+const diasAte = dt => Math.round((dt - HOJE) / 864e5);
+const diasDesde = dt => Math.round((HOJE - dt) / 864e5);
+const sum = a => a.reduce((x, y) => x + y, 0);
+const avg = a => sum(a) / a.length;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const byId = (arr, id) => arr.find(x => x.id === id);
+function spark(vals, color, w = 110, h = 30){
+  const mn = Math.min(...vals), mx = Math.max(...vals), r = mx - mn || 1;
+  const x = i => 2 + i / (vals.length - 1) * (w - 4), y = v => h - 3 - (v - mn) / r * (h - 6);
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="display:block"><polyline points="${vals.map((v, i) => x(i).toFixed(1) + "," + y(v).toFixed(1)).join(" ")}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${x(vals.length - 1)}" cy="${y(vals[vals.length - 1])}" r="2.6" fill="${color}"/></svg>`;
+}
+function bars(vals, labels, color, hi){
+  const W = 560, H = 160, pl = 50, pb = 22, pt = 14, pw = W - pl - 8, ph = H - pb - pt, mx = Math.max(...vals) * 1.12 || 1, bw = pw / vals.length * .58;
+  let s = ""; for (let k = 0; k <= 3; k++) { const gv = mx * k / 3, gy = pt + ph - gv / mx * ph; s += `<line x1="${pl}" x2="${W - 8}" y1="${gy}" y2="${gy}" stroke="var(--hair)"/><text class="ax" x="${pl - 6}" y="${gy + 3}" text-anchor="end">${brl(gv).replace("R$ ", "")}</text>`; }
+  vals.forEach((v, i) => { const cx = pl + pw / vals.length * (i + .5), h = v / mx * ph; s += `<rect x="${cx - bw / 2}" y="${pt + ph - h}" width="${bw}" height="${h}" rx="4" fill="${i >= hi ? color : "var(--hair-2)"}"><title>${labels[i]}: ${brlFull(v)}</title></rect><text class="ax" x="${cx}" y="${H - 6}" text-anchor="middle">${labels[i]}</text>`; });
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${s}</svg>`;
+}
+
+/* ================= ANÁLISE (sinais calculados dos dados) ================= */
+const A = (() => {
+  const totMes = MESES.map((_, i) => sum(CLIENTES.map(c => c.rec[i])));
+  const fatAtual = totMes[5], fatAnt = totMes[4], varMes = (fatAtual - fatAnt) / fatAnt;
+  const contrib = CLIENTES.map(c => ({ c, v: c.rec[5] - c.rec[4] })).sort((a, b) => b.v - a.v);
+  const top4 = contrib.slice(0, 4), top4v = sum(top4.map(x => x.v));
+  const ativos = CLIENTES.filter(c => diasDesde(c.ult) <= 30).length;
+  const ticket = fatAtual / CLIENTES.length;
+  const conc = [...CLIENTES].sort((a, b) => b.rec[5] - a.rec[5]).slice(0, 3); const concPct = sum(conc.map(c => c.rec[5])) / fatAtual;
+
+  // clientes importantes reduzindo: média Ago-Set 20% abaixo da média Abr-Jul, entre os de maior receita
+  const reduz = CLIENTES.map(c => { const base = avg(c.rec.slice(0, 4)), rec = avg(c.rec.slice(4)); return { c, base, rec, var: (rec - base) / base, perda: base - rec }; })
+    .filter(x => x.var <= -0.2 && x.base >= 15000).sort((a, b) => b.perda - a.perda);
+  const reduzPerda = sum(reduz.map(x => x.perda));
+  const reduzPreco = reduz.filter(x => x.c.conv.some(m => m.tags.includes("preço")));
+  const reduzConc = reduz.filter(x => x.c.conv.some(m => m.tags.includes("concorrente")));
+
+  const contratos = CLIENTES.filter(c => c.contrato && diasAte(c.contrato) >= 0 && diasAte(c.contrato) <= 30).sort((a, b) => a.contrato - b.contrato);
+  const contratosValor = sum(contratos.map(c => c.rec[5] * 12));
+
+  const convs = CLIENTES.flatMap(c => c.conv.map(m => ({ ...m, c })));
+  const semana = convs.filter(m => diasDesde(m.dt) <= 7);
+  const recl = semana.filter(m => m.tags.includes("reclamação"));
+  const reclAtraso = recl.filter(m => m.tema === "atraso");
+  const reclMes = convs.filter(m => m.tags.includes("reclamação") && diasDesde(m.dt) <= 30).length;
+
+  const reajustes = FORNECEDORES.map(f => { let n = 0; for (let i = 1; i < f.preco.length; i++) if (f.preco[i] > f.preco[i - 1]) n++;
+    const rec60 = f.preco[7] > f.preco[5]; return { f, n, alta: f.preco[7] / f.preco[0] - 1, rec60 }; });
+  const reajRec = reajustes.filter(r => r.rec60);
+  const reajMulti = reajustes.filter(r => r.n >= 3).sort((a, b) => b.n - a.n);
+  const atrasoForn = FORNECEDORES.filter(f => f.atrasos >= 4);
+
+  const prods = PRODUTOS.map(p => { const base = avg(p.qtd.slice(2, 5)), v = (p.qtd[5] - base) / base;
+    const mencPreco = convs.filter(m => m.prod === p.id && m.tags.includes("preço")).length; const mencConc = convs.filter(m => m.prod === p.id && m.tags.includes("concorrente")).length;
+    return { p, v, mencPreco, mencConc }; });
+  // prioriza quedas que têm explicação nas conversas (menções), depois a maior queda
+  const prodQueda = prods.filter(x => x.v <= -0.1).sort((a, b) => (b.mencPreco + b.mencConc) - (a.mencPreco + a.mencConc) || a.v - b.v);
+  const prodAlta = prods.filter(x => x.v >= 0.08).sort((a, b) => b.v - a.v);
+
+  const oport = convs.filter(m => m.tags.includes("oportunidade") && diasDesde(m.dt) <= 14);
+  const oportValor = sum(oport.map(m => m.valor || 0));
+  const precoMenc = convs.filter(m => m.tags.includes("preço") && diasDesde(m.dt) <= 30).length;
+  const precoMencAnt = 3; // mês anterior (histórico agregado)
+  return { totMes, fatAtual, fatAnt, varMes, contrib, top4, top4v, ativos, ticket, conc, concPct, reduz, reduzPerda, reduzPreco, reduzConc, contratos, contratosValor,
+    convs, semana, recl, reclAtraso, reclMes, reajustes, reajRec, reajMulti, atrasoForn, prods, prodQueda, prodAlta, oport, oportValor, precoMenc, precoMencAnt };
+})();
+
+// confiança = fontes independentes que sustentam o sinal
+const conf = n => n >= 3 ? { l: "Alta", c: "good" } : n === 2 ? { l: "Média", c: "warn" } : { l: "Baixa", c: "crit" };
+
+function buildSignals(){
+  const S = [];
+  if (A.reduz.length) S.push({ id: "s-reduz", sev: "crit", area: "clientes", fontes: ["Planilha de vendas", "WhatsApp"],
+    t: `${A.reduz.length} clientes importantes estão reduzindo compras`,
+    d: `Média de ago–set ${pct(avg(A.reduz.map(x => x.var)), 0)} abaixo de abr–jul · ${A.reduzPreco.length} mencionaram preço nas conversas`,
+    imp: A.reduzPerda, n: 3 });
+  if (A.contratos.length) S.push({ id: "s-contr", sev: "warn", area: "contratos", fontes: ["Cadastro de clientes", "Planilha de vendas"],
+    t: `${A.contratos.length} contratos vencem nos próximos 30 dias`, d: `${A.contratos.map(c => c.nome + " (" + dia(c.contrato) + ")").join(", ")} · ${brl(A.contratosValor)}/ano em jogo`, imp: A.contratosValor / 12, n: 2 });
+  if (A.recl.length) S.push({ id: "s-recl", sev: "warn", area: "conversas", fontes: ["WhatsApp"],
+    t: `${A.recl.length} reclamações esta semana, ${A.reclAtraso.length} sobre atraso na entrega`, d: `${A.atrasoForn.map(f => f.nome).join(", ")} registrou ${A.atrasoForn.map(f => f.atrasos).join(", ")} atrasos em 60 dias`, n: 2 });
+  if (A.reajMulti.length) { const r = A.reajMulti[0]; S.push({ id: "s-forn", sev: "warn", area: "fornecedores", fontes: ["Compras e fornecedores"],
+    t: `${r.f.nome} reajustou preços ${r.n} vezes em 8 meses`, d: `Alta acumulada de ${pct(r.alta, 0)} · representa ${pct(r.f.part, 0).replace("+", "")} das compras de ${r.f.cat.toLowerCase()}`, n: 1 }); }
+  if (A.prodQueda.length) { const p = A.prodQueda[0]; S.push({ id: "s-prod", sev: "info", area: "produtos", fontes: ["Planilha de vendas", "WhatsApp"],
+    t: `${p.p.nome} caiu ${pct(-p.v, 0).replace("+", "")} nas vendas`, d: `Clientes citaram preço ${p.mencPreco} vezes e concorrente ${p.mencConc} vez${p.mencConc > 1 ? "es" : ""} ao falar desse produto`, n: 2 }); }
+  if (A.oport.length) S.push({ id: "s-oport", sev: "good", area: "clientes", fontes: ["WhatsApp"],
+    t: `${A.oport.length} oportunidades identificadas nas conversas`, d: `${A.oport.map(m => m.c.nome).join(" e ")} · potencial de ${brl(A.oportValor)}`, imp: A.oportValor, n: 1 });
+  return S;
+}
+const SIGNALS = buildSignals();
+
+function buildRecs(){
+  const R = [];
+  A.reduz.slice(0, 2).forEach(x => R.push({ id: "r-" + x.c.id, tipo: "contato", alvo: x.c.id, sig: "s-reduz",
+    t: `Falar com ${x.c.nome} sobre a redução de compras`, porque: [`compras caíram ${pct(x.var, 0)} (média ago–set vs abr–jul)`, ...x.c.conv.filter(m => m.tags.some(t => ["preço", "concorrente", "negociação"].includes(t))).map(m => `em ${dia(m.dt)}: "${m.txt}"`)],
+    imp: x.perda, n: 3, msg: `Olá! Aqui é da ${EMPRESA}. Notamos que os pedidos diminuíram nos últimos meses e queremos entender como podemos ajudar. Podemos conversar sobre condições para o próximo pedido?` }));
+  const cMaior = A.contratos.slice().sort((a, b) => b.rec[5] - a.rec[5])[0];
+  if (cMaior) R.push({ id: "r-ren-" + cMaior.id, tipo: "renovacao", alvo: cMaior.id, sig: "s-contr", t: `Iniciar a renovação do contrato com ${cMaior.nome}`,
+    porque: [`contrato vence em ${dia(cMaior.contrato)} (${diasAte(cMaior.contrato)} dias)`, `receita crescendo: ${brl(cMaior.rec[0])} → ${brl(cMaior.rec[5])} por mês`, "sem reclamações nos últimos 90 dias"],
+    imp: cMaior.rec[5] * 12, n: 3, msg: `Olá! O nosso contrato vence em ${dia(cMaior.contrato)}. Preparamos uma proposta de renovação com as condições atuais e prioridade de entrega. Podemos enviar?` });
+  const f = A.reajMulti[0];
+  if (f) R.push({ id: "r-cot-" + f.f.id, tipo: "cotacao", alvo: f.f.id, sig: "s-forn", t: `Cotar fornecedor alternativo para ${f.f.cat.toLowerCase()}`,
+    porque: [`${f.f.nome} reajustou ${f.n} vezes em 8 meses (${pct(f.alta, 0)})`, `concentração de ${Math.round(f.f.part * 100)}% das compras da categoria`, `2 clientes citaram concorrente em laticínios/azeite`],
+    imp: f.f.compras * f.alta, n: 2, msg: `Solicitar cotação de ${f.f.cat.toLowerCase()} a 2 fornecedores alternativos com base no volume dos últimos 3 meses.` });
+  const op = A.oport.slice().sort((a, b) => (b.valor || 0) - (a.valor || 0))[0];
+  if (op) R.push({ id: "r-op-" + op.c.id, tipo: "proposta", alvo: op.c.id, sig: "s-oport", t: `Enviar proposta de volume para ${op.c.nome}`,
+    porque: [`em ${dia(op.dt)}: "${op.txt}"`, `cliente cresceu ${pct(op.c.rec[5] / op.c.rec[0] - 1, 0)} em 6 meses`], imp: op.valor, n: 2,
+    msg: `Olá! Conseguimos atender o volume extra de laticínios para os eventos de outubro. Segue proposta com preço por volume e entregas programadas.` });
+  const p = A.prodQueda[0];
+  if (p) R.push({ id: "r-pr-" + p.p.id, tipo: "preco", alvo: p.p.id, sig: "s-prod", t: `Revisar preço e margem do ${p.p.nome}`,
+    porque: [`vendas ${pct(p.v, 0)} no último mês vs média de jun–ago`, `${p.mencPreco} menções a preço e ${p.mencConc} a concorrente`, `fornecedor reajustou 2 vezes em 3 meses`], imp: (avg(p.p.qtd.slice(2, 5)) - p.p.qtd[5]) * 38, n: 3,
+    msg: `Simular redução de 4% no preço do ${p.p.nome} com a margem atual e comparar com o preço citado pelos clientes.` });
+  return R;
+}
+
+/* ================= ESTADO (demonstração) ================= */
+const KEY = "mae-demo-v1";
+function freshState(){ return { recs: buildRecs().map(r => ({ ...r, status: "pendente" })), results: [] }; }
+let ST = freshState();
+try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && s.recs) ST = s; } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(ST)); } catch (e) {} };
+const recsBy = st => ST.recs.filter(r => r.status === st);
+
+function toast(msg){ const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 2400); }
+
+/* ================= NAVEGAÇÃO ================= */
+const NAV = [
+  { g: "", items: [{ id: "visao", ic: "◉", l: "Visão geral" }] },
+  { g: "Operação", items: [{ id: "clientes", ic: "👥", l: "Clientes" }, { id: "fornecedores", ic: "🤝", l: "Fornecedores" }, { id: "produtos", ic: "📦", l: "Produtos" }, { id: "contratos", ic: "📄", l: "Contratos" }, { id: "conversas", ic: "💬", l: "Conversas" }] },
+  { g: "Inteligência", items: [{ id: "insights", ic: "✦", l: "Insights" }, { id: "recomendacoes", ic: "🎯", l: "Recomendações" }, { id: "acoes", ic: "⚙", l: "Ações" }, { id: "resultados", ic: "📊", l: "Resultados" }, { id: "aprendizado", ic: "📈", l: "Aprendizado" }, { id: "dna", ic: "🧬", l: "Company DNA", soon: true }] },
+  { g: "", items: [{ id: "pergunte", ic: "🧠", l: "Pergunte à empresa", ask: true }] },
+  { g: "Dados", items: [{ id: "dados", ic: "📥", l: "Dados & integrações" }, { id: "config", ic: "⚙", l: "Configurações", soon: true }] },
+];
+let ROUTE = (location.hash || "").replace("#", "") || "visao";
+function renderNav(){
+  const badge = { visao: SIGNALS.filter(s => s.sev === "crit").length, recomendacoes: recsBy("pendente").length, acoes: recsBy("aprovada").length + recsBy("executada").length };
+  document.getElementById("side").innerHTML = `
+    <div class="brand"><div class="logo">MAE</div><div><div class="nm">MAE</div><div class="tg">Motor de Adaptação Empresarial</div></div></div>
+    ${NAV.map(g => `<div class="nav-group">${g.g ? `<div class="gl">${g.g}</div>` : ""}${g.items.map(it => `
+      <button class="nav-item ${it.ask ? "ask" : ""} ${ROUTE === it.id ? "on" : ""}" data-r="${it.id}" ${it.soon ? "disabled" : ""}>
+        <span class="ic">${it.ic}</span>${it.l}${it.soon ? '<span class="soon">em breve</span>' : badge[it.id] ? `<span class="badge ${it.id === "visao" ? "" : "soft"}">${badge[it.id]}</span>` : ""}</button>`).join("")}</div>`).join("")}
+    <div class="side-foot">${EMPRESA} · dados de exemplo<br><button id="reset">Reiniciar demonstração</button></div>`;
+  document.querySelectorAll(".nav-item[data-r]").forEach(b => b.addEventListener("click", () => { if (!b.disabled) go(b.dataset.r); }));
+  document.getElementById("reset").addEventListener("click", () => { ST = freshState(); save(); render(); toast("Demonstração reiniciada."); });
+}
+function go(r){ ROUTE = r; try { history.replaceState(null, "", "#" + r); } catch (e) {} closeDrawer(); render(); document.querySelector(".main").scrollTo?.(0, 0); window.scrollTo(0, 0); }
+
+/* ================= GAVETA ================= */
+function openDrawer(t, s, html){
+  document.getElementById("dr-t").textContent = t; document.getElementById("dr-s").textContent = s;
+  document.getElementById("dr-b").innerHTML = html; document.getElementById("dr-b").scrollTop = 0;
+  document.getElementById("drawer").classList.add("open"); document.getElementById("drawer").setAttribute("aria-hidden", "false");
+  document.getElementById("backdrop").classList.add("open"); document.getElementById("dr-x").focus();
+  wire(document.getElementById("dr-b"));
+}
+function closeDrawer(){ document.getElementById("drawer").classList.remove("open"); document.getElementById("drawer").setAttribute("aria-hidden", "true"); document.getElementById("backdrop").classList.remove("open"); }
+document.getElementById("dr-x").addEventListener("click", closeDrawer);
+document.getElementById("backdrop").addEventListener("click", closeDrawer);
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeDrawer(); });
+
+// ações declarativas: data-act="cliente:c1", "evid:s-reduz", "go:clientes", "approve:id", "reject:id", ...
+function wire(root){
+  root.querySelectorAll("[data-act]").forEach(el => el.addEventListener("click", ev => {
+    ev.stopPropagation(); const [a, arg] = el.dataset.act.split(":");
+    if (a === "go") go(arg);
+    else if (a === "cliente") openCliente(arg);
+    else if (a === "forn") openFornecedor(arg);
+    else if (a === "prod") openProduto(arg);
+    else if (a === "evid") openEvidencias(arg);
+    else if (a === "rec") openRec(arg);
+    else if (a === "approve") approve(arg, el);
+    else if (a === "reject") showReject(arg, el);
+    else if (a === "execute") execute(arg);
+    else if (a === "result") recordResult(arg, el.dataset.res);
+    else if (a === "ask") ask(decodeURIComponent(arg));
+  }));
+}
+
+/* ================= DETALHES ================= */
+function convHTML(m, showCliente){
+  return `<div class="conv"><div class="ch"><span>${showCliente ? `<b style="color:var(--ink)">${esc(m.c.nome)}</b> · ` : ""}WhatsApp · ${dia(m.dt)}</span><span>${m.c ? "cliente identificado" : ""}</span></div>
+    <div class="cm">"${esc(m.txt)}"</div><div class="ct">${m.tags.map(t => `<span class="tag ${t === "reclamação" ? "crit" : t === "preço" || t === "concorrente" ? "warn" : t === "oportunidade" || t === "elogio" ? "good" : ""}">${t}</span>`).join("")}</div></div>`;
+}
+function perceivedCliente(c){
+  const out = []; const base = avg(c.rec.slice(0, 4)), rec = avg(c.rec.slice(4)), v = (rec - base) / base;
+  if (v <= -0.15) out.push(`Reduziu compras: média de ago–set ${pct(v, 0)} em relação a abr–jul (${brl(base - rec)}/mês a menos).`);
+  if (v >= 0.15) out.push(`Está crescendo: média de ago–set ${pct(v, 0)} em relação a abr–jul.`);
+  const pr = c.conv.filter(m => m.tags.includes("preço")).length; if (pr) out.push(`Mencionou preço em ${pr} conversa${pr > 1 ? "s" : ""} recente${pr > 1 ? "s" : ""}.`);
+  const co = c.conv.filter(m => m.tags.includes("concorrente")).length; if (co) out.push(`Citou concorrente ${co} vez${co > 1 ? "es" : ""}.`);
+  const rc = c.conv.filter(m => m.tags.includes("reclamação")); if (rc.length) out.push(`${rc.length} ${rc.length > 1 ? "reclamações recentes" : "reclamação recente"}${rc.some(m => m.tema === "atraso") ? ", sobre atraso na entrega" : ""}.`);
+  const op = c.conv.filter(m => m.tags.includes("oportunidade")); if (op.length) out.push(`Pediu orçamento: potencial de ${brl(sum(op.map(m => m.valor || 0)))}.`);
+  if (c.contrato && diasAte(c.contrato) <= 30 && diasAte(c.contrato) >= 0) out.push(`Contrato vence em ${diasAte(c.contrato)} dias (${dia(c.contrato)}).`);
+  if (diasDesde(c.ult) > 7 && v < 0) out.push(`Último pedido há ${diasDesde(c.ult)} dias.`);
+  return out.length ? out : ["Relacionamento estável: sem variação relevante de compras nem alertas nas conversas."];
+}
+function openCliente(id){
+  const c = byId(CLIENTES, id), tot6 = sum(c.rec), share = c.rec[5] / A.fatAtual;
+  const rec = ST.recs.find(r => r.alvo === id && r.status === "pendente");
+  openDrawer(c.nome, `${c.seg} · ${c.fone} · cliente desde 2024`, `
+    <div class="perceived"><div class="pt" style="display:block">✦ O que o MAE percebeu</div>${perceivedCliente(c).map(t => `<div>${esc(t)}</div>`).join("")}</div>
+    <div class="kpis">
+      <div class="kpi"><div class="kl">Faturamento 6 meses</div><div class="kv">${brl(tot6)}</div></div>
+      <div class="kpi"><div class="kl">Mês atual</div><div class="kv">${brl(c.rec[5])}</div></div>
+      <div class="kpi"><div class="kl">Última compra</div><div class="kv">${dia(c.ult)}</div></div>
+      <div class="kpi"><div class="kl">Da receita</div><div class="kv">${(share * 100).toFixed(1).replace(".", ",")}%</div></div>
+    </div>
+    <div><div class="sec-t">Compras por mês</div>${bars(c.rec, MESES, "var(--accent)", 4)}</div>
+    ${rec ? `<div class="note">O MAE tem uma recomendação aguardando aprovação para este cliente: <b>${esc(rec.t)}</b>. <button class="btn ghost sm" data-act="rec:${rec.id}">Ver recomendação ›</button></div>` : ""}
+    <div><div class="sec-t">Conversas (${c.conv.length})</div><div style="display:flex;flex-direction:column;gap:8px">${c.conv.length ? c.conv.map(m => convHTML({ ...m, c })).join("") : '<div class="empty">Nenhuma conversa nos últimos 30 dias.</div>'}</div></div>
+    <div><div class="sec-t">Produtos que compra</div><div style="display:flex;gap:6px;flex-wrap:wrap">${c.prods.map(p => `<button class="tag" style="border:0;cursor:pointer" data-act="prod:${p}">${esc(byId(PRODUTOS, p).nome)}</button>`).join("")}</div></div>
+    <div class="note">Contrato: ${c.contrato ? `<b>vence em ${dia(c.contrato)}</b> (${diasAte(c.contrato)} dias)` : "vigente até 2027"}.</div>`);
+}
+function openFornecedor(id){
+  const f = byId(FORNECEDORES, id), r = A.reajustes.find(x => x.f.id === id);
+  const labels = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set"];
+  const perc = []; if (r.n) perc.push(`Reajustou preços ${r.n} vez${r.n > 1 ? "es" : ""} em 8 meses (${pct(r.alta, 0)} acumulado).`);
+  if (f.part >= 0.45 && f.part < 1) perc.push(`Representa ${Math.round(f.part * 100)}% das compras de ${f.cat.toLowerCase()}: dependência alta.`);
+  if (f.atrasos >= 4) perc.push(`${f.atrasos} atrasos nos últimos 60 dias, ligados a ${A.reclAtraso.length} reclamações de clientes esta semana.`);
+  if (!perc.length) perc.push("Preços estáveis e entregas no prazo.");
+  openDrawer(f.nome, `${f.cat} · compras de ${brl(f.compras)}/mês`, `
+    <div class="perceived"><div class="pt" style="display:block">✦ O que o MAE percebeu</div>${perc.map(t => `<div>${esc(t)}</div>`).join("")}</div>
+    <div><div class="sec-t">Índice de preço (fev = 100)</div>${bars(f.preco, labels, "var(--warn)", 0).replace(/R\$ /g, "")}</div>
+    <div class="note">Fonte: planilha de compras e fornecedores, sincronizada <b>há 4 dias</b>. Reajustes posteriores podem não aparecer.</div>`);
+}
+function openProduto(id){
+  const x = A.prods.find(p => p.p.id === id), p = x.p, f = byId(FORNECEDORES, p.forn);
+  const menc = A.convs.filter(m => m.prod === id);
+  const compradores = CLIENTES.filter(c => c.prods.includes(id));
+  openDrawer(p.nome, `${p.cat} · fornecedor ${f.nome}`, `
+    <div class="perceived"><div class="pt" style="display:block">✦ O que o MAE percebeu</div>
+      <div>Vendas de ${num(p.qtd[5])} unidades em setembro, ${pct(x.v, 0)} em relação à média de jun–ago.</div>
+      ${x.mencPreco ? `<div>Clientes citaram preço ${x.mencPreco} vezes${x.mencConc ? ` e concorrente ${x.mencConc} vez${x.mencConc > 1 ? "es" : ""}` : ""} ao falar deste produto.</div>` : ""}
+      ${A.reajustes.find(r => r.f.id === f.id).n >= 2 ? `<div>O fornecedor ${esc(f.nome)} reajustou o preço ${A.reajustes.find(r => r.f.id === f.id).n} vezes em 8 meses.</div>` : ""}
+    </div>
+    <div><div class="sec-t">Unidades vendidas por mês</div>${bars(p.qtd, MESES, x.v < 0 ? "var(--crit)" : "var(--good)", 5).replace(/R\$ /g, "").replace(/ mil/g, "k")}</div>
+    <div><div class="sec-t">Quem compra (${compradores.length})</div><div style="display:flex;gap:6px;flex-wrap:wrap">${compradores.map(c => `<button class="tag" style="border:0;cursor:pointer" data-act="cliente:${c.id}">${esc(c.nome)}</button>`).join("")}</div></div>
+    ${menc.length ? `<div><div class="sec-t">Conversas sobre o produto</div><div style="display:flex;flex-direction:column;gap:8px">${menc.map(m => convHTML(m, true)).join("")}</div></div>` : ""}`);
+}
+function evidenceList(sigId){
+  const ev = [];
+  if (sigId === "s-reduz") {
+    A.reduz.forEach(x => ev.push({ i: "📉", t: `${x.c.nome}: ${pct(x.var, 0)}`, d: `média abr–jul ${brl(x.base)} → ago–set ${brl(x.rec)} (${brl(x.perda)}/mês a menos) · planilha de vendas` }));
+    A.reduz.flatMap(x => x.c.conv.filter(m => m.tags.some(t => ["preço", "concorrente"].includes(t))).map(m => ({ ...m, c: x.c }))).forEach(m => ev.push({ i: "💬", t: `${m.c.nome} · ${dia(m.dt)}`, d: `"${m.txt}" · WhatsApp` }));
+    ev.push({ i: "🧮", t: "Como o impacto foi calculado", d: `Soma, para os ${A.reduz.length} clientes, da diferença entre a média mensal de abr–jul e a de ago–set = ${brl(A.reduzPerda)}/mês. Não inclui margem nem sazonalidade.` });
+  } else if (sigId === "s-contr") {
+    A.contratos.forEach(c => ev.push({ i: "📄", t: `${c.nome}: vence em ${dia(c.contrato)}`, d: `${diasAte(c.contrato)} dias · compra ${brl(c.rec[5])}/mês · cadastro de clientes` }));
+    ev.push({ i: "🧮", t: "Valor em jogo", d: `Receita do mês atual × 12 para os contratos listados = ${brl(A.contratosValor)}/ano.` });
+  } else if (sigId === "s-recl") {
+    A.recl.forEach(m => ev.push({ i: "💬", t: `${m.c.nome} · ${dia(m.dt)}`, d: `"${m.txt}"` }));
+    A.atrasoForn.forEach(f => ev.push({ i: "🚚", t: `${f.nome}: ${f.atrasos} atrasos em 60 dias`, d: "planilha de compras e fornecedores" }));
+  } else if (sigId === "s-forn") {
+    const r = A.reajMulti[0]; const lb = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set"];
+    for (let i = 1; i < 8; i++) if (r.f.preco[i] > r.f.preco[i - 1]) ev.push({ i: "🏷", t: `Reajuste em ${lb[i]}`, d: `índice ${r.f.preco[i - 1]} → ${r.f.preco[i]} (${pct(r.f.preco[i] / r.f.preco[i - 1] - 1, 1)})` });
+    ev.push({ i: "📊", t: "Concentração", d: `${Math.round(r.f.part * 100)}% das compras de ${r.f.cat.toLowerCase()}` });
+  } else if (sigId === "s-prod") {
+    const x = A.prodQueda[0]; ev.push({ i: "📉", t: `${x.p.nome}: ${pct(x.v, 0)}`, d: `setembro ${num(x.p.qtd[5])} un. vs média jun–ago ${num(avg(x.p.qtd.slice(2, 5)))} un.` });
+    A.convs.filter(m => m.prod === x.p.id).forEach(m => ev.push({ i: "💬", t: `${m.c.nome} · ${dia(m.dt)}`, d: `"${m.txt}"` }));
+  } else if (sigId === "s-oport") {
+    A.oport.forEach(m => ev.push({ i: "💬", t: `${m.c.nome} · ${dia(m.dt)}`, d: `"${m.txt}" · potencial estimado de ${brl(m.valor || 0)}` }));
+  }
+  return ev;
+}
+function openEvidencias(sigId){
+  const s = SIGNALS.find(x => x.id === sigId), c = conf(s.n);
+  openDrawer("Evidências", s.t, `
+    <div class="note">Confiança <span class="tag ${c.c}">${c.l}</span> · sustentado por <b>${s.n} tipo${s.n > 1 ? "s" : ""} de evidência</b> vindos de: ${s.fontes.join(", ")}.</div>
+    <div>${evidenceList(sigId).map(e => `<div class="ev"><div class="ei">${e.i}</div><div><div class="et">${esc(e.t)}</div><div class="ed">${esc(e.d)}</div></div></div>`).join("")}</div>
+    ${sigId === "s-reduz" ? `<div style="display:flex;gap:8px;flex-wrap:wrap">${A.reduz.map(x => `<button class="btn r sm" data-act="cliente:${x.c.id}">Abrir ${esc(x.c.nome)}</button>`).join("")}</div>` : ""}`);
+}
+function openRec(id){
+  const r = ST.recs.find(x => x.id === id), s = SIGNALS.find(x => x.id === r.sig);
+  openDrawer("Recomendação", r.t, `
+    <div class="cycle"><span>Insight</span>→<span class="hl">Recomendação</span>→<span>Aprovação</span>→<span>Ação</span>→<span>Resultado</span></div>
+    <div><div class="sec-t">Por que o MAE recomenda</div><ul style="margin:0;padding-left:18px;line-height:1.7;color:var(--ink-2)">${r.porque.map(p => `<li>${esc(p)}</li>`).join("")}</ul></div>
+    <div class="note">Impacto estimado <b>${brl(r.imp)}${r.tipo === "renovacao" ? "/ano" : r.tipo === "proposta" ? "" : "/mês"}</b> · confiança <span class="tag ${conf(r.n).c}">${conf(r.n).l}</span> · histórico: ações de "${TIPO_LBL[r.tipo].toLowerCase()}" deram certo em <b>${Math.round(rate(r.tipo) * 100)}%</b> das vezes.</div>
+    <div><div class="sec-t">Ação proposta</div><div class="draft" style="background:var(--surface-2);border-radius:12px;padding:12px;border-left:3px solid var(--mae);font-size:13px;line-height:1.55">${esc(r.msg)}</div></div>
+    ${s ? `<button class="btn r sm" data-act="evid:${s.id}">Ver evidências do sinal</button>` : ""}`);
+}
+
+/* ================= CICLO: aprovar → executar → resultado ================= */
+function rate(tipo){
+  const all = [...HIST, ...ST.results.map(x => ({ tipo: x.tipo, res: x.res }))].filter(h => h.tipo === tipo);
+  return all.length ? all.filter(h => h.res === "sucesso").length / all.length : 0;
+}
+function approve(id, el){
+  const r = ST.recs.find(x => x.id === id); const card = el.closest(".rec");
+  const done = () => { r.status = "aprovada"; r.aprovadaEm = Date.now(); save(); render(); toast("Aprovada. A ação ficou pronta em Ações, aguardando execução."); };
+  if (card && !REDUCE) { card.classList.add("leaving"); setTimeout(done, 320); } else done();
+}
+function showReject(id, el){
+  const box = el.closest(".rec").querySelector(".acts");
+  box.innerHTML = `<div class="reject-box" style="width:100%"><label style="font-size:12px;font-weight:700" for="rj-${id}">Por que rejeitar? O MAE usa isso para aprender.</label>
+    <select id="rj-${id}"><option>Já tratado por outro canal</option><option>Não faz sentido para este cliente</option><option>Momento errado</option><option>Evidência insuficiente</option><option>Outro motivo</option></select>
+    <div style="display:flex;gap:8px"><button class="btn r sm" id="rjc-${id}">Cancelar</button><button class="btn p sm" id="rjo-${id}">Confirmar rejeição</button></div></div>`;
+  document.getElementById("rjc-" + id).addEventListener("click", () => render());
+  document.getElementById("rjo-" + id).addEventListener("click", () => {
+    const r = ST.recs.find(x => x.id === id); r.status = "rejeitada"; r.motivo = document.getElementById("rj-" + id).value; save(); render(); toast("Rejeitada. Motivo registrado para o aprendizado.");
+  });
+}
+function execute(id){ const r = ST.recs.find(x => x.id === id); r.status = "executada"; save(); render(); toast("Ação registrada como executada (simulado no protótipo)."); }
+function recordResult(id, res){
+  const r = ST.recs.find(x => x.id === id); r.status = "concluida"; r.res = res;
+  ST.results.push({ id, tipo: r.tipo, t: r.t, res }); save(); render();
+  toast(res === "sucesso" ? "Resultado registrado: deu certo. O Aprendizado foi atualizado." : "Resultado registrado. O Aprendizado foi atualizado.");
+}
+
+/* ================= COMPONENTES ================= */
+function recCard(r, mode){
+  const c = conf(r.n);
+  let acts = "";
+  if (mode === "pendente") acts = `<button class="btn g sm" data-act="approve:${r.id}">✓ Aprovar</button><button class="btn r sm" data-act="reject:${r.id}">Rejeitar</button><button class="btn ghost sm" data-act="rec:${r.id}">Detalhes</button>`;
+  else if (mode === "aprovada") acts = `<button class="btn p sm" data-act="execute:${r.id}">▶ Executar ação</button><span style="font-size:11.5px;color:var(--muted)">nada é enviado sem este clique</span>`;
+  else if (mode === "executada") acts = `<span style="font-size:12px;font-weight:700">Como terminou?</span><button class="btn g sm" data-act="result:${r.id}" data-res="sucesso">Deu certo</button><button class="btn r sm" data-act="result:${r.id}" data-res="recusou">Recusou</button><button class="btn r sm" data-act="result:${r.id}" data-res="sem resposta">Sem resposta</button>`;
+  else if (mode === "rejeitada") acts = `<span class="tag">Motivo: ${esc(r.motivo || "—")}</span>`;
+  return `<div class="rec reveal">
+    <div class="rh"><span class="tag mae">${TIPO_LBL[r.tipo]}</span><span class="tag ${c.c}">Confiança ${c.l.toLowerCase()}</span></div>
+    <div class="rt">${esc(r.t)}</div>
+    <ul>${r.porque.slice(0, 3).map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+    <div class="meta"><span>Impacto <b>${brl(r.imp)}${r.tipo === "renovacao" ? "/ano" : r.tipo === "proposta" ? "" : "/mês"}</b></span><span>Funcionou em <b>${Math.round(rate(r.tipo) * 100)}%</b> das vezes</span></div>
+    ${mode === "aprovada" ? `<div class="draft">${esc(r.msg)}</div>` : ""}
+    <div class="acts">${acts}</div></div>`;
+}
+function sigRow(s){
+  return `<button class="sig" data-act="evid:${s.id}"><span class="bar sev-${s.sev}"></span>
+    <span><div class="st">${esc(s.t)}</div><div class="sd">${esc(s.d)}</div><div class="src-tag">${s.fontes.map(f => `<span>◦ ${esc(f)}</span>`).join("")}<span class="tag ${conf(s.n).c}" style="margin-left:2px">confiança ${conf(s.n).l.toLowerCase()}</span></div></span>
+    <span class="go">evidências ›</span></button>`;
+}
+
+/* ================= VIEWS ================= */
+function vVisao(){
+  const h = new Date().getHours(), saud = h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
+  const hero = SIGNALS[0], pend = recsBy("pendente");
+  const rows = [
+    { ic: "💰", a: "Receita", s: `<span class="${A.varMes >= 0 ? "up" : "down"}">${A.varMes >= 0 ? "↑" : "↓"} ${pct(A.varMes).replace(/[+−]/, "")}</span> vs agosto · ${brl(A.fatAtual)}`, r: "insights" },
+    { ic: "👥", a: "Clientes", s: `${A.reduz.length} em atenção · ${A.ativos} ativos`, r: "clientes" },
+    { ic: "🤝", a: "Fornecedores", s: `${A.reajRec.length} reajustes detectados · ${A.atrasoForn.length} com atrasos`, r: "fornecedores" },
+    { ic: "📦", a: "Produtos", s: `${A.prodQueda.length} em queda · ${A.prodAlta.length} em alta`, r: "produtos" },
+    { ic: "📄", a: "Contratos", s: `${A.contratos.length} vencem em 30 dias`, r: "contratos" },
+    { ic: "💬", a: "Conversas", s: `${A.semana.length} assuntos relevantes na semana · ${A.recl.length} reclamações`, r: "conversas" },
+    { ic: "🎯", a: "Recomendações", s: `${pend.length} aguardando aprovação`, r: "recomendacoes" },
+  ];
+  const recent = [...ST.results.slice(-3).reverse().map(x => ({ c: x.res === "sucesso" ? "var(--good)" : "var(--ink-2)", i: x.res === "sucesso" ? "✓" : "•", t: x.t, d: "Resultado: " + x.res })),
+    ...HIST.slice(0, 3).map(x => ({ c: x.res === "sucesso" ? "var(--good)" : "var(--ink-2)", i: x.res === "sucesso" ? "✓" : "•", t: x.titulo, d: "Resultado: " + x.det }))].slice(0, 4);
+  return `
+    <div class="head reveal"><div class="eyebrow">Visão geral · ${EMPRESA}</div>
+      <h1>${saud}, ${USUARIO}.</h1>
+      <p>O MAE leu <b>1.284 mensagens</b> (${A.convs.length} com assunto de negócio), 6 meses de vendas e 8 meses de compras, e percebeu algumas coisas importantes na sua operação.</p>
+      <div class="coverage">${FONTES.map(f => `<span class="src"><span class="dot ${f.status}"></span>${f.nome} · ${f.sinc}</span>`).join("")}</div>
+    </div>
+
+    <div class="hero reveal">
+      <div>
+        <div class="lbl"><span class="dot live" style="background:#fff"></span>O MAE percebeu</div>
+        <div class="ttl">${esc(hero.t)}</div>
+        <div class="why">
+          ${A.reduz.map(x => `<div><span class="b">↓</span><span><b>${esc(x.c.nome)}</b>: ${pct(x.var, 0)} nas compras (ago–set vs abr–jul)</span></div>`).join("")}
+          <div><span class="b">💬</span><span>${A.reduzPreco.length} mencionaram preço nas conversas recentes e ${A.reduzConc.length} citaram concorrente</span></div>
+        </div>
+      </div>
+      <div class="side-box">
+        <div><div class="imp-l">Impacto estimado</div><div class="imp-v" id="hero-imp">${brl(0)}/mês</div></div>
+        <div class="todo"><b>O que fazer:</b> revisar a negociação com esses clientes antes do próximo ciclo de pedidos.</div>
+        <div class="conf">Confiança ${conf(hero.n).l.toLowerCase()} · vendas + conversas + histórico</div>
+        <div class="acts"><button class="btn w sm" data-act="go:clientes">Ver clientes</button><button class="btn wg sm" data-act="evid:${hero.id}">Ver evidências</button></div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="card reveal"><h2>🔴 Atenção agora</h2><p class="cs">Ordenado por impacto. Clique para ver as evidências.</p>
+        ${SIGNALS.slice(1).map(sigRow).join("")}</div>
+      <div class="card reveal"><h2>Hoje na sua empresa</h2><p class="cs">Cada área resumida pelo que merece olhar, não por totais.</p>
+        <table class="today"><tbody>${rows.map(r => `<tr data-act="go:${r.r}"><td>${r.ic} ${r.a}</td><td>${r.s}</td><td>abrir ›</td></tr>`).join("")}</tbody></table>
+        <div class="note" style="margin-top:12px">A receita cresceu ${pct(A.varMes)}, porém os <b>4 clientes que mais cresceram somam ${brl(A.top4v)}</b>, mais que todo o crescimento líquido de ${brl(A.fatAtual - A.fatAnt)}, porque ${A.reduz.length} clientes caíram.</div>
+      </div>
+    </div>
+
+    <div class="card reveal"><h2>🎯 Aguardando sua aprovação (${pend.length})</h2>
+      <p class="cs">O MAE recomenda; você decide. Nada é executado sem aprovação.</p>
+      ${pend.length ? `<div class="recs">${pend.slice(0, 3).map(r => recCard(r, "pendente")).join("")}</div>${pend.length > 3 ? `<button class="btn ghost" style="margin-top:10px" data-act="go:recomendacoes">Ver todas as ${pend.length} recomendações ›</button>` : ""}` : '<div class="empty">Nenhuma recomendação pendente. Veja o andamento em Ações.</div>'}
+    </div>
+
+    <div class="row2">
+      <div class="card reveal"><h2>Ciclo recente</h2><p class="cs">Recomendação → ação → resultado</p>
+        <div class="timeline">${recent.map(x => `<div class="tl"><div class="ti" style="background:${x.c}">${x.i}</div><div><div class="tt">${esc(x.t)}</div><div class="td">${esc(x.d)}</div></div></div>`).join("")}</div></div>
+      <div class="card reveal"><h2>🧠 Pergunte à empresa</h2><p class="cs">Respostas a partir dos seus dados, sempre com as fontes.</p>
+        <div class="sugs">${SUGS.slice(0, 4).map(q => `<button class="sug" data-act="ask:${encodeURIComponent(q)}">${esc(q)}</button>`).join("")}</div></div>
+    </div>`;
+}
+function vClientes(){
+  const list = CLIENTES.map(c => { const base = avg(c.rec.slice(0, 4)), rec = avg(c.rec.slice(4)), v = (rec - base) / base; return { c, v, sit: v <= -0.2 ? "atenção" : c.conv.some(m => m.tags.includes("oportunidade")) ? "oportunidade" : v >= 0.15 ? "crescendo" : "estável" }; })
+    .sort((a, b) => ({ atenção: 0, oportunidade: 1, crescendo: 2, estável: 3 })[a.sit] - ({ atenção: 0, oportunidade: 1, crescendo: 2, estável: 3 })[b.sit] || b.c.rec[5] - a.c.rec[5]);
+  return `<div class="head reveal"><div class="eyebrow">Operação</div><h1>Clientes</h1><p>Pesquise um cliente e abra o perfil para ver o histórico, as conversas e o que o MAE percebeu.</p></div>
+    <div class="search reveal"><input id="q-cli" type="search" placeholder="Buscar cliente, segmento ou telefone…" aria-label="Buscar cliente"></div>
+    <div class="card reveal"><div class="tbl-wrap"><table class="list"><thead><tr><th>Cliente</th><th>Situação</th><th class="n">Mês atual</th><th class="n">Tendência</th><th>6 meses</th><th class="n">Última compra</th></tr></thead>
+      <tbody id="cli-body">${list.map(x => `<tr data-act="cliente:${x.c.id}" data-s="${esc((x.c.nome + " " + x.c.seg + " " + x.c.fone).toLowerCase())}"><td><b>${esc(x.c.nome)}</b><div style="font-size:11.5px;color:var(--muted)">${esc(x.c.seg)}</div></td>
+        <td><span class="tag ${x.sit === "atenção" ? "crit" : x.sit === "oportunidade" ? "good" : x.sit === "crescendo" ? "info" : ""}">${x.sit}</span></td>
+        <td class="n">${brl(x.c.rec[5])}</td><td class="n"><span class="${x.v >= 0 ? "up" : "down"}">${pct(x.v, 0)}</span></td>
+        <td>${spark(x.c.rec, x.v <= -0.2 ? "var(--crit)" : "var(--accent)")}</td><td class="n">${dia(x.c.ult)}</td></tr>`).join("")}</tbody></table></div></div>`;
+}
+function vFornecedores(){
+  return `<div class="head reveal"><div class="eyebrow">Operação</div><h1>Fornecedores</h1><p>Preços, reajustes, dependência e entregas. Clique para ver o histórico.</p></div>
+    <div class="card reveal"><div class="tbl-wrap"><table class="list"><thead><tr><th>Fornecedor</th><th>Categoria</th><th>Preço (8 meses)</th><th class="n">Reajustes</th><th class="n">Alta acum.</th><th class="n">Dependência</th><th class="n">Atrasos 60d</th></tr></thead><tbody>
+    ${A.reajustes.map(r => `<tr data-act="forn:${r.f.id}"><td><b>${esc(r.f.nome)}</b></td><td>${esc(r.f.cat)}</td><td>${spark(r.f.preco, r.n >= 2 ? "var(--warn)" : "var(--accent)")}</td>
+      <td class="n">${r.n >= 3 ? `<span class="tag warn">${r.n}</span>` : r.n}</td><td class="n">${r.alta ? pct(r.alta, 0) : "—"}</td><td class="n">${r.f.part < 1 ? Math.round(r.f.part * 100) + "%" : "único"}</td>
+      <td class="n">${r.f.atrasos >= 4 ? `<span class="tag crit">${r.f.atrasos}</span>` : r.f.atrasos}</td></tr>`).join("")}</tbody></table></div></div>`;
+}
+function vProdutos(){
+  return `<div class="head reveal"><div class="eyebrow">Operação</div><h1>Produtos</h1><p>Vendas, evolução e o que os clientes dizem sobre cada produto.</p></div>
+    <div class="card reveal"><div class="tbl-wrap"><table class="list"><thead><tr><th>Produto</th><th>Categoria</th><th>Unidades (6 meses)</th><th class="n">Set vs jun–ago</th><th class="n">Menções a preço</th><th>Fornecedor</th></tr></thead><tbody>
+    ${A.prods.slice().sort((a, b) => a.v - b.v).map(x => `<tr data-act="prod:${x.p.id}"><td><b>${esc(x.p.nome)}</b></td><td>${esc(x.p.cat)}</td><td>${spark(x.p.qtd, x.v < -0.1 ? "var(--crit)" : x.v > 0.08 ? "var(--good)" : "var(--accent)")}</td>
+      <td class="n"><span class="${x.v >= 0 ? "up" : "down"}">${pct(x.v, 0)}</span></td><td class="n">${x.mencPreco || "—"}</td><td>${esc(byId(FORNECEDORES, x.p.forn).nome)}</td></tr>`).join("")}</tbody></table></div></div>`;
+}
+function vContratos(){
+  const list = CLIENTES.filter(c => c.contrato).sort((a, b) => a.contrato - b.contrato);
+  return `<div class="head reveal"><div class="eyebrow">Operação</div><h1>Contratos</h1><p>Vencimentos próximos e o que está em jogo em cada um.</p></div>
+    <div class="card reveal"><div class="tbl-wrap"><table class="list"><thead><tr><th>Cliente</th><th class="n">Vence em</th><th class="n">Dias</th><th class="n">Receita/ano</th><th>Situação</th></tr></thead><tbody>
+    ${list.map(c => `<tr data-act="cliente:${c.id}"><td><b>${esc(c.nome)}</b></td><td class="n">${dia(c.contrato)}</td><td class="n">${diasAte(c.contrato)}</td><td class="n">${brl(c.rec[5] * 12)}</td>
+      <td><span class="tag ${diasAte(c.contrato) <= 15 ? "crit" : "warn"}">${diasAte(c.contrato) <= 15 ? "urgente" : "renovar"}</span></td></tr>`).join("")}</tbody></table></div>
+    <div class="note" style="margin-top:12px">Os demais ${CLIENTES.length - list.length} clientes têm contrato vigente até 2027.</div></div>`;
+}
+function vConversas(){
+  const list = A.convs.slice().sort((a, b) => b.dt - a.dt);
+  const tags = ["todas", "reclamação", "preço", "concorrente", "oportunidade"];
+  return `<div class="head reveal"><div class="eyebrow">Operação</div><h1>Conversas</h1><p>O MAE identifica quem está falando, o assunto e a intenção de cada mensagem do WhatsApp, e liga tudo ao cliente certo.</p></div>
+    <div class="note reveal">Fluxo: <b>WhatsApp → MAE → identificação do contato → contexto do cliente → interpretação → sinal</b>. Números já cadastrados são reconhecidos; números novos entram como "novo contato" para classificação.</div>
+    <div class="chips reveal" id="conv-f">${tags.map((t, i) => `<button data-t="${t}" class="${i ? "" : "on"}">${t}</button>`).join("")}</div>
+    <div class="card reveal"><div id="conv-list" style="display:flex;flex-direction:column;gap:8px">${list.map(m => `<div data-tags="${m.tags.join(",")}">${convHTML(m, true)}</div>`).join("")}</div></div>`;
+}
+function vInsights(){
+  const extra = [
+    { sev: A.precoMenc > A.precoMencAnt ? "warn" : "info", t: `Menções a preço ${A.precoMenc > A.precoMencAnt ? "subiram" : A.precoMenc < A.precoMencAnt ? "caíram" : "se mantiveram"} de ${A.precoMencAnt} para ${A.precoMenc} em 30 dias (${pct(A.precoMenc / A.precoMencAnt - 1, 0)})`, d: "Concentradas em azeite e laticínios", fontes: ["WhatsApp"], n: 1 },
+    { sev: "info", t: `Os 3 maiores clientes representam ${Math.round(A.concPct * 100)}% da receita do mês`, d: A.conc.map(c => c.nome).join(", "), fontes: ["Planilha de vendas"], n: 1 },
+    { sev: "good", t: `${A.prodAlta.length} produtos crescendo acima de 8%`, d: A.prodAlta.map(x => `${x.p.nome} ${pct(x.v, 0)}`).join(" · "), fontes: ["Planilha de vendas"], n: 1 },
+  ];
+  return `<div class="head reveal"><div class="eyebrow">Inteligência</div><h1>Insights</h1><p>Padrões que o MAE encontrou cruzando vendas, compras, contratos e conversas.</p></div>
+    <div class="card reveal"><h2>Sinais ativos</h2><p class="cs">Cada sinal mostra de onde veio e com que confiança.</p>${SIGNALS.map(sigRow).join("")}</div>
+    <div class="card reveal"><h2>Padrões</h2><p class="cs">Observações sem ação imediata</p>${extra.map(s => `<div class="sig" style="cursor:default"><span class="bar sev-${s.sev}"></span><span><div class="st">${esc(s.t)}</div><div class="sd">${esc(s.d)}</div><div class="src-tag">${s.fontes.map(f => `<span>◦ ${f}</span>`).join("")}</div></span><span></span></div>`).join("")}</div>
+    <div class="card reveal"><h2>Receita por mês</h2><p class="cs">Soma de todos os clientes · planilha de vendas</p>${bars(A.totMes, MESES, "var(--accent)", 5)}</div>`;
+}
+let REC_TAB = "pendente";
+function vRecs(){
+  const tabs = [["pendente", "Aguardando aprovação"], ["aprovada", "Aprovadas"], ["rejeitada", "Rejeitadas"]];
+  const list = recsBy(REC_TAB);
+  return `<div class="head reveal"><div class="eyebrow">Inteligência</div><h1>Recomendações</h1><p>O MAE transforma sinais em recomendações com motivo, impacto e confiança. Você aprova ou rejeita, e o motivo da rejeição também ensina o MAE.</p></div>
+    <div class="cycle reveal"><span>Insight</span>→<span class="hl">Recomendação</span>→<span>Aprovação</span>→<span>Ação</span>→<span>Resultado</span>→<span>Aprendizado</span></div>
+    <div class="chips reveal" id="rec-tabs">${tabs.map(([k, l]) => `<button data-k="${k}" class="${REC_TAB === k ? "on" : ""}">${l} (${recsBy(k).length})</button>`).join("")}</div>
+    ${list.length ? `<div class="recs">${list.map(r => recCard(r, REC_TAB === "aprovada" ? "aprovada" : REC_TAB)).join("")}</div>` : `<div class="empty reveal">Nada aqui por enquanto.</div>`}`;
+}
+function vAcoes(){
+  const ap = recsBy("aprovada"), ex = recsBy("executada");
+  return `<div class="head reveal"><div class="eyebrow">Inteligência</div><h1>Ações</h1><p>Recomendações aprovadas viram ações. Nada é enviado sem o seu clique em "Executar", e toda ação pede o registro do resultado.</p></div>
+    <div class="card reveal"><h2>Prontas para executar (${ap.length})</h2><p class="cs">Aprovadas, com a mensagem ou tarefa preparada</p>${ap.length ? `<div class="recs">${ap.map(r => recCard(r, "aprovada")).join("")}</div>` : '<div class="empty">Nenhuma ação aprovada. Aprove uma recomendação para ela aparecer aqui.</div>'}</div>
+    <div class="card reveal"><h2>Aguardando resultado (${ex.length})</h2><p class="cs">Registre como terminou; isso alimenta o Aprendizado</p>${ex.length ? `<div class="recs">${ex.map(r => recCard(r, "executada")).join("")}</div>` : '<div class="empty">Nenhuma ação aguardando resultado.</div>'}</div>`;
+}
+function vResultados(){
+  const all = [...ST.results.slice().reverse().map(x => ({ t: x.t, tipo: x.tipo, res: x.res, det: "registrado nesta sessão" })), ...HIST.map(x => ({ t: x.titulo, tipo: x.tipo, res: x.res, det: x.det }))];
+  return `<div class="head reveal"><div class="eyebrow">Inteligência</div><h1>Resultados</h1><p>O que aconteceu depois de cada ação. É o histórico operacional que o MAE usa para aprender.</p></div>
+    <div class="card reveal"><div class="tbl-wrap"><table class="list"><thead><tr><th>Ação</th><th>Tipo</th><th>Resultado</th><th>Detalhe</th></tr></thead><tbody>
+    ${all.map(x => `<tr style="cursor:default"><td><b>${esc(x.t)}</b></td><td>${TIPO_LBL[x.tipo]}</td><td><span class="tag ${x.res === "sucesso" ? "good" : x.res === "recusou" ? "crit" : ""}">${x.res}</span></td><td>${esc(x.det)}</td></tr>`).join("")}</tbody></table></div></div>`;
+}
+function vAprendizado(){
+  const tipos = Object.keys(TIPO_LBL).map(t => { const all = [...HIST, ...ST.results].filter(h => h.tipo === t); return { t, n: all.length, r: rate(t) }; }).sort((a, b) => b.r - a.r);
+  const rej = ST.recs.filter(r => r.status === "rejeitada");
+  return `<div class="head reveal"><div class="eyebrow">Inteligência</div><h1>Aprendizado</h1><p>Quais tipos de ação funcionam melhor nesta empresa. O MAE usa isso para ordenar recomendações, sem ganhar autonomia: a aprovação continua sendo sua.</p></div>
+    <div class="card reveal"><h2>Taxa de sucesso por tipo de ação</h2><p class="cs">Histórico + resultados registrados nesta sessão</p>
+      ${tipos.map(x => `<div style="display:grid;grid-template-columns:170px 1fr 90px;gap:12px;align-items:center;padding:8px 0">
+        <div style="font-weight:700;font-size:13px">${TIPO_LBL[x.t]}</div>
+        <div style="height:12px;background:var(--surface-3);border-radius:7px;overflow:hidden"><div class="lf" data-w="${Math.round(x.r * 100)}" style="height:100%;width:0;border-radius:7px;background:${x.r >= .7 ? "var(--good)" : x.r >= .5 ? "var(--warn)" : "var(--crit)"};transition:width .9s cubic-bezier(.2,.8,.25,1)"></div></div>
+        <div style="text-align:right;font-size:12.5px"><b>${Math.round(x.r * 100)}%</b> <span style="color:var(--muted)">(${x.n})</span></div></div>`).join("")}
+      <div class="note" style="margin-top:12px">Renovações antecipadas deram certo em <b>${Math.round(rate("renovacao") * 100)}%</b> das vezes; contatos por queda de compras em <b>${Math.round(rate("contato") * 100)}%</b>. Por isso o MAE sugere renovar com antecedência de 30 dias.</div></div>
+    <div class="card reveal"><h2>Rejeições e motivos</h2><p class="cs">O que você recusou também ensina</p>${rej.length ? rej.map(r => `<div class="ev"><div class="ei">✕</div><div><div class="et">${esc(r.t)}</div><div class="ed">Motivo: ${esc(r.motivo)}</div></div></div>`).join("") : '<div class="empty">Nenhuma rejeição registrada ainda.</div>'}</div>`;
+}
+function vDados(){
+  return `<div class="head reveal"><div class="eyebrow">Dados</div><h1>Dados & integrações</h1><p>O MAE fica por cima dos sistemas que a empresa já usa. Aqui você vê o que está conectado, quando sincronizou e o que ainda falta.</p></div>
+    <div class="card reveal"><div class="tbl-wrap"><table class="list"><thead><tr><th>Fonte</th><th>Tipo</th><th>Status</th><th>Última sincronização</th><th>Dados</th></tr></thead><tbody>
+    ${FONTES.map(f => `<tr style="cursor:default"><td><b>${f.nome}</b></td><td>${f.tipo}</td><td><span class="dot ${f.status}"></span> ${f.status === "off" ? "não conectado" : f.status === "stale" ? "desatualizado" : "conectado"}</td><td>${f.sinc}</td><td>${f.vol}</td></tr>`).join("")}</tbody></table></div>
+    <div class="note" style="margin-top:12px"><b>Cobertura:</b> sem o ERP, o MAE não vê estoque nem notas fiscais, então sinais de ruptura e margem por produto ficam fora da análise. A planilha de compras está com 4 dias de atraso: reajustes recentes podem não aparecer.</div></div>
+    <div class="card reveal"><h2>Adicionar fonte</h2><p class="cs">No produto final: Excel/CSV, WhatsApp, ERP, CRM, APIs e bancos de dados</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${["Excel / CSV", "WhatsApp", "ERP", "CRM", "API", "Banco de dados"].map(x => `<span class="tag" style="padding:7px 12px">${x}</span>`).join("")}</div></div>`;
+}
+
+/* ================= PERGUNTE À EMPRESA ================= */
+const SUGS = ["Quais clientes reduziram compras?", "Quanto faturamos com o Mercado Bom Preço nos últimos 6 meses?", "Quais fornecedores tiveram aumento de preço?", "Por que nosso faturamento mudou este mês?", "Quais contratos vencem este mês?", "Quais produtos estão em queda?"];
+let ASKED = null;
+function norm(s){ return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+function answer(q){
+  const n = norm(q);
+  const cli = CLIENTES.find(c => n.includes(norm(c.nome)) || norm(c.nome).split(" ").filter(w => w.length > 4).some(w => n.includes(w)));
+  if (cli && /(fatur|compr|venda|quanto)/.test(n)) return { a: `Nos últimos 6 meses (abr–set) faturamos <b>${brlFull(sum(cli.rec))}</b> com ${esc(cli.nome)}. Em setembro foram ${brlFull(cli.rec[5])}, ${pct(cli.rec[5] / cli.rec[4] - 1, 0)} em relação a agosto.`,
+    ev: MESES.map((m, i) => `${m}: ${brlFull(cli.rec[i])}`), src: ["Planilha de vendas"], link: `cliente:${cli.id}` };
+  if (/(reduz|diminu|cair|caiu|queda)/.test(n) && /client/.test(n)) return { a: `${A.reduz.length} clientes reduziram compras de forma relevante (≥ 20%): ${A.reduz.map(x => `<b>${esc(x.c.nome)}</b> (${pct(x.var, 0)})`).join(", ")}. Juntos são <b>${brl(A.reduzPerda)}/mês</b> a menos.`,
+    ev: A.reduz.map(x => `${x.c.nome}: média ${brl(x.base)} → ${brl(x.rec)}`), src: ["Planilha de vendas", "WhatsApp"], link: "go:clientes" };
+  if (/fornecedor/.test(n) && /(preco|aument|reajust)/.test(n)) return { a: `${A.reajustes.filter(r => r.n).length} fornecedores reajustaram preços em 8 meses. O maior foi <b>${esc(A.reajMulti[0].f.nome)}</b>: ${A.reajMulti[0].n} reajustes, ${pct(A.reajMulti[0].alta, 0)} acumulado.`,
+    ev: A.reajustes.filter(r => r.n).map(r => `${r.f.nome}: ${r.n} reajuste(s), ${pct(r.alta, 0)}`), src: ["Compras e fornecedores (sincronizado há 4 dias)"], link: "go:fornecedores" };
+  if (/fatur|receita/.test(n)) { const neg = A.contrib.filter(x => x.v < 0), posv = sum(A.contrib.filter(x => x.v > 0).map(x => x.v));
+    return { a: `O faturamento foi de ${brl(A.fatAnt)} em agosto para <b>${brl(A.fatAtual)}</b> em setembro (${pct(A.varMes)}). Os clientes que cresceram somaram ${brl(posv)}, puxados por ${A.top4.slice(0, 2).map(x => `<b>${esc(x.c.nome)}</b> (+${brl(x.v)})`).join(" e ")}. As quedas somaram ${brl(-sum(neg.map(x => x.v)))}, principalmente ${neg.sort((a, b) => a.v - b.v).slice(0, 2).map(x => `<b>${esc(x.c.nome)}</b> (${brl(x.v)})`).join(" e ")}.`,
+      ev: A.contrib.slice(0, 4).concat(A.contrib.slice(-3)).map(x => `${x.c.nome}: ${x.v >= 0 ? "+" : ""}${brl(x.v)}`), src: ["Planilha de vendas"], link: "go:insights" }; }
+  if (/contrato/.test(n)) return { a: `${A.contratos.length} contratos vencem nos próximos 30 dias: ${A.contratos.map(c => `<b>${esc(c.nome)}</b> em ${dia(c.contrato)}`).join(", ")}.`, ev: A.contratos.map(c => `${c.nome}: ${brl(c.rec[5] * 12)}/ano`), src: ["Cadastro de clientes"], link: "go:contratos" };
+  if (/produto/.test(n)) return { a: `${A.prodQueda.length} produtos estão em queda: ${A.prodQueda.map(x => `<b>${esc(x.p.nome)}</b> (${pct(x.v, 0)})`).join(", ")}.${A.prodQueda[0].mencPreco ? ` No ${esc(A.prodQueda[0].p.nome)}, clientes citaram preço ${A.prodQueda[0].mencPreco} vezes.` : ""}`,
+    ev: A.prodQueda.map(x => `${x.p.nome}: set ${num(x.p.qtd[5])} un. vs média ${num(avg(x.p.qtd.slice(2, 5)))}`), src: ["Planilha de vendas", "WhatsApp"], link: "go:produtos" };
+  return null;
+}
+function ask(q){ ASKED = q; if (ROUTE !== "pergunte") { ROUTE = "pergunte"; try { history.replaceState(null, "", "#pergunte"); } catch (e) {} } closeDrawer(); render(); }
+function vPergunte(){
+  let ans = "";
+  if (ASKED) { const r = answer(ASKED);
+    ans = r ? `<div class="card answer reveal"><div class="q">${esc(ASKED)}</div><div class="a">${r.a}</div>
+      <div><div class="sec-t">Evidências usadas</div>${r.ev.map(e => `<div class="ev"><div class="ei">▪</div><div><div class="ed" style="margin:0">${esc(e)}</div></div></div>`).join("")}</div>
+      <div class="srcs">Fontes: ${r.src.map(s => `<span class="tag">${esc(s)}</span>`).join("")}<button class="btn ghost sm" data-act="${r.link}">abrir ›</button></div></div>`
+      : `<div class="card answer reveal"><div class="q">${esc(ASKED)}</div><div class="a">Não encontrei dados suficientes para responder com segurança. No protótipo, o MAE responde perguntas sobre faturamento por cliente, clientes em queda, reajustes de fornecedores, contratos e produtos. No produto final, essa área usa o motor de perguntas do backend do MAE.</div></div>`; }
+  return `<div class="head reveal"><div class="eyebrow">🧠 Pergunte à empresa</div><h1>O que você quer saber?</h1><p>O MAE responde a partir dos dados disponíveis e mostra as evidências. Se não houver dado suficiente, ele diz isso em vez de inventar.</p></div>
+    <form class="ask-box reveal" id="ask-form"><input id="ask-in" placeholder="Ex.: quanto faturamos com o Hotel Vista Mar?" aria-label="Pergunta" value="${ASKED ? esc(ASKED) : ""}"><button class="btn p" type="submit">Perguntar</button></form>
+    <div class="sugs reveal">${SUGS.map(q => `<button class="sug" data-act="ask:${encodeURIComponent(q)}">${esc(q)}</button>`).join("")}</div>${ans}`;
+}
+
+/* ================= RENDER ================= */
+const VIEWS = { visao: vVisao, clientes: vClientes, fornecedores: vFornecedores, produtos: vProdutos, contratos: vContratos, conversas: vConversas, insights: vInsights, recomendacoes: vRecs, acoes: vAcoes, resultados: vResultados, aprendizado: vAprendizado, pergunte: vPergunte, dados: vDados };
+function countUp(el, target, fmt, dur = 900){ if (!el) return; if (REDUCE) { el.textContent = fmt(target); return; } const t0 = performance.now();
+  (function st(now){ const t = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - t, 3); el.textContent = fmt(target * e); if (t < 1) requestAnimationFrame(st); })(performance.now()); }
+function render(){
+  if (!VIEWS[ROUTE]) ROUTE = "visao";
+  renderNav();
+  const v = document.getElementById("view"); v.innerHTML = VIEWS[ROUTE](); wire(v);
+  [...v.querySelectorAll(".reveal")].forEach((el, i) => { el.style.animationDelay = REDUCE ? "0ms" : (i * 60) + "ms"; el.classList.add("in"); });
+  if (ROUTE === "visao") countUp(document.getElementById("hero-imp"), SIGNALS[0].imp, x => brl(x) + "/mês");
+  if (ROUTE === "aprendizado") requestAnimationFrame(() => requestAnimationFrame(() => v.querySelectorAll(".lf").forEach(el => el.style.width = el.dataset.w + "%")));
+  if (ROUTE === "clientes") document.getElementById("q-cli").addEventListener("input", e => { const q = norm(e.target.value); document.querySelectorAll("#cli-body tr").forEach(tr => tr.hidden = q && !norm(tr.dataset.s).includes(q)); });
+  if (ROUTE === "conversas") document.querySelectorAll("#conv-f button").forEach(b => b.addEventListener("click", () => { document.querySelectorAll("#conv-f button").forEach(x => x.classList.toggle("on", x === b)); const t = b.dataset.t;
+    document.querySelectorAll("#conv-list > div").forEach(el => el.hidden = t !== "todas" && !el.dataset.tags.split(",").includes(t)); }));
+  if (ROUTE === "recomendacoes") document.querySelectorAll("#rec-tabs button").forEach(b => b.addEventListener("click", () => { REC_TAB = b.dataset.k; render(); }));
+  if (ROUTE === "pergunte") document.getElementById("ask-form").addEventListener("submit", e => { e.preventDefault(); const q = document.getElementById("ask-in").value.trim(); if (q) ask(q); });
+}
+render();
+</script>

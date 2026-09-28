@@ -35,4 +35,7 @@ Com esse texto, a skill preenche um `CONFIG` diretamente. Se faltar "sobe bom ou
 **Projeto / governança (ex.: MAE)** (molde pronto em `assets/examples/project-sprints.config.js`, com números inventados)
 > Painel de acompanhamento do **[projeto]**: entregas concluídas × planejadas, % do escopo, lead time (dias), bugs abertos (sobe ruim), custo acumulado × orçado, horas por frente. Quebra por frente/equipe. Metas por sprint (`periodType: "label"`). Resumo executivo com o que avançou, o que atrasou e o risco principal.
 
+**Sistema de inteligência (MAE) · painel de comando**
+> O cliente entra e vê o que o sistema percebeu na empresa, com evidências, impacto e o que fazer; recomendações com aprovar/rejeitar; ações, resultados e aprendizado; perfis de cliente, fornecedor e produto com "o que foi percebido"; perguntas respondidas com fontes; cobertura das fontes de dados. → Caminho C, template `signal-command-center.html`.
+
 Para um painel **dentro** do frontend do projeto (não como Artifact), veja `porting.md`.

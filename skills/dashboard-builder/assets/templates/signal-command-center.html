@@ -1,5 +1,5 @@
 <title>MAE Centro de Comando</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 124 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='124' y1='0' y2='0' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%2314e0d2'/%3E%3Cstop offset='.5' stop-color='%232f8bff'/%3E%3Cstop offset='1' stop-color='%238a4bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 52 36 14 60 44' fill='none' stroke='url(%23g)' stroke-width='19' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M62 44 88 14 112 52' fill='none' stroke='url(%23g)' stroke-width='19' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="brand/mae-icon.png">
 <style>
   :root {
     color-scheme: light;
@@ -8,13 +8,13 @@
     --accent: #3b4dff; --accent-soft: #eceefe; --mae: #0aa896; --mae-soft: #e1f6f3;
     --crit: #e5484d; --crit-soft: #fdecec; --warn: #d9860a; --warn-soft: #fff3de;
     --info: #2f7ef7; --info-soft: #e7f0fe; --good: #149b5f; --good-soft: #e3f5ec;
-    --hero: linear-gradient(135deg, #0a1030 0%, #2448d8 55%, #7a45f0 115%);
+    --hero: linear-gradient(135deg, #0B1D56 0%, #1b62c9 55%, #5B5CF7 115%);
     --shadow: 0 1px 3px rgba(15,26,51,.06), 0 12px 32px rgba(15,26,51,.08);
     --shadow-sm: 0 1px 3px rgba(15,26,51,.07);
     --radius: 18px;
-    --fhero: linear-gradient(140deg, #2f6bff 0%, #5a4dff 55%, #8a4bff 100%);
-    --falt: linear-gradient(150deg, #0fc6bb 0%, #2f8bff 100%);
-    --hero-glow: rgba(40,60,200,.28);
+    --fhero: linear-gradient(140deg, #259EF8 0%, #4a73f8 50%, #5B5CF7 100%);
+    --falt: linear-gradient(150deg, #0aa8b8 0%, #259EF8 100%);
+    --hero-glow: rgba(11,29,86,.3);
   }
   /* ---------- temas (escolha no menu; bege é o padrão) ---------- */
   :root, :root[data-theme="bege"] {
@@ -33,10 +33,10 @@
   }
   :root[data-theme="preto"] {
     color-scheme: dark;
-    --bg: #05070d; --surface: #0e121c; --surface-2: #151a26; --surface-3: #1d2331; 
+    --bg: #05070E; --surface: #0B1020; --surface-2: #131A2E; --surface-3: #1B2438; 
     --ink: #eef1f7; --ink-2: #aab2c5; --muted: #737c92; --hair: #292e39; --hair-2: #363c49;
-    --accent: #6f86ff; --accent-soft: #1b2250; --mae: #1fd6c8; --mae-soft: #0d2c2c;
-    --hero: linear-gradient(135deg, #070b1f 0%, #1c3fd0 55%, #7a45f0 115%); --hero-glow: rgba(60,80,255,.25);
+    --accent: #259EF8; --accent-soft: #10284a; --mae: #0AE5E2; --mae-soft: #0a2c33;
+    --hero: linear-gradient(135deg, #0B1D56 0%, #1b62c9 55%, #5B5CF7 115%); --hero-glow: rgba(37,158,248,.22);
     --crit: #ff6b70; --crit-soft: #3a1c1f; --warn: #f0a63a; --warn-soft: #3a2c14;
     --info: #5b9dff; --info-soft: #1a2a44; --good: #38c985; --good-soft: #15301f;
     --shadow: 0 1px 3px rgba(0,0,0,.35), 0 12px 32px rgba(0,0,0,.35);
@@ -152,9 +152,11 @@
   .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 6px; }
   .brand .mark { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
   .brand .lockup { display: flex; align-items: center; gap: 9px; }
-  .brand .sym { width: 50px; height: 26px; flex-shrink: 0; display: block; }
-  .brand .word { height: 19px; width: auto; display: block; color: var(--ink); }
-  .brand .tg2 { font-size: 7.6px; font-weight: 600; letter-spacing: .24em; color: var(--ink-2); white-space: nowrap; }
+  /* logo oficial (docs/brand/BRANDBOOK.md): versão clara nos temas claros, escura no preto */
+  .brand .logo-img { height: 46px; width: auto; max-width: 200px; display: block; }
+  .brand .logo-img.dk, .brand .logo-ic { display: none; }
+  :root[data-theme="preto"] .brand .logo-img.lt { display: none; }
+  :root[data-theme="preto"] .brand .logo-img.dk { display: block; }
   .brand .logo { width: 38px; height: 38px; border-radius: 12px; background: var(--hero); color: #fff; font-weight: 900; display: grid; place-items: center; letter-spacing: -.04em; font-size: 15px; flex-shrink: 0; }
   .brand .nm { font-weight: 800; font-size: 16px; letter-spacing: -.02em; }
   .brand .tg { font-size: 11px; color: var(--muted); }
@@ -175,7 +177,7 @@
   .side-foot button { border: 0; background: transparent; color: var(--accent); cursor: pointer; padding: 0; font-weight: 700; font-size: 11px; }
   @media (max-width: 900px) {
     .side { position: sticky; top: 0; height: auto; flex-direction: row; align-items: center; overflow-x: auto; padding: 10px 12px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); gap: 6px; border-right: 0; border-bottom: 1px solid var(--hair); z-index: 30; }
-    .brand { padding: 0 6px 0 0; } .brand .tg, .brand .nm, .brand .word, .brand .tg2 { display: none; } .brand .sym { width: 44px; height: 23px; }
+    .brand { padding: 0 6px 0 0; } .brand .tg, .brand .nm, .brand .logo-img.lt, .brand .logo-img.dk, :root[data-theme="preto"] .brand .logo-img.dk { display: none; } .brand .logo-ic { display: block; width: 36px; height: 36px; }
     .nav-group { flex-direction: row; gap: 4px; } .nav-group .gl, .side-foot { display: none; }
     .nav-item { white-space: nowrap; width: auto; padding: 8px 10px; }
     .nav-item[disabled] { display: none; }
@@ -700,7 +702,7 @@ const recsBy = st => ST.recs.filter(r => r.status === st);
 const THEMES = [
   { id: "bege",     l: "Bege",     sw: "linear-gradient(135deg,#f3ede2 50%,#d9c7a8 50%)" },
   { id: "branco",   l: "Branco",   sw: "linear-gradient(135deg,#ffffff 50%,#dfe4ef 50%)" },
-  { id: "preto",    l: "Preto",    sw: "linear-gradient(135deg,#05070d 50%,#6f86ff 50%)" },
+  { id: "preto",    l: "Preto",    sw: "linear-gradient(135deg,#05070E 50%,#259EF8 50%)" },
   { id: "azul",     l: "Azul",     sw: "linear-gradient(135deg,#e9f0fa 50%,#1463d8 50%)" },
   { id: "vermelho", l: "Vermelho", sw: "linear-gradient(135deg,#faeeec 50%,#b8162f 50%)" },
 ];
@@ -712,13 +714,9 @@ setTheme(THEME);
 function toast(msg){ const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 2400); }
 
 /* ================= MARCA =================
-   Símbolo: duas fitas em Λ formando o M, gradiente ciano → azul → violeta.
-   Nome: M, Λ (A sem travessão) e E desenhados em traço, na cor do texto do tema. */
-const LOGO_SYM = `<svg class="sym" viewBox="0 0 124 64" aria-hidden="true"><defs><linearGradient id="mae-g" x1="0" x2="124" y1="0" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#14e0d2"/><stop offset=".5" stop-color="#2f8bff"/><stop offset="1" stop-color="#8a4bff"/></linearGradient></defs>
-  <path d="M12 52 36 14 60 44" fill="none" stroke="url(#mae-g)" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M60 44 56 38" fill="none" stroke="rgba(8,20,70,.35)" stroke-width="19" stroke-linecap="round"/>
-  <path d="M62 44 88 14 112 52" fill="none" stroke="url(#mae-g)" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-const LOGO_WORD = `<svg class="word" viewBox="0 0 136 45" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="10" stroke-linejoin="round"><path d="M5 45V5l20 25 20-25v40"/><path d="M55 45 74 5l19 40"/><path d="M131 5h-23v35h23M108 22.5h19"/></g></svg>`;
+   Arquivos oficiais de docs/brand (repo well098/mae), servidos em brand/. Nunca redesenhar a logo.
+   Cores oficiais: ciano #0AE5E2 · azul #259EF8 · violeta #5B5CF7 · navy #0B1D56. */
+const BRAND = { cyan: "#0AE5E2", blue: "#259EF8", violet: "#5B5CF7", navy: "#0B1D56" };
 
 /* ================= NAVEGAÇÃO ================= */
 const NAV = [
@@ -733,7 +731,7 @@ let ROUTE = (location.hash || "").replace("#", "") || "visao";
 function renderNav(){
   const badge = { visao: SIGNALS.filter(s => s.sev === "crit").length, recomendacoes: recsBy("pendente").length, acoes: recsBy("aprovada").length + recsBy("executada").length };
   document.getElementById("side").innerHTML = `
-    <div class="brand" aria-label="MAE · Motor de Adaptação Empresarial"><div class="mark"><div class="lockup">${LOGO_SYM}${LOGO_WORD}</div><div class="tg2">MOTOR DE ADAPTAÇÃO EMPRESARIAL</div>${IS_DEMO ? '<span class="demo-pill">Demonstração</span>' : ""}</div></div>
+    <div class="brand" aria-label="MAE · Motor de Adaptação Empresarial"><div class="mark"><img class="logo-img lt" src="brand/mae-logo-light.png" alt="MAE · Motor de Adaptação Empresarial"><img class="logo-img dk" src="brand/mae-logo-dark.png" alt="MAE · Motor de Adaptação Empresarial"><img class="logo-ic" src="brand/mae-icon.png" alt="MAE">${IS_DEMO ? '<span class="demo-pill">Demonstração</span>' : ""}</div></div>
     ${NAV.map(g => `<div class="nav-group">${g.g ? `<div class="gl">${g.g}</div>` : ""}${g.items.map(it => `
       <button class="nav-item ${it.ask ? "ask" : ""} ${ROUTE === it.id ? "on" : ""}" data-r="${it.id}" ${it.soon ? "disabled" : ""}>
         <span class="ic">${it.ic}</span>${it.l}${it.soon ? '<span class="soon">em breve</span>' : badge[it.id] ? `<span class="badge ${it.id === "visao" ? "" : "soft"}">${badge[it.id]}</span>` : ""}</button>`).join("")}</div>`).join("")}
@@ -1360,16 +1358,17 @@ function finCSV(){
   return "﻿" + [head.join(";"), ...FIN.map(r => [r.lbl, ...ks.map(k => cell(k, r[k])), ...FSEGS.map(s => r.seg[s.k].r), Math.round(r.b.receita), Math.round(r.b.lucroLiq)].join(";"))].join("\r\n");
 }
 const fSafe = s => String(s).replace(/<[^>]+>/g, "").replace(/−/g, "-").replace(/▲/g, "+").replace(/▼/g, "-").replace(/[■●✦]/g, "").replace(/→/g, "->").replace(/[“”]/g, '"').replace(/…/g, "...").replace(/[  ]/g, " ");
+// logo oficial (versão escura) para o cabeçalho do PDF; sem ela o PDF sai só com o texto
+let FLOGO = null;
+if (location.protocol !== "file:") fetch("brand/mae-logo-dark.png").then(r => r.ok ? r.blob() : null).then(b => { if (!b) return; const fr = new FileReader(); fr.onload = () => { FLOGO = fr.result; }; fr.readAsDataURL(b); }).catch(() => {});
 function finPDF(){
   const J = window.jspdf && window.jspdf.jsPDF; if (!J) throw new Error("jspdf");
   const doc = new J({ unit: "mm", format: "a4" }), i = FS.idx, d = FIN[i], W = 210, M = 14; let y;
-  doc.setFillColor(5, 7, 13); doc.rect(0, 0, W, 30, "F");
-  doc.setLineCap("round"); doc.setLineJoin("round"); doc.setLineWidth(2.6);
-  doc.setDrawColor(20, 224, 210); doc.line(M, 17, M + 4.2, 10.4); doc.line(M + 4.2, 10.4, M + 8.4, 15.6);
-  doc.setDrawColor(138, 75, 255); doc.line(M + 8.8, 15.6, M + 13.3, 10.4); doc.line(M + 13.3, 10.4, M + 17.5, 17);
-  doc.setLineCap("butt"); doc.setLineWidth(0.2);
-  doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.text(fSafe(`MAE · Financeiro · ${EMPRESA}`), M + 23, 16);
-  doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(190, 198, 225); doc.text(fSafe(`${d.ext} | comparado com ${FCMP[FS.cmp]} | ${IS_DEMO ? "dados de exemplo" : EMPRESA}`), M + 23, 23);
+  doc.setFillColor(5, 7, 14); doc.rect(0, 0, W, 30, "F");
+  const lx = FLOGO ? M + 44 : M;
+  if (FLOGO) doc.addImage(FLOGO, "PNG", M, 7.5, 38, 38 * 298 / 1057);
+  doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.text(fSafe(`Financeiro · ${EMPRESA}`), lx, 15);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(190, 198, 225); doc.text(fSafe(`${d.ext} | comparado com ${FCMP[FS.cmp]} | ${IS_DEMO ? "dados de exemplo" : EMPRESA}`), lx, 22);
   y = 40; const kp = ["receita", "lucroLiq", "caixa", "margemBruta", "margemLiq", "opex"], bw = (W - 2 * M - 8) / 3;
   kp.forEach((k, n) => { const cx = M + (n % 3) * (bw + 4), cy = y + Math.floor(n / 3) * 22, dl = fDelta(k, d[k], fBase(i, k));
     doc.setFillColor(243, 245, 250); doc.roundedRect(cx, cy, bw, 18, 2, 2, "F"); doc.setTextColor(86, 96, 126); doc.setFontSize(8); doc.text(fSafe(FM[k].l), cx + 3, cy + 5);

@@ -37,6 +37,18 @@ Para outro domínio, troque `FSEGS` (segmentos e quais entidades compõem cada u
 
 O template traz um seletor de tema no menu com 5 opções: **bege** (padrão), branco, preto, azul e vermelho. Cada tema é um bloco `:root[data-theme="…"]` que redefine os tokens, inclusive os gradientes (`--hero`, `--fhero`, `--falt`, `--hero-glow`). A escolha fica salva em `localStorage` (`mae-theme`). Texto sobre fundo colorido continua `#fff`; todo o resto usa tokens, para que nenhum tema quebre o contraste. O preto é opcional: o padrão continua claro.
 
+## Celular
+
+Até 900px o menu vira uma barra rolável no topo e o seletor de tema vira um botão fixo (`.theme-fab`). Regras que o template já aplica e que valem para qualquer painel:
+- **O botão fixo não cobre o menu.** O menu reserva espaço à direita (`padding-right`) e uma faixa separada (`.theme-shield`, altura medida do menu em `--side-h`) esmaece os itens antes do botão. Não use pseudo-elemento no próprio botão: ele pinta por cima da cor do tema.
+- **Topo com altura fixa.** A grade `.app` usa `grid-template-rows: auto 1fr`; sem isso, em páginas curtas a linha do menu estica e o topo dobra de altura.
+- **Listas viram cartões** até 600px (`table.list.cards`): nome e valor na primeira linha, situação e variação na segunda, detalhe menor embaixo, sem rolagem horizontal. Mantenha a tabela no computador.
+- **Aviso de demonstração em uma linha** até 600px (textos `.dl` longo / `.ds` curto).
+- **Sinal principal compacto** até 600px: título, impacto e próxima ação visíveis; evidências atrás de um botão "Evidências (n)" que abre e fecha (`.ev-tog`, classe `ev-open`). "Atenção agora" deve aparecer logo depois.
+- Coloque as regras de celular **depois** das regras base do mesmo seletor; com a mesma especificidade, a regra que vem depois vence.
+
+Verifique a 390px de largura: `scrollWidth` igual à largura, topo com a mesma altura em todas as rotas e o botão de tema visível com o menu rolado até o fim. Teste com a página publicada ou com a meta viewport: sem ela, a emulação de celular desenha a página a 980px.
+
 ## Marca
 
 Use sempre os **arquivos oficiais** da marca (fonte: `docs/brand/BRANDBOOK.md` do repositório `well098/mae`), nunca uma logo redesenhada. O template traz cópias em `assets/templates/brand/`: `mae-logo-light.png` (temas claros), `mae-logo-dark.png` (tema preto e cabeçalho do PDF) e `mae-icon.png` (celular e favicon). Ao publicar como Artifact, envie a pasta junto com `files` (`brand/...`). Cores oficiais: ciano `#0AE5E2`, azul `#259EF8`, violeta `#5B5CF7`, navy `#0B1D56`; os gradientes dos temas (`--hero`, `--fhero`, `--falt`) partem delas.
